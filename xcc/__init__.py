@@ -6,6 +6,6 @@ provide interfaces for managing devices and jobs, respectively.
 """
 
 from ._version import __version__
-from .connection import Connection, XanaduCloudConnectionError
+from .connection import Connection
 
-__all__ = ["Connection", "XanaduCloudConnectionError"]
+__all__ = ["Connection"]

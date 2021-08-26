@@ -5,6 +5,7 @@ This module tests the :module:`xcc.connection` module.
 
 import pytest
 import responses
+from requests.models import HTTPError
 
 import xcc
 
@@ -73,13 +74,15 @@ class TestConnection:
     def test_ping_success(self, connection):
         """Tests that a ping succeeds when a connection is configured correctly."""
         responses.add(responses.GET, connection.url("healthz"), status=200)
-        assert connection.ping() is True
+        response = connection.ping()
+        assert response.status_code == 200
 
     @responses.activate
     def test_ping_failure(self, connection):
         """Tests that a ping fails when a connection is configured incorrectly."""
         responses.add(responses.GET, connection.url("healthz"), status=400)
-        assert connection.ping() is False
+        with pytest.raises(HTTPError, match=r"400 Client Error: Bad Request"):
+            connection.ping()
 
     @responses.activate
     def test_request_with_fresh_access_token(self, connection):
@@ -130,7 +133,5 @@ class TestConnection:
             status=400,
         )
 
-        match = r"Failed to update access token\. Ensure that your Xanadu Cloud API key is correct"
-
-        with pytest.raises(xcc.XanaduCloudConnectionError, match=match):
+        with pytest.raises(HTTPError, match=r"400 Client Error: Bad Request"):
             connection.update_access_token()

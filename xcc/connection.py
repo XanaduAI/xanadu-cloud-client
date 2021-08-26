@@ -9,10 +9,6 @@ import requests
 from ._version import __version__
 
 
-class XanaduCloudConnectionError(Exception):
-    """Raised when a request to the Xanadu Cloud is unsuccessful."""
-
-
 class Connection:
     """Manages remote connections to the Xanadu Cloud.
 
@@ -24,24 +20,26 @@ class Connection:
 
     **Example:**
 
-    The following example shows how to use the :class:`~xcc.Connection` class.
-    First, we instantiate a connection with a Xanadu Cloud API key:
+    The following example shows how to use the :class:`~xcc.Connection` class
+    to access the Xanadu Cloud API. First, a connection is instantiated with a
+    Xanadu Cloud API key:
 
     >>> import xcc
     >>> connection = xcc.Connection(key="Xanadu Cloud API key goes here")
 
-    Next, we test the connection to the Xanadu Cloud using the
-    :class:`~xcc.Connection.ping` method:
+    This connection can be tested using :meth:`~xcc.Connection.ping`. If there
+    is an issue with the connection, a :exc:`requests.models.HTTPError` will be
+    raised.
 
     >>> connection.ping()
-    True
+    <Response [200]>
 
-    Finally, we call the Xanadu Cloud API directly to retrieve information about
-    the X8_01 device:
+    The Xanadu Cloud API can now be directly accessed to, for example, retrieve
+    information about the X8_01 device:
 
     >>> response = connection.request(method="GET", path="/devices/X8_01")
-    >>> response.status_code
-    200
+    >>> response
+    <Response [200]>
     >>> import pprint
     >>> pp = pprint.PrettyPrinter(indent=4)
     >>> pp.pprint(response.json())
@@ -140,14 +138,16 @@ class Connection:
         """
         return f"{self.scheme}://{self.host}:{self.port}/" + path.lstrip("/")
 
-    def ping(self) -> bool:
+    def ping(self) -> requests.Response:
         """Pings the Xanadu Cloud.
 
         Returns:
-            bool: ``True`` if the connection is successful and ``False`` otherwise.
+            requests.Response: HTTP response of the ping HTTP request.
+
+        Raises:
+            requests.models.HTTPError: If the connection is not successful.
         """
-        response = self.request(method="GET", path="/healthz")
-        return response.status_code == 200
+        return self.request(method="GET", path="/healthz")
 
     def request(self, method: str, path: str, **kwargs) -> requests.Response:
         """Sends an HTTP request to the Xanadu Cloud.
@@ -162,11 +162,15 @@ class Connection:
         Returns:
             requests.Response: HTTP response of the HTTP request.
 
+        Raises:
+            requests.models.HTTPError: If the status code of the (second)
+                response indicates an error has occurred (i.e., 4XX or 5XX).
+
         .. note::
 
             A second HTTP request will be made to the Xanadu Cloud if the first
             one returned status code 401. The second request will be identical
-            to the first one except a fresh access token will be used.
+            to the first one except that a fresh access token is used.
         """
         url = self.url(path)
 
@@ -176,13 +180,15 @@ class Connection:
             self.update_access_token()
             response = requests.request(method=method, url=url, headers=self.headers, **kwargs)
 
+        response.raise_for_status()
+
         return response
 
     def update_access_token(self) -> None:
         """Updates the access token of a connection using its refresh token.
 
         Raises:
-            XanaduCloudConnectionError: If the access token could not be updated.
+            requests.models.HTTPError: If the access token could not be updated.
         """
         url = self.url("/auth/realms/platform/protocol/openid-connect/token")
         data = {
@@ -190,11 +196,8 @@ class Connection:
             "refresh_token": self._refresh_token,
             "client_id": "public",
         }
-        response = requests.post(url=url, data=data)
 
-        if response.status_code == 200:
-            self._access_token = response.json().get("access_token")
-        else:
-            raise XanaduCloudConnectionError(
-                "Failed to update access token. Ensure that your Xanadu Cloud API key is correct."
-            )
+        response = requests.post(url=url, data=data)
+        response.raise_for_status()
+
+        self._access_token = response.json().get("access_token")
