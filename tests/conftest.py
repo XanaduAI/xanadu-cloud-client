@@ -1,3 +1,7 @@
+"""
+This module contains shared pytest fixtures.
+"""
+
 import pytest
 
 import xcc

@@ -3,7 +3,6 @@
 This module tests the :module:`xcc.connection` module.
 """
 
-from requests.models import HTTPError
 import pytest
 import responses
 from requests.models import HTTPError

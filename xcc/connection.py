@@ -5,7 +5,6 @@ This module contains the :class:`~xcc.Connection` class.
 from typing import Dict, Optional
 
 import requests
-from requests.models import HTTPError
 
 from ._version import __version__
 
