@@ -5,6 +5,7 @@ This module contains the :class:`~xcc.Connection` class.
 from typing import Dict, Optional
 
 import requests
+from requests.models import HTTPError
 
 from ._version import __version__
 
@@ -62,7 +63,7 @@ class Connection:
         host: str = "platform.strawberryfields.ai",
         port: int = 443,
         tls: bool = True,
-    ):
+    ) -> None:
         self._access_token = None
         self._refresh_token = key
 
@@ -71,12 +72,12 @@ class Connection:
         self._port = port
 
     @property
-    def access_token(self) -> str:
+    def access_token(self) -> Optional[str]:
         """Returns the access token used to authorize requests to the Xanadu Cloud."""
         return self._access_token
 
     @property
-    def refresh_token(self) -> Optional[str]:
+    def refresh_token(self) -> str:
         """Returns the refresh token (API key) used to fetch access tokens."""
         return self._refresh_token
 
@@ -122,10 +123,6 @@ class Connection:
     def __repr__(self) -> str:
         """Returns a printable representation of a connection."""
         return f"<{self.__class__.__name__}: key={self.refresh_token}, url={self.url()}>"
-
-    def __str__(self) -> str:
-        """Returns a string representation of a connection."""
-        return repr(self)
 
     def url(self, path: str = "") -> str:
         """Returns the URL to a Xanadu Cloud endpoint.

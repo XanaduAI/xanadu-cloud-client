@@ -3,6 +3,7 @@
 This module tests the :module:`xcc.connection` module.
 """
 
+from requests.models import HTTPError
 import pytest
 import responses
 from requests.models import HTTPError
@@ -10,14 +11,8 @@ from requests.models import HTTPError
 import xcc
 
 
-@pytest.fixture
-def connection() -> xcc.Connection:
-    """Returns a mock connection."""
-    return xcc.Connection(key="j.w.t", host="cloud.xanadu.ai", port=443, tls=True)
-
-
 class TestConnection:
-    """Tests for the :class:`xcc.Connection` class."""
+    """Tests the :class:`xcc.Connection` class."""
 
     def test_access_token(self, connection):
         """Tests that the correct access token is returned for a connection."""
