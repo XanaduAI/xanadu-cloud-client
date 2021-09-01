@@ -7,5 +7,6 @@ provide interfaces for managing devices and jobs, respectively.
 
 from ._version import __version__
 from .connection import Connection
+from .device import Device
 
-__all__ = ["Connection"]
+__all__ = ["Connection", "Device"]
