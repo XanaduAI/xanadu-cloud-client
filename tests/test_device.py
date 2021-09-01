@@ -73,6 +73,7 @@ class TestDevice:
         add_device_response({"state": status})
         assert device.status == status
 
+    # pylint: disable=invalid-name
     @responses.activate
     @pytest.mark.parametrize("up", [False, True])
     def test_up(self, device, add_device_response, up):

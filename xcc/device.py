@@ -72,7 +72,7 @@ class Device:
             Dict[str, Any]: mapping from field names to values for this device
 
         .. note::
-        
+
             These fields are not intended to be directly accessed by external
             callers. Instead, they should be individually retrieved through
             their associated public properties.
@@ -183,5 +183,5 @@ class Device:
         self._specification = None
 
         if not lazy:
-            # Accessing the properties triggers the refresh.
+            # pylint: disable=pointless-statement
             self._details, self.certificate, self.specification
