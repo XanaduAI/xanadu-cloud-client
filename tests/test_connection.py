@@ -44,14 +44,14 @@ class TestConnection:
 
     def test_user_agent(self, connection):
         """Tests that the correct user agent is returned for a connection."""
-        assert connection.user_agent == "XanaduCloudClient/0.1.0-dev"
+        assert connection.user_agent == f"XanaduCloudClient/{xcc.__version__}"
 
     def test_headers(self, connection):
         """Tests that the correct headers are returned for a connection."""
         assert connection.headers == {
             "Accept-Version": "0.4.0",
             "Authorization": "Bearer None",
-            "User-Agent": "XanaduCloudClient/0.1.0-dev",
+            "User-Agent": f"XanaduCloudClient/{xcc.__version__}",
         }
 
     def test_repr(self, connection):
