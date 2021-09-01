@@ -36,6 +36,10 @@ class TestDevice:
         device = xcc.Device("qpu", connection)
         assert device.connection == connection
 
+    def test_lazy(self, device):
+        """Tests that the correct laziness indicator is returned for a device."""
+        assert device.lazy is True
+
     def test_target(self, device):
         """Tests that the correct target is returned for a device."""
         assert device.target == "qpu"
@@ -81,47 +85,57 @@ class TestDevice:
         add_device_response({"up": up})
         assert device.up == up
 
+    def test_repr(self, device):
+        """Tests that the printable representation of a device is correct."""
+        assert repr(device) == "<Device: target=qpu>"
+
     @responses.activate
-    def test_refresh_lazy(self, device, add_device_response):
+    def test_refresh_lazy(self, add_device_response, connection):
         """Tests that the cache of a device can be lazily refreshed."""
         add_device_response({"up": False})
         add_device_response({"up": True})
 
+        device = xcc.Device("qpu", connection, lazy=True)
+
         assert device.up is False
         assert device.up is False
 
-        device.refresh(lazy=True)
+        device.refresh()
 
         assert len(responses.calls) == 1
         assert device.up is True
+        assert len(responses.calls) == 2
 
     @responses.activate
-    def test_refresh_eager(self, device, add_device_response):
+    def test_refresh_eager(self, add_device_response, connection):
         """Tests that the cache of a device can be eagerly refreshed."""
-        add_device_response({"up": False})
-        add_device_response({"up": True, "certificate_url": "/cert", "specifications_url": "/spec"})
-        responses.add(responses.GET, device.connection.url("/cert"), status=200, body="{}")
-        responses.add(responses.GET, device.connection.url("/spec"), status=200, body="{}")
+        paths = {"certificate_url": "/cert", "specifications_url": "/spec"}
+        add_device_response({"up": False, **paths})
+        add_device_response({"up": True, **paths})
+
+        responses.add(responses.GET, connection.url("/cert"), status=200, body="{}")
+        responses.add(responses.GET, connection.url("/spec"), status=200, body="{}")
+
+        device = xcc.Device("qpu", connection, lazy=False)
 
         assert device.up is False
         assert device.up is False
 
-        device.refresh(lazy=False)
+        device.refresh()
 
-        assert len(responses.calls) == 4
+        assert len(responses.calls) == 6
         assert device.up is True
+        assert len(responses.calls) == 6
 
     @responses.activate
     def test_refresh_scope(self, add_device_response, connection):
-        """Tests that refreshing the cache of one device does not affect the
-        cache of another device.
-        """
-        device_1 = xcc.Device("qpu", connection)
-        device_2 = xcc.Device("qpu", connection)
-
+        """Tests that refreshing the cache of one device does not affect the cache of another."""
         add_device_response({"up": False})
         add_device_response({"up": False})
         add_device_response({"up": True})
+
+        device_1 = xcc.Device("qpu", connection)
+        device_2 = xcc.Device("qpu", connection)
 
         assert device_1.up is False
         assert device_2.up is False
