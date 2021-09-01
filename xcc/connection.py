@@ -5,7 +5,6 @@ This module contains the :class:`~xcc.Connection` class.
 from typing import Dict, Optional
 
 import requests
-from requests.models import HTTPError
 
 from ._version import __version__
 
@@ -14,15 +13,15 @@ class Connection:
     """Manages remote connections to the Xanadu Cloud.
 
     Args:
-        key (str): The Xanadu Cloud API key used for authentication.
-        host (str): The hostname of the Xanadu Cloud server.
-        port (int): The port of the Xanadu Cloud server.
-        tls (bool): Whether to use HTTPS for the connection.
+        key (str): Xanadu Cloud API key used for authentication
+        host (str): hostname of the Xanadu Cloud server
+        port (int): port of the Xanadu Cloud server
+        tls (bool): whether to use HTTPS for the connection
 
     **Example:**
 
     The following example shows how to use the :class:`~xcc.Connection` class
-    to access the Xanadu Cloud API. First, a connection is instantiated with a
+    to access the Xanadu Cloud. First, a connection is instantiated with a
     Xanadu Cloud API key:
 
     >>> import xcc
@@ -35,7 +34,7 @@ class Connection:
     >>> connection.ping()
     <Response [200]>
 
-    The Xanadu Cloud API can now be directly accessed to, for example, retrieve
+    The Xanadu Cloud can now be directly accessed to, for example, retrieve
     information about the X8_01 device:
 
     >>> response = connection.request(method="GET", path="/devices/X8_01")
@@ -128,10 +127,10 @@ class Connection:
         """Returns the URL to a Xanadu Cloud endpoint.
 
         Args:
-            path (str): Path component of the URL.
+            path (str): path component of the URL
 
         Returns:
-            str: URL containing a scheme, host, port, the provided path.
+            str: URL containing a scheme, host, port, the provided path
         """
         return f"{self.scheme}://{self.host}:{self.port}/" + path.lstrip("/")
 
@@ -139,10 +138,10 @@ class Connection:
         """Pings the Xanadu Cloud.
 
         Returns:
-            requests.Response: HTTP response of the ping HTTP request.
+            requests.Response: HTTP response of the ping HTTP request
 
         Raises:
-            requests.models.HTTPError: If the connection is not successful.
+            requests.models.HTTPError: if the connection is not successful
         """
         return self.request(method="GET", path="/healthz")
 
@@ -150,24 +149,25 @@ class Connection:
         """Sends an HTTP request to the Xanadu Cloud.
 
         Args:
-            method (str): HTTP request method.
-            path (str): HTTP request path.
+            method (str): HTTP request method
+            path (str): HTTP request path
 
         Keyword Args:
             Arguments to pass along to the call to ``requests.request()``.
 
         Returns:
-            requests.Response: HTTP response of the HTTP request.
+            requests.Response: HTTP response of the HTTP request
 
         Raises:
-            requests.models.HTTPError: If the status code of the (second)
-                response indicates an error has occurred (i.e., 4XX or 5XX).
+            requests.models.HTTPError: if the status code of the response
+                indicates an error has occurred (i.e., 4XX or 5XX)
 
         .. note::
 
-            A second HTTP request will be made to the Xanadu Cloud if the first
-            one returned status code 401. The second request will be identical
-            to the first one except that a fresh access token is used.
+            A second HTTP request will be made to the Xanadu Cloud if the
+            response to the first request has a 401 status code. The second
+            request will be identical to the first one except that a fresh
+            access token is used.
         """
         url = self.url(path)
 
@@ -185,7 +185,7 @@ class Connection:
         """Updates the access token of a connection using its refresh token.
 
         Raises:
-            requests.models.HTTPError: If the access token could not be updated.
+            requests.models.HTTPError: if the access token could not be updated
         """
         url = self.url("/auth/realms/platform/protocol/openid-connect/token")
         data = {
