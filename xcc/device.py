@@ -2,7 +2,7 @@
 This module contains the :class:`~xcc.Device` class.
 """
 
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 from urllib.parse import urlparse
 
 from .connection import Connection
@@ -43,6 +43,24 @@ class Device:
 
     >>> device.refresh()
     """
+
+    @staticmethod
+    def list_targets(connection: Connection, status: Optional[str] = None) -> Sequence[str]:
+        """Lists device targets on the Xanadu Cloud.
+
+        Args:
+            connection (Connection): connection to the Xanadu Cloud
+            status (Optional[str]): optionally filter device targets by status
+        """
+        response = connection.request("GET", "/devices")
+
+        def include(details: Dict[str, Any]) -> bool:
+            """Returns True if the target with the given details should be
+            included in the list returned by the outer function.
+            """
+            return status is None or details["state"] == status
+
+        return [details["target"] for details in filter(include, response.json()["data"])]
 
     def __init__(self, target: str, connection: Connection, lazy: bool = True) -> None:
         self._target = target

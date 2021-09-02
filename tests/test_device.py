@@ -19,17 +19,37 @@ def device(connection) -> xcc.Device:
 
 
 @pytest.fixture
-def add_device_response(connection) -> Callable[[object], None]:
+def add_response(connection) -> Callable[[object, str], None]:
     """Returns a function that places a JSON serialization of its argument
     inside the body of an HTTP 200 response to the next GET request to the
-    "/devices/qpu" path of the given connection's URL.
+    specified path ("/devices/qpu" by default) using the given connection.
     """
-    url = connection.url("/devices/qpu")
-    return lambda body: responses.add(responses.GET, url, status=200, body=json.dumps(body))
+
+    def add_response_(body: object, path: str = "/devices/qpu") -> None:
+        url = connection.url(path)
+        return responses.add(responses.GET, url, status=200, body=json.dumps(body))
+
+    return add_response_
 
 
 class TestDevice:
     """Tests the :class:`xcc.Device` class."""
+
+    @pytest.mark.parametrize(
+        "status, want_targets",
+        [(None, ["foo", "bar"]), ("online", ["foo"]), ("offline", ["bar"])],
+    )
+    @responses.activate
+    def test_list_targets(self, connection, add_response, status, want_targets):
+        """Tests that the correct device targets are listed."""
+        data = [
+            {"target": "foo", "state": "online"},
+            {"target": "bar", "state": "offline"},
+        ]
+        add_response(body={"data": data}, path="/devices")
+
+        have_targets = xcc.Device.list_targets(connection, status)
+        assert have_targets == want_targets
 
     def test_connection(self, connection):
         """Tests that the correct connection is returned for a device."""
