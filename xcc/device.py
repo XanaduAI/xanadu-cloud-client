@@ -166,16 +166,6 @@ class Device:
         """
         return self._details["state"]
 
-    # pylint: disable=invalid-name
-    @property
-    def up(self) -> bool:
-        """Returns whether a device can currently accept jobs.
-
-        Returns:
-            bool: ``True`` if a device can accept jobs or ``False`` otherwise
-        """
-        return self._details["up"]
-
     def __repr__(self) -> str:
         """Returns a printable representation of a device."""
         return f"<{self.__class__.__name__}: target={self.target}>"
