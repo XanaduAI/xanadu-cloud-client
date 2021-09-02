@@ -45,22 +45,34 @@ class Device:
     """
 
     @staticmethod
-    def list_targets(connection: Connection, status: Optional[str] = None) -> Sequence[str]:
-        """Lists device targets on the Xanadu Cloud.
+    def list(connection: Connection, status: Optional[str] = None) -> Sequence["Device"]:
+        """Returns devices on the Xanadu Cloud.
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
-            status (Optional[str]): optionally filter device targets by status
+            status (Optional[str]): optionally filter devices by status
+
+        Returns:
+            Sequence[Device]: devices on the Xanadu Cloud which match the status filter
         """
         response = connection.request("GET", "/devices")
 
         def include(details: Dict[str, Any]) -> bool:
-            """Returns True if the target with the given details should be
-            included in the list returned by the outer function.
+            """Returns ``True`` if a device with the given details should be
+            included in the response.  Otherwise, ``False`` is returned.
             """
             return status is None or details["state"] == status
 
-        return [details["target"] for details in filter(include, response.json()["data"])]
+        devices = []
+
+        for details in filter(include, response.json()["data"]):
+            device = Device(target=details["target"], connection=connection, lazy=True)
+            # Cache the device details since they have already been fetched.
+            # pylint: disable=protected-access,unused-private-member
+            device.__details = details
+            devices.append(device)
+
+        return devices
 
     def __init__(self, target: str, connection: Connection, lazy: bool = True) -> None:
         self._target = target

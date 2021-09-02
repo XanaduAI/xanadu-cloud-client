@@ -40,15 +40,15 @@ class TestDevice:
         [(None, ["foo", "bar"]), ("online", ["foo"]), ("offline", ["bar"])],
     )
     @responses.activate
-    def test_list_targets(self, connection, add_response, status, want_targets):
-        """Tests that the correct device targets are listed."""
+    def test_list(self, connection, add_response, status, want_targets):
+        """Tests that the correct devices are listed for a status."""
         data = [
             {"target": "foo", "state": "online"},
             {"target": "bar", "state": "offline"},
         ]
         add_response(body={"data": data}, path="/devices")
 
-        have_targets = xcc.Device.list_targets(connection, status)
+        have_targets = [device.target for device in xcc.Device.list(connection, status)]
         assert have_targets == want_targets
 
     def test_connection(self, connection):
