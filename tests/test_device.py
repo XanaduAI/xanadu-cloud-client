@@ -91,6 +91,13 @@ class TestDevice:
         add_response(body={"state": status})
         assert device.status == status
 
+    @responses.activate
+    @pytest.mark.parametrize("status, up", [("offline", False), ("online", True)])
+    def test_up(self, device, add_response, status, up):  # pylint: disable=invalid-name
+        """Tests that the correct "up" indicator is returned for a device."""
+        add_response(body={"state": status})
+        assert device.up == up
+
     def test_repr(self, device):
         """Tests that the printable representation of a device is correct."""
         assert repr(device) == "<Device: target=qpu>"
