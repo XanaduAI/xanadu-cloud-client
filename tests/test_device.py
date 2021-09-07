@@ -65,6 +65,12 @@ class TestDevice:
         assert device.target == "qpu"
 
     @responses.activate
+    def test_overview(self, device, add_response):
+        """Tests that the correct overview is returned for a device."""
+        add_response(body={"target": "qpu", "state": "online"})
+        assert device.overview == {"target": "qpu", "status": "online"}
+
+    @responses.activate
     def test_certificate(self, device, add_response):
         """Tests that the correct certificate is returned for a device."""
         add_response(body={"certificate_url": "https://example.com/devices/qpu/certificate"})
