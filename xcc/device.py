@@ -1,8 +1,9 @@
 """
 This module contains the :class:`~xcc.Device` class.
 """
+from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, List, Mapping, Optional, Sequence
 from urllib.parse import urlparse
 
 from .connection import Connection
@@ -15,7 +16,7 @@ class Device:
         target (str): target name of the device
         connection (Connection): connection to the Xanadu Cloud
         lazy (bool): fetch properties from the Xanadu Cloud on demand;
-            specifying ``True`` can help conserve network bandwidth
+            specifying ``True`` helps conserve network bandwidth
 
     **Example:**
 
@@ -28,15 +29,17 @@ class Device:
 
     Next, a reference to the X8_01 device is created using the connection.
 
-    >>> device = xcc.Device("X8_01", connection)
+    >>> device = xcc.Device(target="X8_01", connection=connection)
 
     Finally, the certificate, specification, status, etc. of the X8_01 device
-    is retrieved by accessing the device's corresponding properties:
+    are retrieved by accessing the corresponding property of the device:
 
     >>> device.certificate
     {'device_url': ..., 'laser_wavelength_meters': 1.55270048e-06}
     >>> device.specification
     {'gate_parameters': ..., 'target': 'X8_01'}
+    >>> device.status
+    online
 
     Note that, for performance reasons, the properties of a device are cached.
     This cache can be cleared by calling :meth:`~xcc.Device.refresh`.
@@ -45,19 +48,19 @@ class Device:
     """
 
     @staticmethod
-    def list(connection: Connection, status: Optional[str] = None) -> Sequence["Device"]:
+    def list(connection: Connection, status: Optional[str] = None) -> Sequence[Device]:
         """Returns devices on the Xanadu Cloud.
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
-            status (Optional[str]): optionally filter devices by status
+            status (str, optional): optionally filter devices by status
 
         Returns:
             Sequence[Device]: devices on the Xanadu Cloud which match the status filter
         """
         response = connection.request("GET", "/devices")
 
-        def include(details: Dict[str, Any]) -> bool:
+        def include(details: Mapping[str, Any]) -> bool:
             """Returns ``True`` if a device with the given details should be
             included in the response.  Otherwise, ``False`` is returned.
             """
@@ -106,11 +109,22 @@ class Device:
         return self._target
 
     @property
-    def _details(self) -> Dict[str, Any]:
+    def overview(self) -> Mapping[str, Any]:
+        """Returns an overview of a device.
+
+        Returns:
+            Mapping[str, Any]: mapping from field names to values for this
+                device as determined by the needs of a Xanadu Cloud user.
+        """
+        return {"target": self.target, "status": self.status}
+
+    @property
+    def _details(self) -> Mapping[str, Any]:
         """Returns the details of a device.
 
         Returns:
-            Dict[str, Any]: mapping from field names to values for this device
+            Mapping[str, Any]: mapping from field names to values for this
+                device as determined by the Xanadu Cloud device endpoint.
 
         .. note::
 
@@ -125,14 +139,14 @@ class Device:
         return self.__details
 
     @property
-    def certificate(self) -> Dict[str, Any]:
+    def certificate(self) -> Mapping[str, Any]:
         """Returns the certificate of a device.
 
         A device certificate contains the current operating conditions of a
         device and is periodically updated while the device is online.
 
         Returns:
-            Dict[str, Any]: certificate of this device
+            Mapping[str, Any]: certificate of this device
 
         .. note::
 
@@ -153,14 +167,14 @@ class Device:
         return self._certificate
 
     @property
-    def specification(self) -> Dict[str, Any]:
+    def specification(self) -> Mapping[str, Any]:
         """Returns the specification of a device.
 
         A device specification lists the hardware and sofware capabilities of a
         device and is not expected to change across the lifetime of a device.
 
         Returns:
-            Dict[str, Any]: specification of this device
+            Mapping[str, Any]: specification of this device
 
         .. note::
 
