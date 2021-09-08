@@ -170,16 +170,13 @@ class Device:
     def specification(self) -> Mapping[str, Any]:
         """Returns the specification of a device.
 
-        A device specification lists the hardware and sofware capabilities of a
-        device and is not expected to change across the lifetime of a device.
-
         Returns:
             Mapping[str, Any]: specification of this device
 
         .. note::
 
             After this property is accessed, :meth:`~xcc.Device.refresh()` must
-            be called to fetch a new specification from the Xanadu Cloud.
+            be called to refetch the specification from the Xanadu Cloud.
         """
         if self._specification is None:
             url = self._details["specifications_url"]
