@@ -22,8 +22,6 @@ class Device:
         and stored in a cache. This cache can be cleared at any time by calling
         :meth:`xcc.Device.refresh`.
 
-        >>> device.refresh()
-
     **Example:**
 
     The following example shows how to use the :class:`xcc.Device` class to
