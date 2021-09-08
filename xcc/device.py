@@ -46,7 +46,7 @@ class Device:
     >>> device.specification
     {'gate_parameters': ..., 'target': 'X8_01'}
     >>> device.status
-    online
+    'online'
     """
 
     @staticmethod
