@@ -72,7 +72,7 @@ class Device:
             device = Device(target=details["target"], connection=connection, lazy=True)
             # Cache the device details since they have already been fetched.
             # pylint: disable=protected-access,unused-private-member
-            device.__details = details
+            device._details_ = details
             devices.append(device)
 
         return devices
@@ -86,7 +86,7 @@ class Device:
         # decorators on their corresponding properties; however, clearing
         # these caches on a per-instance basis is challenging because the
         # caches across each device are shared using this technique.
-        self.__details = None
+        self._details_ = None
         self._certificate = None
         self._specification = None
 
@@ -132,11 +132,11 @@ class Device:
             callers. Instead, they should be individually retrieved through
             their associated public properties.
         """
-        if self.__details is None:
+        if self._details_ is None:
             response = self.connection.request("GET", f"/devices/{self.target}")
-            self.__details = response.json()
+            self._details_ = response.json()
 
-        return self.__details
+        return self._details_
 
     @property
     def certificate(self) -> Mapping[str, Any]:
@@ -222,7 +222,7 @@ class Device:
 
     def _fetch(self) -> None:
         """Caches the details, certificate, and specification of a device."""
-        self.__details = self._details
+        self._details_ = self._details
         self._certificate = self.certificate
         self._specification = self.specification
 
@@ -233,7 +233,7 @@ class Device:
 
             This method supports both lazy and eager fetching strategies.
         """
-        self.__details = None
+        self._details_ = None
         self._certificate = None
         self._specification = None
 
