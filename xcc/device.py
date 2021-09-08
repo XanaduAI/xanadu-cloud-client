@@ -21,18 +21,18 @@ class Device:
     **Example:**
 
     The following example shows how to use the :class:`xcc.Device` class to
-    query various properties of the X8_01 device on the Xanadu Cloud. First, a
-    connection is established to the Xanadu Cloud:
+    query various properties of the ``X8_01`` device on the Xanadu Cloud. First,
+    a connection is established to the Xanadu Cloud:
 
     >>> import xcc
     >>> connection = xcc.Connection(key="Xanadu Cloud API key goes here")
 
-    Next, a reference to the X8_01 device is created using the connection.
+    Next, a reference to the ``X8_01`` device is created using the connection.
 
     >>> device = xcc.Device(target="X8_01", connection=connection)
 
-    Finally, the certificate, specification, status, etc. of the X8_01 device
-    are retrieved by accessing the corresponding property of the device:
+    Finally, the certificate, specification, status, etc. of the ``X8_01``
+    device are retrieved by accessing the corresponding property of the device:
 
     >>> device.certificate
     {'device_url': ..., 'laser_wavelength_meters': 1.55270048e-06}
