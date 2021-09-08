@@ -18,6 +18,13 @@ class Device:
         lazy (bool): fetch properties from the Xanadu Cloud on demand;
             specifying ``True`` helps conserve network bandwidth
 
+    .. note::
+
+        For performance reasons, the properties of a device are cached.
+        This cache can be cleared by calling :meth:`~xcc.Device.refresh`.
+
+        >>> device.refresh()
+
     **Example:**
 
     The following example shows how to use the :class:`xcc.Device` class to
@@ -40,11 +47,6 @@ class Device:
     {'gate_parameters': ..., 'target': 'X8_01'}
     >>> device.status
     online
-
-    Note that, for performance reasons, the properties of a device are cached.
-    This cache can be cleared by calling :meth:`~xcc.Device.refresh`.
-
-    >>> device.refresh()
     """
 
     @staticmethod
@@ -148,11 +150,6 @@ class Device:
         Returns:
             Mapping[str, Any]: certificate of this device
 
-        .. note::
-
-            After this property is accessed, :meth:`~xcc.Device.refresh()` must
-            be called to fetch a new certificate from the Xanadu Cloud.
-
         .. warning::
 
             The structure of a certificate may vary from device to device.
@@ -172,11 +169,6 @@ class Device:
 
         Returns:
             Mapping[str, Any]: specification of this device
-
-        .. note::
-
-            After this property is accessed, :meth:`~xcc.Device.refresh()` must
-            be called to refetch the specification from the Xanadu Cloud.
         """
         if self._specification is None:
             url = self._details["specifications_url"]
@@ -200,7 +192,7 @@ class Device:
 
     @property
     def status(self) -> str:
-        """Returns the current status of a device.
+        """Returns the status of a device.
 
         Returns:
             str: status of this device ("online" or "offline")
@@ -209,7 +201,7 @@ class Device:
 
     @property
     def up(self) -> bool:  # pylint: disable=invalid-name
-        """Returns whether a device is currently accepting jobs.
+        """Returns whether a device is accepting jobs.
 
         Returns:
             bool: ``True`` iff the status of this device is "online"
