@@ -116,7 +116,7 @@ class Device:
 
         Returns:
             Mapping[str, Any]: mapping from field names to values for this
-                device as determined by the needs of a Xanadu Cloud user.
+            device as determined by the needs of a Xanadu Cloud user.
         """
         return {"target": self.target, "status": self.status}
 
@@ -126,7 +126,7 @@ class Device:
 
         Returns:
             Mapping[str, Any]: mapping from field names to values for this
-                device as determined by the Xanadu Cloud device endpoint.
+            device as determined by the Xanadu Cloud device endpoint.
 
         .. note::
 
