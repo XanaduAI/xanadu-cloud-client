@@ -15,13 +15,12 @@ class Device:
     Args:
         target (str): target name of the device
         connection (Connection): connection to the Xanadu Cloud
-        lazy (bool): fetch properties from the Xanadu Cloud on demand;
-            specifying ``True`` helps conserve network bandwidth
 
     .. note::
 
-        For performance reasons, the properties of a device are cached.
-        This cache can be cleared by calling :meth:`~xcc.Device.refresh`.
+        For performance reasons, the properties of a device are lazily fetched
+        and stored in a cache. This cache can be cleared at any time by calling
+        :meth:`xcc.Device.refresh`.
 
         >>> device.refresh()
 
@@ -71,7 +70,7 @@ class Device:
         devices = []
 
         for details in filter(include, response.json()["data"]):
-            device = Device(target=details["target"], connection=connection, lazy=True)
+            device = Device(target=details["target"], connection=connection)
             # Cache the device details since they have already been fetched.
             # pylint: disable=protected-access,unused-private-member
             device._details_ = details
@@ -79,10 +78,9 @@ class Device:
 
         return devices
 
-    def __init__(self, target: str, connection: Connection, lazy: bool = True) -> None:
+    def __init__(self, target: str, connection: Connection) -> None:
         self._target = target
         self._connection = connection
-        self._lazy = lazy
 
         # Ideally, these private members would be replaced with @lru_cache
         # decorators on their corresponding properties; however, clearing
@@ -92,18 +90,10 @@ class Device:
         self._certificate = None
         self._specification = None
 
-        if not lazy:
-            self._fetch()
-
     @property
     def connection(self) -> Connection:
         """Returns the connection used to access the Xanadu Cloud."""
         return self._connection
-
-    @property
-    def lazy(self) -> bool:
-        """Returns whether a device only contacts the Xanadu Cloud on demand."""
-        return self._lazy
 
     @property
     def target(self) -> str:
@@ -212,22 +202,8 @@ class Device:
         """Returns a printable representation of a device."""
         return f"<{self.__class__.__name__}: target={self.target}>"
 
-    def _fetch(self) -> None:
-        """Caches the details, certificate, and specification of a device."""
-        self._details_ = self._details
-        self._certificate = self.certificate
-        self._specification = self.specification
-
     def refresh(self) -> None:
-        """Refreshes the details, certificate, and specification of a device.
-
-        .. note::
-
-            This method supports both lazy and eager fetching strategies.
-        """
+        """Refreshes the details, certificate, and specification of a device."""
         self._details_ = None
         self._certificate = None
         self._specification = None
-
-        if not self.lazy:
-            self._fetch()

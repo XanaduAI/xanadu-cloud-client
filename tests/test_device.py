@@ -56,10 +56,6 @@ class TestDevice:
         device = xcc.Device("qpu", connection)
         assert device.connection == connection
 
-    def test_lazy(self, device):
-        """Tests that the correct laziness indicator is returned for a device."""
-        assert device.lazy is True
-
     def test_target(self, device):
         """Tests that the correct target is returned for a device."""
         assert device.target == "qpu"
@@ -109,12 +105,10 @@ class TestDevice:
         assert repr(device) == "<Device: target=qpu>"
 
     @responses.activate
-    def test_refresh_lazy(self, add_response, connection):
-        """Tests that the cache of a device can be lazily refreshed."""
+    def test_refresh(self, device, add_response):
+        """Tests that the cache of a device can be refreshed."""
         add_response(body={"state": "offline"})
         add_response(body={"state": "online"})
-
-        device = xcc.Device("qpu", connection, lazy=True)
 
         assert device.status == "offline"
         assert device.status == "offline"
@@ -126,39 +120,25 @@ class TestDevice:
         assert len(responses.calls) == 2
 
     @responses.activate
-    def test_refresh_eager(self, add_response, connection):
-        """Tests that the cache of a device can be eagerly refreshed."""
-        paths = {"certificate_url": "/cert", "specifications_url": "/spec"}
-        add_response(body={"state": "offline", **paths})
-        add_response(body={"state": "online", **paths})
-        add_response(body={}, path="/cert")
-        add_response(body={}, path="/spec")
-
-        device = xcc.Device("qpu", connection, lazy=False)
-
-        assert device.status == "offline"
-        assert device.status == "offline"
-
-        device.refresh()
-
-        assert len(responses.calls) == 6
-        assert device.status == "online"
-        assert len(responses.calls) == 6
-
-    @responses.activate
-    def test_refresh_scope(self, add_response, connection):
-        """Tests that refreshing the cache of one device does not affect the cache of another."""
-        add_response(body={"state": "offline"})
+    def test_cache_independence(self, connection, add_response):
+        """Tests that caches are not shared across device instances."""
         add_response(body={"state": "offline"})
         add_response(body={"state": "online"})
+        add_response(body={"state": "online"})
+        add_response(body={"state": "offline"})
 
         device_1 = xcc.Device("qpu", connection)
         device_2 = xcc.Device("qpu", connection)
 
         assert device_1.status == "offline"
-        assert device_2.status == "offline"
+        assert device_2.status == "online"
 
         device_1.refresh()
+
+        assert device_1.status == "online"
+        assert device_2.status == "online"
+
+        device_2.refresh()
 
         assert device_1.status == "online"
         assert device_2.status == "offline"
