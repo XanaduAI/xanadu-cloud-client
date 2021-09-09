@@ -132,13 +132,16 @@ class TestDevice:
 
         assert device_1.status == "offline"
         assert device_2.status == "online"
+        assert len(responses.calls) == 2
 
         device_1.refresh()
 
         assert device_1.status == "online"
         assert device_2.status == "online"
+        assert len(responses.calls) == 3
 
         device_2.refresh()
 
         assert device_1.status == "online"
         assert device_2.status == "offline"
+        assert len(responses.calls) == 4
