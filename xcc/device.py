@@ -70,9 +70,7 @@ class Device:
 
         for details in filter(include, response.json()["data"]):
             device = Device(target=details["target"], connection=connection)
-            # Cache the device details since they have already been fetched.
-            # pylint: disable=protected-access,unused-private-member
-            device._details = details
+            device._details = details  # pylint: disable=protected-access
             devices.append(device)
 
         return devices
