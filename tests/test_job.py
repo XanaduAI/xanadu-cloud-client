@@ -286,15 +286,15 @@ class TestJob:
         assert len(responses.calls) == 3
 
     @responses.activate
-    def test_refresh(self, job, add_response):
-        """Tests that the cache of a job can be refreshed."""
+    def test_clear(self, job, add_response):
+        """Tests that the cache of a job can be cleared."""
         add_response(body={"status": "queued"})
         add_response(body={"status": "completed"})
 
         assert job.status == "queued"
         assert len(responses.calls) == 1
 
-        job.refresh()
+        job.clear()
         assert len(responses.calls) == 1
 
         assert job.status == "completed"
@@ -314,12 +314,12 @@ class TestJob:
         assert job_1.status == "open"
         assert job_2.status == "queued"
 
-        job_1.refresh()
+        job_1.clear()
 
         assert job_1.status == "completed"
         assert job_2.status == "queued"
 
-        job_2.refresh()
+        job_2.clear()
 
         assert job_1.status == "completed"
         assert job_2.status == "completed"

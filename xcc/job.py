@@ -27,7 +27,7 @@ class Job:
 
         For performance reasons, the properties of a job are lazily fetched and
         stored in a cache. This cache can be cleared at any time by calling
-        :meth:`Job.refresh`.
+        :meth:`Job.clear`.
 
     **Example:**
 
@@ -339,10 +339,10 @@ class Job:
         """Cancels a job."""
         if not self.finished:
             self.connection.request("PATCH", f"/jobs/{self.id}", json={"status": "cancelled"})
-            self.refresh()
+            self.clear()
 
-    def refresh(self) -> None:
-        """Refreshes the details, circuit, and result of a job."""
+    def clear(self) -> None:
+        """Clears the details, circuit, and result caches of a job."""
         del self._details
         del self._circuit
         del self.result
@@ -355,4 +355,4 @@ class Job:
         """
         while not self.finished:
             time.sleep(delay)
-            self.refresh()
+            self.clear()

@@ -21,7 +21,7 @@ class Device:
 
         For performance reasons, the properties of a device are lazily fetched
         and stored in a cache. This cache can be cleared at any time by calling
-        :meth:`Device.refresh`.
+        :meth:`Device.clear`.
 
     **Example:**
 
@@ -177,8 +177,8 @@ class Device:
         """Returns a printable representation of a device."""
         return f"<{self.__class__.__name__}: target={self.target}>"
 
-    def refresh(self) -> None:
-        """Refreshes the details, certificate, and specification of a device."""
+    def clear(self) -> None:
+        """Clears the details, certificate, and specification caches of a device."""
         del self._details
         del self.certificate
         del self.specification
