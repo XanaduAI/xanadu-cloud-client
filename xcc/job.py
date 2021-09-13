@@ -227,8 +227,8 @@ class Job:
 
         # Adapted from strawberryfields.api.Connection.get_job_result().
         # The result of a job on the Xanadu Cloud is an HTTP response with a
-        # payload containing the bytes of either an .npy or .npz file. The
-        # actual format of the returned file depends on the language of the job.
+        # payload containing the bytes of either an .npy or .npz file depending
+        # on the language of the submitted job.
         with io.BytesIO(response.content) as buffer:
             result = np.load(buffer, allow_pickle=False)
 
