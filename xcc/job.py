@@ -205,6 +205,7 @@ class Job:
 
             elif np.issubdtype(result.dtype, np.integer):
                 # The payload is a .npy file with integral entries.
+                # Convert to int64 to avoid surprises during post-processing.
                 result = result.astype(np.int64)
 
             return result
