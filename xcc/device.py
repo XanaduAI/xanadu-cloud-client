@@ -107,22 +107,6 @@ class Device:
         return {"target": self.target, "status": self.status}
 
     @cached_property
-    def _details(self) -> Mapping[str, Any]:
-        """Returns the details of a device.
-
-        Returns:
-            Mapping[str, Any]: mapping from field names to values for this
-            device as determined by the Xanadu Cloud device endpoint.
-
-        .. note::
-
-            These fields are not intended to be directly accessed by external
-            callers. Instead, they should be individually retrieved through
-            their associated public properties.
-        """
-        return self.connection.request("GET", f"/devices/{self.target}").json()
-
-    @cached_property
     def certificate(self) -> Mapping[str, Any]:
         """Returns the certificate of a device.
 
@@ -179,6 +163,22 @@ class Device:
             bool: ``True`` iff the status of this device is "online"
         """
         return self.status == "online"
+
+    @cached_property
+    def _details(self) -> Mapping[str, Any]:
+        """Returns the details of a device.
+
+        Returns:
+            Mapping[str, Any]: mapping from field names to values for this
+            device as determined by the Xanadu Cloud device endpoint.
+
+        .. note::
+
+            These fields are not intended to be directly accessed by external
+            callers. Instead, they should be individually retrieved through
+            their associated public properties.
+        """
+        return self.connection.request("GET", f"/devices/{self.target}").json()
 
     def __repr__(self) -> str:
         """Returns a printable representation of a device."""

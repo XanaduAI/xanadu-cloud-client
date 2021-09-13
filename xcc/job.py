@@ -181,39 +181,6 @@ class Job:
         }
 
     @cached_property
-    def _details(self) -> Mapping[str, Any]:
-        """Returns the details of a job.
-
-        Returns:
-            Mapping[str, Any]: mapping from field names to values for this job
-                as determined by the Xanadu Cloud job endpoint.
-
-        .. note::
-
-            These fields are not intended to be directly accessed by external
-            callers. Instead, they should be individually retrieved through
-            their associated public properties.
-        """
-        return self.connection.request("GET", f"/jobs/{self.id}").json()
-
-    @cached_property
-    def _circuit(self) -> Mapping[str, str]:
-        """Returns the circuit and language of a job.
-
-        Returns:
-            Mapping[str, str]: mapping with "circuit" and "language" fields
-
-        .. note::
-
-            The circuit and language should be retrieved through the
-            :attr:`Device.circuit` and :attr:`Device.language` properties,
-            respectively.
-        """
-        url = self._details["circuit_url"]
-        path = urlparse(url).path
-        return self.connection.request("GET", path).json()
-
-    @cached_property
     def result(self) -> Union[np.ndarray, List[Union[np.number, np.ndarray]]]:
         """Returns the result of a job.
 
@@ -336,6 +303,39 @@ class Job:
             "failed"
         """
         return self.status in ("cancelled", "completed", "failed")
+
+    @cached_property
+    def _details(self) -> Mapping[str, Any]:
+        """Returns the details of a job.
+
+        Returns:
+            Mapping[str, Any]: mapping from field names to values for this job
+                as determined by the Xanadu Cloud job endpoint.
+
+        .. note::
+
+            These fields are not intended to be directly accessed by external
+            callers. Instead, they should be individually retrieved through
+            their associated public properties.
+        """
+        return self.connection.request("GET", f"/jobs/{self.id}").json()
+
+    @cached_property
+    def _circuit(self) -> Mapping[str, str]:
+        """Returns the circuit and language of a job.
+
+        Returns:
+            Mapping[str, str]: mapping with "circuit" and "language" fields
+
+        .. note::
+
+            The circuit and language should be retrieved through the
+            :attr:`Device.circuit` and :attr:`Device.language` properties,
+            respectively.
+        """
+        url = self._details["circuit_url"]
+        path = urlparse(url).path
+        return self.connection.request("GET", path).json()
 
     def __repr__(self) -> str:
         """Returns a printable representation of a job."""
