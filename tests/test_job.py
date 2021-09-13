@@ -101,11 +101,6 @@ class TestJob:
         assert job.id == job_id
         assert job.name == "foo"
 
-    def test_connection(self, connection):
-        """Tests that the correct connection is returned for a job."""
-        job = xcc.Job("qpu", connection)
-        assert job.connection == connection
-
     def test_id(self, job):
         """Tests that the correct ID is returned for a job."""
         assert job.id == "00000000-0000-4000-8000-000000000000"
@@ -126,7 +121,7 @@ class TestJob:
         assert set(job.overview) == set(body)
 
     @responses.activate
-    def test_result_npy(self, job, add_response):
+    def test_result_npy(self, connection, job, add_response):
         """Tests that the correct .npy result is returned for a job."""
         result = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
 
@@ -137,12 +132,12 @@ class TestJob:
             body = buffer.read()
 
             add_response(body={"result_url": "https://example.com/jobs/result"})
-            responses.add(responses.GET, job.connection.url("/jobs/result"), status=200, body=body)
+            responses.add(responses.GET, connection.url("/jobs/result"), status=200, body=body)
 
             assert job.result == pytest.approx(result)
 
     @responses.activate
-    def test_result_npz(self, job, add_response):
+    def test_result_npz(self, connection, job, add_response):
         """Tests that the correct .npz result is returned for a job."""
         result = [np.complex64(1 + 2j), np.arange(5)]
 
@@ -155,7 +150,7 @@ class TestJob:
             body = buffer.read()
 
             add_response(body={"result_url": "https://example.com/jobs/result"})
-            responses.add(responses.GET, job.connection.url("/jobs/result"), status=200, body=body)
+            responses.add(responses.GET, connection.url("/jobs/result"), status=200, body=body)
 
             assert len(job.result) == len(result)
             assert [have == pytest.approx(want) for have, want in zip(job.result, result)]
@@ -256,12 +251,12 @@ class TestJob:
         assert repr(job) == f"<Job: id={job.id}>"
 
     @responses.activate
-    def test_cancel(self, job, add_response):
+    def test_cancel(self, connection, job, add_response):
         """Tests that a job can be cancelled."""
         add_response(body={"status": "open"})
         add_response(body={"status": "cancelled"})
 
-        url = job.connection.url(f"/jobs/{job.id}")
+        url = connection.url(f"/jobs/{job.id}")
         responses.add(responses.PATCH, url, status=204)
 
         assert job.finished is False
@@ -289,15 +284,15 @@ class TestJob:
         assert len(responses.calls) == 2
 
     @responses.activate
-    def test_cache_independence(self, job, add_response):
+    def test_cache_independence(self, connection, job_id, add_response):
         """Tests that caches are not shared across job instances."""
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
         add_response(body={"status": "completed"})
         add_response(body={"status": "completed"})
 
-        job_1 = xcc.Job(job.id, job.connection)
-        job_2 = xcc.Job(job.id, job.connection)
+        job_1 = xcc.Job(job_id, connection)
+        job_2 = xcc.Job(job_id, connection)
 
         assert job_1.status == "open"
         assert job_2.status == "queued"

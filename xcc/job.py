@@ -153,11 +153,6 @@ class Job:
         self._connection = connection
 
     @property
-    def connection(self) -> Connection:
-        """Returns the connection used to access the Xanadu Cloud."""
-        return self._connection
-
-    @property
     def id(self) -> str:  # pylint: disable=invalid-name
         """Returns the ID of a job."""
         return self._id
@@ -190,7 +185,7 @@ class Job:
         """
         url = self._details["result_url"]
         path = urlparse(url).path
-        response = self.connection.request("GET", path)
+        response = self._connection.request("GET", path)
 
         # Adapted from strawberryfields.api.Connection.get_job_result().
         # The result of a job on the Xanadu Cloud is an HTTP response with a
@@ -319,7 +314,7 @@ class Job:
             callers. Instead, they should be individually retrieved through
             their associated public properties.
         """
-        return self.connection.request("GET", f"/jobs/{self.id}").json()
+        return self._connection.request("GET", f"/jobs/{self.id}").json()
 
     @cached_property
     def _circuit(self) -> Mapping[str, str]:
@@ -336,7 +331,7 @@ class Job:
         """
         url = self._details["circuit_url"]
         path = urlparse(url).path
-        return self.connection.request("GET", path).json()
+        return self._connection.request("GET", path).json()
 
     def __repr__(self) -> str:
         """Returns a printable representation of a job."""
@@ -345,7 +340,7 @@ class Job:
     def cancel(self) -> None:
         """Cancels a job."""
         if not self.finished:
-            self.connection.request("PATCH", f"/jobs/{self.id}", json={"status": "cancelled"})
+            self._connection.request("PATCH", f"/jobs/{self.id}", json={"status": "cancelled"})
             self.clear()
 
     def clear(self) -> None:

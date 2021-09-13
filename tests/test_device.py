@@ -51,11 +51,6 @@ class TestDevice:
         have_targets = [device.target for device in xcc.Device.list(connection, status)]
         assert have_targets == want_targets
 
-    def test_connection(self, connection):
-        """Tests that the correct connection is returned for a device."""
-        device = xcc.Device("qpu", connection)
-        assert device.connection == connection
-
     def test_target(self, device):
         """Tests that the correct target is returned for a device."""
         assert device.target == "qpu"

@@ -87,11 +87,6 @@ class Device:
         self._connection = connection
 
     @property
-    def connection(self) -> Connection:
-        """Returns the connection used to access the Xanadu Cloud."""
-        return self._connection
-
-    @property
     def target(self) -> str:
         """Returns the target of a device."""
         return self._target
@@ -122,7 +117,7 @@ class Device:
         """
         url = self._details["certificate_url"]
         path = urlparse(url).path
-        return self.connection.request("GET", path).json()
+        return self._connection.request("GET", path).json()
 
     @cached_property
     def specification(self) -> Mapping[str, Any]:
@@ -133,7 +128,7 @@ class Device:
         """
         url = self._details["specifications_url"]
         path = urlparse(url).path
-        return self.connection.request("GET", path).json()
+        return self._connection.request("GET", path).json()
 
     @property
     def expected_uptime(self) -> Mapping[str, List[str]]:
@@ -178,7 +173,7 @@ class Device:
             callers. Instead, they should be individually retrieved through
             their associated public properties.
         """
-        return self.connection.request("GET", f"/devices/{self.target}").json()
+        return self._connection.request("GET", f"/devices/{self.target}").json()
 
     def __repr__(self) -> str:
         """Returns a printable representation of a device."""
