@@ -23,6 +23,13 @@ class Device:
         and stored in a cache. This cache can be cleared at any time by calling
         :meth:`Device.clear`.
 
+
+    .. warning::
+
+        The :class:`xcc.Device` class transparently contacts the Xanadu Cloud
+        when an uncached device property is accessed. This means that requesting
+        a device property for the first time may take longer than expected.
+
     **Example:**
 
     The following example shows how to use the :class:`Device` class to query

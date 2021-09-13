@@ -29,6 +29,12 @@ class Job:
         stored in a cache. This cache can be cleared at any time by calling
         :meth:`Job.clear`.
 
+    .. warning::
+
+        The :class:`xcc.Job` class transparently contacts the Xanadu Cloud when
+        an uncached job property is accessed. This means that requesting a job
+        property for the first time may take longer than expected.
+
     **Example:**
 
     The following example shows how to use the :class:`Job` class to submit and
