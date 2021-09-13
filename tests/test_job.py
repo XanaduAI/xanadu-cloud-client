@@ -120,6 +120,7 @@ class TestJob:
             "target": "bar",
             "created_at": datetime_.isoformat(),
             "finished_at": datetime_.isoformat(),
+            "running_time": 0.12345,
         }
         add_response(body=body)
         assert set(job.overview) == set(body)

@@ -171,6 +171,7 @@ class Job:
             "target": self.target,
             "created_at": self.created_at,
             "finished_at": self.finished_at,
+            "running_time": self.running_time,
         }
 
     @cached_property
