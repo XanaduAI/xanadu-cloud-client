@@ -164,18 +164,14 @@ class Job:
             Mapping[str, Any]: mapping from field names to values for this job
             as determined by the needs of a Xanadu Cloud user.
         """
-        overview = {
+        return {
             "id": self.id,
             "name": self.name,
             "status": self.status,
             "target": self.target,
             "created_at": self.created_at,
+            "finished_at": self.finished_at,
         }
-
-        if self.finished:
-            overview.update({"finished_at": self.finished_at})
-
-        return overview
 
     @cached_property
     def _details(self) -> Mapping[str, Any]:

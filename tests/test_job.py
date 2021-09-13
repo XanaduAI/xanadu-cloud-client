@@ -111,21 +111,8 @@ class TestJob:
         assert job.id == "00000000-0000-4000-8000-000000000000"
 
     @responses.activate
-    def test_overview_of_unfinished_job(self, job, add_response, datetime_):
-        """Tests that the correct overview is returned for an unfinished job."""
-        body = {
-            "id": job.id,
-            "name": "foo",
-            "status": "queued",
-            "target": "bar",
-            "created_at": datetime_.isoformat(),
-        }
-        add_response(body=body)
-        assert set(job.overview) == set(body)
-
-    @responses.activate
-    def test_overview_of_finished_job(self, job, add_response, datetime_):
-        """Tests that the correct overview is returned for a finished job."""
+    def test_overview(self, job, add_response, datetime_):
+        """Tests that the correct overview is returned for a job."""
         body = {
             "id": job.id,
             "name": "foo",
