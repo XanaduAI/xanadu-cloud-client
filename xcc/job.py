@@ -98,7 +98,8 @@ class Job:
         Args:
             connection (Connection): connection to the Xanadu Cloud
             status (str, optional): optionally filter jobs by status
-            limit (int): maximum number of jobs to retrieve
+            limit (int): maximum number of jobs to retrieve (before the status
+                filter is applied)
 
         Returns:
             Sequence[Job]: jobs on the Xanadu Cloud which match the status
