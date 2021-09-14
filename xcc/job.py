@@ -92,31 +92,22 @@ class Job:
     """
 
     @staticmethod
-    def list(connection: Connection, status: Optional[str] = None, limit: int = 5) -> Sequence[Job]:
+    def list(connection: Connection, limit: int = 5) -> Sequence[Job]:
         """Returns jobs submitted to the Xanadu Cloud.
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
-            status (str, optional): optionally filter jobs by status
-            limit (int): maximum number of jobs to retrieve (before the status
-                filter is applied)
+            limit (int): maximum number of jobs to retrieve
 
         Returns:
-            Sequence[Job]: jobs on the Xanadu Cloud which match the status
-            filter and were submitted by the user associated with the Xanadu
-            Cloud connection
+            Sequence[Job]: jobs which were submitted on the Xanadu Cloud by the
+            user associated with the Xanadu Cloud connection
         """
         response = connection.request("GET", "/jobs", params={"size": limit})
 
-        def include(details: Mapping[str, Any]) -> bool:
-            """Returns ``True`` if a job with the given details should be
-            included in the response.  Otherwise, ``False`` is returned.
-            """
-            return status is None or details["status"] == status
-
         jobs = []
 
-        for details in filter(include, response.json()["data"]):
+        for details in response.json()["data"]:
             job = Job(details["id"], connection=connection)
             job._details = details  # pylint: disable=protected-access
             jobs.append(job)

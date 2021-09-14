@@ -53,18 +53,15 @@ class TestJob:
     """Tests the :class:`xcc.Job` class."""
 
     @pytest.mark.parametrize(
-        "limit, status, want_names",
+        "limit, want_names",
         [
-            (2, None, ["foo", "bar"]),
-            (1, None, ["foo"]),
-            (2, "failed", []),
-            (2, "queued", ["foo"]),
-            (2, "complete", ["bar"]),
+            (1, ["foo"]),
+            (2, ["foo", "bar"]),
         ],
     )
     @responses.activate
-    def test_list(self, connection, add_response, limit, status, want_names):
-        """Tests that the correct jobs are listed for a status and limit."""
+    def test_list(self, connection, add_response, limit, want_names):
+        """Tests that the correct jobs are listed."""
         data = [
             {
                 "id": "00000000-0000-4000-8000-000000000001",
@@ -84,7 +81,7 @@ class TestJob:
         ][:limit]
         add_response(body={"data": data}, path="/jobs")
 
-        have_names = [job.name for job in xcc.Job.list(connection, status=status, limit=limit)]
+        have_names = [job.name for job in xcc.Job.list(connection, limit=limit)]
         assert have_names == want_names
 
         have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
