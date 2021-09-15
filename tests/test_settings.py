@@ -26,7 +26,7 @@ def test_get_path_to_env_file(monkeypatch):
 
 
 def test_get_name_of_env_var():
-    """Tests that the names of Xanadu Cloud environment variables is derived correctly."""
+    """Tests that the names of Xanadu Cloud environment variables are derived correctly."""
     assert xcc.settings.get_name_of_env_var() == "XANADU_CLOUD_"
     assert xcc.settings.get_name_of_env_var("KEY") == "XANADU_CLOUD_KEY"
 

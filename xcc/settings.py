@@ -1,5 +1,5 @@
 """
-This module contains the :class:`~xcc.Settings` class.
+This module contains the :class:`~xcc.Settings` class and related helper functions.
 """
 
 import os
