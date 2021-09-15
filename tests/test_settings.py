@@ -2,8 +2,8 @@
 """
 This module tests the :module:`xcc.settings` module.
 """
-
-from tempfile import NamedTemporaryFile
+import os
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 import pytest
 from dotenv import dotenv_values
@@ -13,7 +13,7 @@ import xcc
 
 @pytest.fixture()
 def env_file(monkeypatch):
-    """Returns a mock .env file."""
+    """Returns a mock .env file which :class:`xcc.Settings` is configured to use."""
     with NamedTemporaryFile() as env_file:
         monkeypatch.setattr("xcc.settings.Settings.Config.env_file", env_file.name)
         yield env_file
@@ -49,7 +49,7 @@ class TestSettings:
         assert xcc.Settings().PORT == 54321
 
     def test_save(self, env_file):
-        """Tests that settings can be saved to the .env file."""
+        """Tests that settings can be saved to a .env file."""
         settings = xcc.Settings()
 
         settings.API_KEY = "j.w.t"
@@ -66,7 +66,16 @@ class TestSettings:
             "XANADU_CLOUD_TLS": "False",
         }
 
-    def test_save_missing_api_key(self, env_file):
-        """Tests that missing API keys are not saved to the .env file."""
+    def test_save_without_api_key(self, env_file):
+        """Tests that settings can be saved to a .env file without an API key."""
         xcc.Settings().save()
         assert "XANADU_CLOUD_API_KEY" not in dotenv_values(env_file.name)
+
+    def test_save_to_nonexistent_directory(self, monkeypatch):
+        """Tests that settings can be saved to a .env file in a nonexistent directory."""
+        with TemporaryDirectory() as env_dir:
+            env_file = os.path.join(env_dir, "foo", "bar", ".env")
+            monkeypatch.setattr("xcc.settings.Settings.Config.env_file", env_file)
+
+            xcc.Settings().save()
+            assert os.path.exists(env_file) is True
