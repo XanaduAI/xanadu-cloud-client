@@ -41,11 +41,10 @@ class Settings(BaseSettings):
         env_dir = os.path.dirname(env_file)
         os.makedirs(env_dir, exist_ok=True)
 
-        for key, val in self.__dict__.items():
-            if val is not None:
-                set_key(
-                    dotenv_path=env_file,
-                    key_to_set=get_name_of_env_var(key),
-                    value_to_set=str(val),
-                    quote_mode="auto",
-                )
+        for key, val in self.dict(exclude_none=True).items():
+            set_key(
+                dotenv_path=env_file,
+                key_to_set=get_name_of_env_var(key),
+                value_to_set=str(val),
+                quote_mode="auto",
+            )
