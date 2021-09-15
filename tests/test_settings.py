@@ -50,13 +50,7 @@ class TestSettings:
 
     def test_save(self, env_file):
         """Tests that settings can be saved to a .env file."""
-        settings = xcc.Settings()
-
-        settings.API_KEY = "j.w.t"
-        settings.HOST = "example.com"
-        settings.PORT = 80
-        settings.TLS = False
-
+        settings = xcc.Settings(API_KEY="j.w.t", HOST="example.com", PORT=80, TLS=False)
         settings.save()
 
         assert dotenv_values(env_file.name) == {
