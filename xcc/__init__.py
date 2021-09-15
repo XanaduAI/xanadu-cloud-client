@@ -8,5 +8,6 @@ provide interfaces for managing devices and jobs, respectively.
 from ._version import __version__
 from .connection import Connection
 from .device import Device
+from .job import Job
 
-__all__ = ["Connection", "Device"]
+__all__ = ["Connection", "Device", "Job"]

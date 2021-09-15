@@ -51,11 +51,6 @@ class TestDevice:
         have_targets = [device.target for device in xcc.Device.list(connection, status)]
         assert have_targets == want_targets
 
-    def test_connection(self, connection):
-        """Tests that the correct connection is returned for a device."""
-        device = xcc.Device("qpu", connection)
-        assert device.connection == connection
-
     def test_target(self, device):
         """Tests that the correct target is returned for a device."""
         assert device.target == "qpu"
@@ -105,15 +100,15 @@ class TestDevice:
         assert repr(device) == "<Device: target=qpu>"
 
     @responses.activate
-    def test_refresh(self, device, add_response):
-        """Tests that the cache of a device can be refreshed."""
+    def test_clear(self, device, add_response):
+        """Tests that the cache of a device can be cleared."""
         add_response(body={"state": "offline"})
         add_response(body={"state": "online"})
 
         assert device.status == "offline"
         assert device.status == "offline"
 
-        device.refresh()
+        device.clear()
 
         assert len(responses.calls) == 1
         assert device.status == "online"
@@ -134,13 +129,13 @@ class TestDevice:
         assert device_2.status == "online"
         assert len(responses.calls) == 2
 
-        device_1.refresh()
+        device_1.clear()
 
         assert device_1.status == "online"
         assert device_2.status == "online"
         assert len(responses.calls) == 3
 
-        device_2.refresh()
+        device_2.clear()
 
         assert device_1.status == "online"
         assert device_2.status == "offline"

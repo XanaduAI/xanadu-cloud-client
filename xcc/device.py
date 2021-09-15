@@ -3,47 +3,11 @@ This module contains the :class:`~xcc.Device` class.
 """
 from __future__ import annotations
 
-from typing import Any, Callable, List, Mapping, Optional, Sequence
+from typing import Any, List, Mapping, Optional, Sequence
 from urllib.parse import urlparse
 
 from .connection import Connection
-
-
-# pylint: disable=invalid-name
-class cached_property:
-    """Descriptor that transforms a class method into a property whose value is
-    computed once and then cached for subsequent accesses.
-
-    Args:
-        func (Callable[[Any], Any]): class method whose value should be cached
-
-    .. note::
-
-        Each class instance is associated with an independent cache.
-
-    .. warning::
-
-        Unlike ``functools.cached_property``, this descriptor is *not* safe for
-        concurrent use.
-    """
-
-    def __init__(self, func: Callable[[Any], Any]) -> None:
-        self.func = func
-        self.caches = {}
-
-    def __get__(self, instance: Any, _) -> Any:
-        """Returns the (cached) value associated with the given instance."""
-        if instance not in self.caches:
-            self.caches[instance] = self.func(instance)
-        return self.caches[instance]
-
-    def __set__(self, instance: Any, value: Any) -> None:
-        """Sets the cache of the given instance to the provided value."""
-        self.caches[instance] = value
-
-    def __delete__(self, instance: Any) -> None:
-        """Clears the cache of the given instance."""
-        self.caches.pop(instance, None)
+from .util import cached_property
 
 
 class Device:
@@ -57,13 +21,20 @@ class Device:
 
         For performance reasons, the properties of a device are lazily fetched
         and stored in a cache. This cache can be cleared at any time by calling
-        :meth:`xcc.Device.refresh`.
+        :meth:`Device.clear`.
+
+
+    .. warning::
+
+        The :class:`xcc.Device` class transparently contacts the Xanadu Cloud
+        when an uncached device property is accessed. This means that requesting
+        a device property for the first time may take longer than expected.
 
     **Example:**
 
-    The following example shows how to use the :class:`xcc.Device` class to
-    query various properties of the ``X8_01`` device on the Xanadu Cloud. First,
-    a connection is established to the Xanadu Cloud:
+    The following example shows how to use the :class:`Device` class to query
+    various properties of the ``X8_01`` device on the Xanadu Cloud. First, a
+    connection is established to the Xanadu Cloud:
 
     >>> import xcc
     >>> connection = xcc.Connection(key="Xanadu Cloud API key goes here")
@@ -106,9 +77,7 @@ class Device:
 
         for details in filter(include, response.json()["data"]):
             device = Device(target=details["target"], connection=connection)
-            # Cache the device details since they have already been fetched.
-            # pylint: disable=protected-access,unused-private-member
-            device._details = details
+            device._details = details  # pylint: disable=protected-access
             devices.append(device)
 
         return devices
@@ -116,11 +85,6 @@ class Device:
     def __init__(self, target: str, connection: Connection) -> None:
         self._target = target
         self._connection = connection
-
-    @property
-    def connection(self) -> Connection:
-        """Returns the connection used to access the Xanadu Cloud."""
-        return self._connection
 
     @property
     def target(self) -> str:
@@ -138,22 +102,6 @@ class Device:
         return {"target": self.target, "status": self.status}
 
     @cached_property
-    def _details(self) -> Mapping[str, Any]:
-        """Returns the details of a device.
-
-        Returns:
-            Mapping[str, Any]: mapping from field names to values for this
-            device as determined by the Xanadu Cloud device endpoint.
-
-        .. note::
-
-            These fields are not intended to be directly accessed by external
-            callers. Instead, they should be individually retrieved through
-            their associated public properties.
-        """
-        return self.connection.request("GET", f"/devices/{self.target}").json()
-
-    @cached_property
     def certificate(self) -> Mapping[str, Any]:
         """Returns the certificate of a device.
 
@@ -169,7 +117,7 @@ class Device:
         """
         url = self._details["certificate_url"]
         path = urlparse(url).path
-        return self.connection.request("GET", path).json()
+        return self._connection.request("GET", path).json()
 
     @cached_property
     def specification(self) -> Mapping[str, Any]:
@@ -180,7 +128,7 @@ class Device:
         """
         url = self._details["specifications_url"]
         path = urlparse(url).path
-        return self.connection.request("GET", path).json()
+        return self._connection.request("GET", path).json()
 
     @property
     def expected_uptime(self) -> Mapping[str, List[str]]:
@@ -211,12 +159,28 @@ class Device:
         """
         return self.status == "online"
 
+    @cached_property
+    def _details(self) -> Mapping[str, Any]:
+        """Returns the details of a device.
+
+        Returns:
+            Mapping[str, Any]: mapping from field names to values for this
+            device as determined by the Xanadu Cloud device endpoint.
+
+        .. note::
+
+            These fields are not intended to be directly accessed by external
+            callers. Instead, they should be individually retrieved through
+            their associated public properties.
+        """
+        return self._connection.request("GET", f"/devices/{self.target}").json()
+
     def __repr__(self) -> str:
         """Returns a printable representation of a device."""
         return f"<{self.__class__.__name__}: target={self.target}>"
 
-    def refresh(self) -> None:
-        """Refreshes the details, certificate, and specification of a device."""
+    def clear(self) -> None:
+        """Clears the details, certificate, and specification caches of a device."""
         del self._details
         del self.certificate
         del self.specification
