@@ -15,7 +15,7 @@ from xcc.util import cached_property
 
 
 class MockDevice(xcc.Device):
-    """Mock device with an offline implementation for the :class:`xcc.Device`
+    """Mock :class:`xcc.Device` class with an offline implementation for the
     properties and functions leveraged by the CLI.
     """
 
@@ -42,7 +42,7 @@ class MockDevice(xcc.Device):
 
 
 class MockJob(xcc.Job):
-    """Mock job with an offline implementation for the :class:`xcc.Job`
+    """Mock :class:`xcc.Job` class with an offline implementation for the
     properties and functions leveraged by the CLI.
     """
 
@@ -104,8 +104,8 @@ class TestGetSetting:
         assert xcc.commands.get_setting(name="PoRt") == 80
 
     def test_invalid_name(self):
-        """Tests that a ValueError is raised when an invalid setting name is specified."""
-        with pytest.raises(ValueError, match=r"The setting name 'DNE' must be one of \[.*\]\."):
+        """Tests that a ValueError is raised when the name of a setting is invalid."""
+        with pytest.raises(ValueError, match=r"The setting name 'DNE' must be one of \[.*\]"):
             xcc.commands.get_setting(name="DNE")
 
     def test_missing_value(self, settings):
@@ -139,7 +139,7 @@ class TestSetSetting:
         assert xcc.Settings().PORT == 123
 
     def test_invalid_name(self):
-        """Tests that a ValueError is raised when an invalid setting name is specified."""
+        """Tests that a ValueError is raised when the name of a setting is invalid."""
         with pytest.raises(ValueError, match=r"The setting name 'DNE' must be one of \[.*\]\."):
             xcc.commands.set_setting(name="DNE", value="N/A")
 
@@ -186,7 +186,7 @@ class TestGetDevice:
 
 
 def test_list_devices():
-    """Tests that devices can be listed."""
+    """Tests that devices can be listed using the :func:`xcc.commands.list_devices()` CLI command."""
     have_list = json.loads(xcc.commands.list_devices())
     want_list = [{"target": "foo"}, {"target": "bar"}]
     assert have_list == want_list
@@ -228,14 +228,14 @@ class TestGetJob:
 
 
 def test_list_jobs():
-    """Tests that jobs can be listed."""
+    """Tests that jobs can be listed using the :func:`xcc.commands.list_jobs()` CLI command."""
     have_list = json.loads(xcc.commands.list_jobs(limit=2))
     want_list = [{"id": "foo"}, {"id": "bar"}]
     assert have_list == want_list
 
 
 def test_submit_job():
-    """Tests that a job can be submitted."""
+    """Tests that a job can be submitted using the :func:`xcc.commands.submit_job()` CLI command."""
     have_overview = json.loads(xcc.commands.submit_job(name="foo", target="bar", circuit="baz"))
     want_overview = {"id": "foo"}
     assert have_overview == want_overview
@@ -246,12 +246,16 @@ def test_submit_job():
 
 
 def test_ping(monkeypatch):
-    """Tests that the Xanadu Cloud server can be pinged."""
+    """Tests that the output of the :func:`xcc.commands.ping()` CLI command
+    is correct when the connection to the Xanadu Cloud is successful.
+    """
     monkeypatch.setattr("xcc.commands.Connection.ping", lambda _: None)
     assert xcc.commands.ping() == "Successfully connected to the Xanadu Cloud."
 
 
 def test_version(monkeypatch):
-    """Tests that the Xanadu Cloud server can be versioned."""
+    """Tests that the output of the :func:`xcc.commands.version()` CLI command
+    has the correct form.
+    """
     monkeypatch.setattr("xcc.commands.__version__", "1.2.3-alpha")
     assert xcc.commands.version() == "Xanadu Cloud Client version 1.2.3-alpha"
