@@ -14,7 +14,7 @@ import xcc
 @pytest.fixture()
 def env_file(monkeypatch):
     """Returns a mock .env file which :class:`xcc.Settings` is configured to use."""
-    with NamedTemporaryFile() as env_file:
+    with NamedTemporaryFile("w") as env_file:
         monkeypatch.setattr("xcc.settings.Settings.Config.env_file", env_file.name)
         yield env_file
 
@@ -41,7 +41,7 @@ class TestSettings:
         """
         assert xcc.Settings().PORT == 443
 
-        env_file.write(b"XANADU_CLOUD_PORT=12345")
+        env_file.write("XANADU_CLOUD_PORT=12345")
         env_file.seek(0)
         assert xcc.Settings().PORT == 12345
 
@@ -60,10 +60,25 @@ class TestSettings:
             "XANADU_CLOUD_TLS": "False",
         }
 
-    def test_save_without_api_key(self, env_file):
-        """Tests that settings can be saved to a .env file without an API key."""
-        xcc.Settings().save()
-        assert "XANADU_CLOUD_API_KEY" not in dotenv_values(env_file.name)
+    def test_save_multiple_times(self, settings):
+        """Tests that settings can be saved to a .env file multiple times."""
+        path_to_env_file = xcc.Settings.Config.env_file
+
+        settings.API_KEY = None
+        settings.save()
+        assert "XANADU_CLOUD_API_KEY" not in dotenv_values(path_to_env_file)
+
+        settings.API_KEY = "f.o.o"
+        settings.save()
+        assert dotenv_values(path_to_env_file)["XANADU_CLOUD_API_KEY"] == "f.o.o"
+
+        settings.API_KEY = "b.a.r"
+        settings.save()
+        assert dotenv_values(path_to_env_file)["XANADU_CLOUD_API_KEY"] == "b.a.r"
+
+        settings.API_KEY = None
+        settings.save()
+        assert "XANADU_CLOUD_API_KEY" not in dotenv_values(path_to_env_file)
 
     def test_save_to_nonexistent_directory(self, monkeypatch):
         """Tests that settings can be saved to a .env file in a nonexistent directory."""

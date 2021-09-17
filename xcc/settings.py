@@ -6,7 +6,7 @@ import os
 from typing import Optional
 
 from appdirs import user_config_dir
-from dotenv import set_key
+from dotenv import dotenv_values, set_key, unset_key
 from pydantic import BaseSettings
 
 
@@ -29,8 +29,7 @@ class Settings(BaseSettings):
     PORT: int = 443
     TLS: bool = True
 
-    # pylint: disable=missing-class-docstring,too-few-public-methods
-    class Config:
+    class Config:  # pylint: disable=missing-class-docstring
         case_sensitive = True
         env_file = get_path_to_env_file()
         env_prefix = get_name_of_env_var()
@@ -41,10 +40,24 @@ class Settings(BaseSettings):
         env_dir = os.path.dirname(env_file)
         os.makedirs(env_dir, exist_ok=True)
 
-        for key, val in self.dict(exclude_none=True).items():
-            set_key(
-                dotenv_path=env_file,
-                key_to_set=get_name_of_env_var(key),
-                value_to_set=str(val),
-                quote_mode="auto",
-            )
+        saved = dotenv_values(dotenv_path=env_file)
+
+        for key, val in self.dict().items():
+            field = get_name_of_env_var(key)
+
+            # Remove keys that are assigned to None.
+            if val is None and field in saved:
+                unset_key(
+                    dotenv_path=env_file,
+                    key_to_unset=field,
+                    quote_mode="auto",
+                )
+
+            # Replace keys that are not assigned to None.
+            elif val is not None and val != saved.get(field):
+                set_key(
+                    dotenv_path=env_file,
+                    key_to_set=field,
+                    value_to_set=str(val),
+                    quote_mode="auto",
+                )
