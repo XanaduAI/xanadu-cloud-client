@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from typing import Any, List, Mapping, Optional, Sequence, Union
 from urllib.parse import urlparse
 
+import dateutil.parser
 import numpy as np
 
 from .connection import Connection
@@ -204,7 +205,7 @@ class Job:
         Returns:
             datetime: datetime when this job was created
         """
-        return datetime.fromisoformat(self._details["created_at"])
+        return dateutil.parser.isoparse(self._details["created_at"])
 
     @property
     def started_at(self) -> Optional[datetime]:
@@ -214,7 +215,7 @@ class Job:
             datetime, optional: datetime when this job started
         """
         datetime_ = self._details["started_at"]
-        return None if datetime_ is None else datetime.fromisoformat(datetime_)
+        return None if datetime_ is None else dateutil.parser.isoparse(datetime_)
 
     @property
     def finished_at(self) -> Optional[datetime]:
@@ -224,7 +225,7 @@ class Job:
             datetime, optional: datetime when this job finished
         """
         datetime_ = self._details["finished_at"]
-        return None if datetime_ is None else datetime.fromisoformat(datetime_)
+        return None if datetime_ is None else dateutil.parser.isoparse(datetime_)
 
     @property
     def running_time(self) -> Optional[timedelta]:

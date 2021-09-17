@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from timeit import timeit
 from typing import Callable
 
+import dateutil.parser
 import numpy as np
 import numpy.lib.npyio
 import pytest
@@ -32,7 +33,7 @@ def job(job_id, connection) -> xcc.Job:
 @pytest.fixture
 def datetime_() -> datetime:
     """Returns a mock datetime."""
-    return datetime.fromisoformat("2020-01-03T12:34:56.789012+00:00")
+    return dateutil.parser.isoparse("2020-01-03T12:34:56.789012Z")
 
 
 @pytest.fixture
