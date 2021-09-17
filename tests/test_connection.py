@@ -14,7 +14,8 @@ from xcc.connection import Connection
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
 
-    def test_load(self, settings):
+    @pytest.mark.usefixtures("settings")
+    def test_load(self):
         """Tests that a connection can be loaded."""
         connection = Connection.load()
         assert connection.refresh_token == "j.w.t"
