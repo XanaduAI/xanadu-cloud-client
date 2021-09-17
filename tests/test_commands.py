@@ -16,7 +16,7 @@ from xcc.util import cached_property
 
 class MockDevice(xcc.Device):
     """Mock :class:`xcc.Device` class with an offline implementation for the
-    properties and functions leveraged by the CLI.
+    properties and functions that are directly accessed by the CLI.
     """
 
     @staticmethod
@@ -43,7 +43,7 @@ class MockDevice(xcc.Device):
 
 class MockJob(xcc.Job):
     """Mock :class:`xcc.Job` class with an offline implementation for the
-    properties and functions leveraged by the CLI.
+    properties and functions that are directly accessed by the CLI.
     """
 
     @staticmethod
@@ -119,7 +119,7 @@ class TestGetSetting:
 
 
 def test_list_settings():
-    """Tests that the current settings can be listed."""
+    """Tests that the :func:`xcc.commands.list_settings()` CLI command lists settings."""
     have_settings = json.loads(xcc.commands.list_settings())
     want_settings = {"API_KEY": "j.w.t", "HOST": "example.com", "PORT": 80, "TLS": False}
     assert have_settings == want_settings
@@ -186,7 +186,7 @@ class TestGetDevice:
 
 
 def test_list_devices():
-    """Tests that devices can be listed using the :func:`xcc.commands.list_devices()` CLI command."""
+    """Tests that the :func:`xcc.commands.list_devices()` CLI command lists devices."""
     have_list = json.loads(xcc.commands.list_devices())
     want_list = [{"target": "foo"}, {"target": "bar"}]
     assert have_list == want_list
@@ -228,7 +228,7 @@ class TestGetJob:
 
 
 def test_list_jobs():
-    """Tests that jobs can be listed using the :func:`xcc.commands.list_jobs()` CLI command."""
+    """Tests that the :func:`xcc.commands.list_jobs()` CLI command lists jobs."""
     have_list = json.loads(xcc.commands.list_jobs(limit=2))
     want_list = [{"id": "foo"}, {"id": "bar"}]
     assert have_list == want_list
@@ -246,7 +246,7 @@ def test_submit_job():
 
 
 def test_ping(monkeypatch):
-    """Tests that the output of the :func:`xcc.commands.ping()` CLI command
+    """Tests that the output of the :func:`xcc.commands.ping()` command
     is correct when the connection to the Xanadu Cloud is successful.
     """
     monkeypatch.setattr("xcc.commands.Connection.ping", lambda _: None)
@@ -254,7 +254,7 @@ def test_ping(monkeypatch):
 
 
 def test_version(monkeypatch):
-    """Tests that the output of the :func:`xcc.commands.version()` CLI command
+    """Tests that the output of the :func:`xcc.commands.version()` command
     has the correct form.
     """
     monkeypatch.setattr("xcc.commands.__version__", "1.2.3-alpha")
