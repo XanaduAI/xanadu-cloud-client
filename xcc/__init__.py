@@ -9,5 +9,6 @@ from ._version import __version__
 from .connection import Connection
 from .device import Device
 from .job import Job
+from .settings import Settings
 
-__all__ = ["Connection", "Device", "Job"]
+__all__ = ["Connection", "Device", "Job", "Settings"]
