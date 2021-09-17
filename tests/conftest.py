@@ -21,8 +21,8 @@ def settings(monkeypatch) -> Iterator[xcc.Settings]:
     with NamedTemporaryFile("w") as env_file:
         monkeypatch.setattr("xcc.Settings.Config.env_file", env_file.name)
 
-        # Saving the settings ensures that new instances have the same values.
         settings_ = xcc.Settings(API_KEY="j.w.t", HOST="example.com", PORT=80, TLS=False)
+        # Saving ensures that new Settings instances are loaded with the same values.
         settings_.save()
 
         yield settings_
