@@ -1,0 +1,257 @@
+# pylint: disable=no-self-use,redefined-outer-name
+"""
+This module tests the :module:`xcc.commands` module.
+"""
+
+import json
+
+import numpy as np
+import pytest
+from fire.core import FireError
+
+import xcc
+import xcc.commands
+from xcc.util import cached_property
+
+
+class MockDevice(xcc.Device):
+    """Mock device with an offline implementation for the :class:`xcc.Device`
+    properties and functions leveraged by the CLI.
+    """
+
+    @staticmethod
+    def list(connection, status=None):
+        connection = xcc.Connection.load()
+        return [MockDevice(target, connection) for target in ("foo", "bar")]
+
+    @property
+    def overview(self):
+        return {"target": self.target}
+
+    @property
+    def status(self):
+        return "online"
+
+    @cached_property
+    def certificate(self):
+        return {"temperature": "300 Kelvin"}
+
+    @cached_property
+    def specification(self):
+        return {"modes": 42}
+
+
+class MockJob(xcc.Job):
+    """Mock job with an offline implementation for the :class:`xcc.Job`
+    properties and functions leveraged by the CLI.
+    """
+
+    @staticmethod
+    def list(connection, limit=5):
+        connection = xcc.Connection.load()
+        return [MockJob(id_, connection) for id_ in ("foo", "bar", "baz")][:limit]
+
+    @staticmethod
+    def submit(connection, name, target, circuit, language="blackbird:1.0"):
+        return MockJob(id_=name, connection=connection)
+
+    @property
+    def overview(self):
+        return {"id": self.id}
+
+    @property
+    def status(self):
+        return "online"
+
+    @property
+    def circuit(self):
+        return "MeasureFock() | [0, 1, 2, 3]"
+
+    @property
+    def language(self):
+        return "blackbird:1.0"
+
+    @cached_property
+    def result(self):
+        return np.zeros((4, 4))
+
+
+@pytest.fixture(autouse=True)
+def device(monkeypatch) -> None:
+    """Replaces the :class:`xcc.Device` class with the :class:`MockDevice` class in the CLI."""
+    monkeypatch.setattr("xcc.commands.Device", MockDevice)
+
+
+@pytest.fixture(autouse=True)
+def job(monkeypatch) -> None:
+    """Replaces the :class:`xcc.Job` class with the :class:`MockJob` class in the CLI."""
+    monkeypatch.setattr("xcc.commands.Job", MockJob)
+
+
+# Settings CLI
+# ------------------------------------------------------------------------------
+
+
+class TestGetSetting:
+    """Tests the :func:`xcc.commands.get_setting()` CLI command."""
+
+    def test_valid(self):
+        """Tests that the value of a setting can be retrieved."""
+        assert xcc.commands.get_setting(name="PORT") == 80
+
+    def test_mixed_case(self):
+        """Tests that the name of a setting is case-insensitive."""
+        assert xcc.commands.get_setting(name="PoRt") == 80
+
+    def test_invalid_name(self):
+        """Tests that a ValueError is raised when an invalid setting name is specified."""
+        with pytest.raises(ValueError, match=r"The setting name 'DNE' must be one of \[.*\]\."):
+            xcc.commands.get_setting(name="DNE")
+
+    def test_missing_value(self, settings):
+        """Tests that a ValueError is raised when the value of a setting is ``None``."""
+        settings.API_KEY = None
+        settings.save()
+
+        match = r"The API_KEY setting does not currently have a value"
+        with pytest.raises(ValueError, match=match):
+            xcc.commands.get_setting(name="API_KEY")
+
+
+def test_list_settings():
+    """Tests that the current settings can be listed."""
+    have_settings = json.loads(xcc.commands.list_settings())
+    want_settings = {"API_KEY": "j.w.t", "HOST": "example.com", "PORT": 80, "TLS": False}
+    assert have_settings == want_settings
+
+
+class TestSetSetting:
+    """Tests the :func:`xcc.commands.set_setting()` CLI command."""
+
+    def test_valid(self):
+        """Tests that the value of a setting can be updated."""
+        xcc.commands.set_setting(name="PORT", value=123)
+        assert xcc.Settings().PORT == 123
+
+    def test_mixed_case(self):
+        """Tests that the name of a setting is case-insensitive."""
+        xcc.commands.set_setting(name="PoRt", value=123)
+        assert xcc.Settings().PORT == 123
+
+    def test_invalid_name(self):
+        """Tests that a ValueError is raised when an invalid setting name is specified."""
+        with pytest.raises(ValueError, match=r"The setting name 'DNE' must be one of \[.*\]\."):
+            xcc.commands.set_setting(name="DNE", value="N/A")
+
+    def test_invalid_value(self):
+        """Tests that a ValueError is raised when the value of a setting is invalid."""
+        match = r"Failed to update PORT setting: value is not a valid integer"
+        with pytest.raises(ValueError, match=match):
+            xcc.commands.set_setting(name="PORT", value="string")
+
+
+# Device CLI
+# ------------------------------------------------------------------------------
+
+
+class TestGetDevice:
+    """Tests the :func:`xcc.commands.get_device()` CLI command."""
+
+    def test_overview(self):
+        """Tests that the overview of a device can be retrieved."""
+        have_overview = json.loads(xcc.commands.get_device(target="foo"))
+        want_overview = {"target": "foo"}
+        assert have_overview == want_overview
+
+    def test_status(self):
+        """Tests that the status of a device can be retrieved."""
+        assert xcc.commands.get_device(target="foo", status=True) == "online"
+
+    def test_certificate(self):
+        """Tests that the certificate of a device can be retrieved."""
+        have_certificate = json.loads(xcc.commands.get_device(target="foo", certificate=True))
+        want_certificate = {"temperature": "300 Kelvin"}
+        assert have_certificate == want_certificate
+
+    def test_specification(self):
+        """Tests that the specification of a device can be retrieved."""
+        have_specification = json.loads(xcc.commands.get_device(target="foo", specification=True))
+        want_specification = {"modes": 42}
+        assert have_specification == want_specification
+
+    def test_invalid_number_of_flags(self):
+        """Tests that a FireError is raised when more than one flag is specified."""
+        with pytest.raises(FireError, match=r"At most one device property can be selected"):
+            xcc.commands.get_device(target="foo", status=True, certificate=True)
+
+
+def test_list_devices():
+    """Tests that devices can be listed."""
+    have_list = json.loads(xcc.commands.list_devices())
+    want_list = [{"target": "foo"}, {"target": "bar"}]
+    assert have_list == want_list
+
+
+# Job CLI
+# ------------------------------------------------------------------------------
+
+
+class TestGetJob:
+    """Tests the :func:`xcc.commands.get_job()` CLI command."""
+
+    def test_overview(self):
+        """Tests that the overview of a job can be retrieved."""
+        have_overview = json.loads(xcc.commands.get_job(id="foo"))
+        want_overview = {"id": "foo"}
+        assert have_overview == want_overview
+
+    def test_status(self):
+        """Tests that the status of a job can be retrieved."""
+        assert xcc.commands.get_job(id="foo", status=True) == "online"
+
+    def test_circuit(self):
+        """Tests that the circuit of a job can be retrieved."""
+        have_circuit = json.loads(xcc.commands.get_job(id="foo", circuit=True))
+        want_circuit = {"circuit": "MeasureFock() | [0, 1, 2, 3]", "language": "blackbird:1.0"}
+        assert have_circuit == want_circuit
+
+    def test_result(self):
+        """Tests that the result of a job can be retrieved."""
+        have_result = xcc.commands.get_job(id="foo", result=True)
+        want_result = str(np.zeros((4, 4)))
+        assert have_result == want_result
+
+    def test_invalid_number_of_flags(self):
+        """Tests that a FireError is raised when more than one flag is specified."""
+        with pytest.raises(FireError, match=r"At most one job property can be selected"):
+            xcc.commands.get_job(id="foo", status=True, result=True)
+
+
+def test_list_jobs():
+    """Tests that jobs can be listed."""
+    have_list = json.loads(xcc.commands.list_jobs(limit=2))
+    want_list = [{"id": "foo"}, {"id": "bar"}]
+    assert have_list == want_list
+
+
+def test_submit_job():
+    """Tests that a job can be submitted."""
+    have_overview = json.loads(xcc.commands.submit_job(name="foo", target="bar", circuit="baz"))
+    want_overview = {"id": "foo"}
+    assert have_overview == want_overview
+
+
+# Other CLI
+# ------------------------------------------------------------------------------
+
+
+def test_ping(monkeypatch):
+    """Tests that the Xanadu Cloud server can be pinged."""
+    monkeypatch.setattr("xcc.commands.Connection.ping", lambda _: None)
+    assert xcc.commands.ping() == "Successfully connected to the Xanadu Cloud."
+
+
+def test_version(monkeypatch):
+    """Tests that the Xanadu Cloud server can be versioned."""
+    monkeypatch.setattr("xcc.commands.__version__", "1.2.3-alpha")
+    assert xcc.commands.version() == "Xanadu Cloud Client version 1.2.3-alpha"
