@@ -2,11 +2,14 @@
 This module contains the :class:`~xcc.Connection` class.
 """
 
+from __future__ import annotations
+
 from typing import Dict, Optional
 
 import requests
 
 from ._version import __version__
+from .settings import Settings
 
 
 class Connection:
@@ -55,6 +58,26 @@ class Connection:
         'up': True,
         'url': 'https://platform.strawberryfields.ai/devices/X8_01'}
     """
+
+    @staticmethod
+    def load() -> Connection:
+        """Loads a connection using the :class:`xcc.Settings` class.
+
+        Returns:
+            Connection: connection initialized from the configuration of a new
+            :class:`xcc.Settings` instance
+
+        Raises:
+            ValueError: if an API key is not specified in the settings
+        """
+        settings = Settings()
+
+        if settings.API_KEY is None:
+            raise ValueError("An API key is required to connect to the Xanadu Cloud.")
+
+        return Connection(
+            key=settings.API_KEY, host=settings.HOST, port=settings.PORT, tls=settings.TLS
+        )
 
     def __init__(
         self,
