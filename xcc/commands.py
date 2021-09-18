@@ -272,6 +272,7 @@ def main() -> None:
                     "list": list_devices,
                 },
                 "job": {
+                    "cancel": cancel_job,
                     "get": get_job,
                     "list": list_jobs,
                     "submit": submit_job,
