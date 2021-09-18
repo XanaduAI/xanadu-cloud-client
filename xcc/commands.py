@@ -160,6 +160,23 @@ def list_devices(status: str = None):
 
 @beautify
 # pylint: disable=invalid-name,redefined-builtin
+def cancel_job(id: str):
+    """Cancels a job on the Xanadu Cloud.
+
+    Args:
+        id (str): ID of the job.
+    """
+    job = Job(id_=id, connection=Connection.load())
+    job.cancel()
+
+    if job.status not in ("cancel_pending", "cancelled"):
+        raise ValueError(f"Job with ID '{id}' was not cancelled in time.")
+
+    return f"Job with ID '{id}' was successfully cancelled."
+
+
+@beautify
+# pylint: disable=invalid-name,redefined-builtin
 def get_job(id: str, circuit: bool = False, result: bool = False, status: bool = False):
     """Gets information about a job on the Xanadu Cloud.
 

@@ -15,8 +15,8 @@ from xcc.util import cached_property
 
 
 class MockDevice(xcc.Device):
-    """Mock :class:`xcc.Device` class with an offline implementation for the
-    properties and functions that are directly accessed by the CLI.
+    """Mock :class:`xcc.Device` class with an offline implementation of each
+    property and function which is directly accessed by a CLI command.
     """
 
     @staticmethod
@@ -42,12 +42,12 @@ class MockDevice(xcc.Device):
 
 
 class MockJob(xcc.Job):
-    """Mock :class:`xcc.Job` class with an offline implementation for the
-    properties and functions that are directly accessed by the CLI.
+    """Mock :class:`xcc.Job` class with an offline implementation of each
+    property and function which is directly accessed by a CLI command.
     """
 
     @staticmethod
-    def list(connection, limit=5):
+    def list(connection, limit=10):
         connection = xcc.Connection.load()
         return [MockJob(id_, connection) for id_ in ("foo", "bar", "baz")][:limit]
 
@@ -61,7 +61,7 @@ class MockJob(xcc.Job):
 
     @property
     def status(self):
-        return "online"
+        return "cancelled"
 
     @property
     def circuit(self):
@@ -74,6 +74,9 @@ class MockJob(xcc.Job):
     @cached_property
     def result(self):
         return np.zeros((4, 4))
+
+    def cancel(self):
+        pass
 
 
 @pytest.fixture(autouse=True)
@@ -196,6 +199,22 @@ def test_list_devices():
 # ------------------------------------------------------------------------------
 
 
+class TestCancelJob:
+    """Tests the :func:`xcc.commands.cancel_job()` CLI command."""
+
+    def test_cancel_success(self):
+        """Tests that the correct message is displayed when a job was cancelled."""
+        have_message = xcc.commands.cancel_job(id="foo")
+        want_message = "Job with ID 'foo' was successfully cancelled."
+        assert have_message == want_message
+
+    def test_cancel_failure(self, monkeypatch):
+        """Tests that a ValueError is raised if a job could not be cancelled."""
+        monkeypatch.setattr("xcc.commands.Job.status", "completed")
+        with pytest.raises(ValueError, match=r"Job with ID 'foo' was not cancelled in time\."):
+            xcc.commands.cancel_job(id="foo")
+
+
 class TestGetJob:
     """Tests the :func:`xcc.commands.get_job()` CLI command."""
 
@@ -207,7 +226,7 @@ class TestGetJob:
 
     def test_status(self):
         """Tests that the status of a job can be retrieved."""
-        assert xcc.commands.get_job(id="foo", status=True) == "online"
+        assert xcc.commands.get_job(id="foo", status=True) == "cancelled"
 
     def test_circuit(self):
         """Tests that the circuit of a job can be retrieved."""
