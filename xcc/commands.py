@@ -40,6 +40,30 @@ def beautify(command: Callable) -> Callable:
     return beautify_
 
 
+def load_connection() -> Connection:
+    """Loads a connection using the :class:`xcc.Settings` class.
+
+    Returns:
+        Connection: connection initialized from the configuration of a new
+        :class:`xcc.Settings` instance
+
+    Raises:
+        ValueError: if the API key is set to ``None`` in the settings
+    """
+    settings = Settings()
+
+    if settings.API_KEY is None:
+        raise ValueError("An API key is required to connect to the Xanadu Cloud.")
+
+    return Connection(
+        key=settings.API_KEY,
+        host=settings.HOST,
+        port=settings.PORT,
+        tls=settings.TLS,
+        headers={"User-Agent": f"XCC/{__version__} (CLI)"},
+    )
+
+
 # Settings CLI
 # ------------------------------------------------------------------------------
 
@@ -125,7 +149,7 @@ def get_device(
         specification (bool): Show the specification of the device.
         status (bool): Show the status of the device.
     """
-    device = Device(target, Connection.load())
+    device = Device(target=target, connection=load_connection())
 
     flags = sum([certificate, specification, status])
     if flags > 1:
@@ -150,7 +174,7 @@ def list_devices(status: str = None):
     Args:
         status (str): Filter devices by status (e.g., "offline" or "online").
     """
-    devices = Device.list(connection=Connection.load(), status=status)
+    devices = Device.list(connection=load_connection(), status=status)
     return [device.overview for device in devices]
 
 
@@ -166,7 +190,7 @@ def cancel_job(id: str):
     Args:
         id (str): ID of the job.
     """
-    job = Job(id_=id, connection=Connection.load())
+    job = Job(id_=id, connection=load_connection())
     job.cancel()
 
     if job.status not in ("cancel_pending", "cancelled"):
@@ -189,7 +213,7 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
         result (bool): Show the result of the job.
         status (bool): Show the status of the job.
     """
-    job = Job(id_=id, connection=Connection.load())
+    job = Job(id_=id, connection=load_connection())
 
     flags = sum([circuit, result, status])
     if flags > 1:
@@ -214,7 +238,7 @@ def list_jobs(limit: int = 10):
     Args:
         limit (int): Maximum number of jobs to display.
     """
-    jobs = Job.list(connection=Connection.load(), limit=limit)
+    jobs = Job.list(connection=load_connection(), limit=limit)
     return [job.overview for job in jobs]
 
 
@@ -229,7 +253,7 @@ def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:
         language (str): Language of the job.
     """
     job = Job.submit(
-        connection=Connection.load(),
+        connection=load_connection(),
         name=name,
         target=target,
         circuit=circuit.replace("\\n", "\n"),
@@ -244,7 +268,7 @@ def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:
 
 def ping():
     """Tests the connection to the Xanadu Cloud."""
-    Connection.load().ping()
+    load_connection().ping()
     return "Successfully connected to the Xanadu Cloud."
 
 

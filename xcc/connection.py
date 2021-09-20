@@ -9,7 +9,6 @@ from typing import Dict, Optional
 import requests
 
 from ._version import __version__
-from .settings import Settings
 
 
 class Connection:
@@ -20,6 +19,7 @@ class Connection:
         host (str): hostname of the Xanadu Cloud server
         port (int): port of the Xanadu Cloud server
         tls (bool): whether to use HTTPS for the connection
+        headers (Dict[str, str], optional): HTTP request headers to override
 
     **Example:**
 
@@ -59,32 +59,13 @@ class Connection:
         'url': 'https://platform.strawberryfields.ai/devices/X8_01'}
     """
 
-    @staticmethod
-    def load() -> Connection:
-        """Loads a connection using the :class:`xcc.Settings` class.
-
-        Returns:
-            Connection: connection initialized from the configuration of a new
-            :class:`xcc.Settings` instance
-
-        Raises:
-            ValueError: if an API key is not specified in the settings
-        """
-        settings = Settings()
-
-        if settings.API_KEY is None:
-            raise ValueError("An API key is required to connect to the Xanadu Cloud.")
-
-        return Connection(
-            key=settings.API_KEY, host=settings.HOST, port=settings.PORT, tls=settings.TLS
-        )
-
     def __init__(
         self,
         key: str,
         host: str = "platform.strawberryfields.ai",
         port: int = 443,
         tls: bool = True,
+        headers: Optional[Dict[str, str]] = None,
     ) -> None:
         self._access_token = None
         self._refresh_token = key
@@ -92,6 +73,8 @@ class Connection:
         self._tls = tls
         self._host = host
         self._port = port
+
+        self._headers = headers or {}
 
     @property
     def access_token(self) -> Optional[str]:
@@ -126,12 +109,12 @@ class Connection:
     @property
     def api_version(self) -> str:
         """Returns the "Accept-Version" header included in requests to the Xanadu Cloud."""
-        return "0.4.0"
+        return self._headers.get("Accept-Version", "0.4.0")
 
     @property
     def user_agent(self) -> str:
         """Returns the "User-Agent" header included in requests to the Xanadu Cloud."""
-        return f"XanaduCloudClient/{__version__}"
+        return self._headers.get("User-Agent", f"XCC/{__version__} (API)")
 
     @property
     def headers(self) -> Dict[str, str]:
@@ -140,6 +123,7 @@ class Connection:
             "Accept-Version": self.api_version,
             "Authorization": f"Bearer {self.access_token}",
             "User-Agent": self.user_agent,
+            **self._headers,
         }
 
     def __repr__(self) -> str:

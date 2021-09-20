@@ -8,29 +8,10 @@ import responses
 from requests.models import HTTPError
 
 import xcc
-from xcc.connection import Connection
 
 
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
-
-    @pytest.mark.usefixtures("settings")
-    def test_load(self):
-        """Tests that a connection can be loaded."""
-        connection = Connection.load()
-        assert connection.refresh_token == "j.w.t"
-        assert connection.host == "example.com"
-        assert connection.port == 80
-        assert connection.tls is False
-
-    def test_load_without_api_key(self, settings):
-        """Tests that a ValueError is raised when a connection is loaded without an API key."""
-        settings.API_KEY = None
-        settings.save()
-
-        match = r"An API key is required to connect to the Xanadu Cloud"
-        with pytest.raises(ValueError, match=match):
-            Connection.load()
 
     def test_access_token(self, connection):
         """Tests that the correct access token is returned for a connection."""
@@ -60,17 +41,23 @@ class TestConnection:
     def test_api_version(self, connection):
         """Tests that the correct API version is returned for a connection."""
         assert connection.api_version == "0.4.0"
+        connection._headers["Accept-Version"] = "1.2.3"  # pylint: disable=protected-access
+        assert connection.api_version == "1.2.3"
 
     def test_user_agent(self, connection):
         """Tests that the correct user agent is returned for a connection."""
-        assert connection.user_agent == f"XanaduCloudClient/{xcc.__version__}"
+        assert connection.user_agent == f"XCC/{xcc.__version__} (API)"
+        connection._headers["User-Agent"] = "Bond/1.2.3"  # pylint: disable=protected-access
+        assert connection.user_agent == "Bond/1.2.3"
 
     def test_headers(self, connection):
         """Tests that the correct headers are returned for a connection."""
+        connection._headers["Accept-Language"] = "en-CA"  # pylint: disable=protected-access
         assert connection.headers == {
+            "Accept-Language": "en-CA",
             "Accept-Version": "0.4.0",
             "Authorization": "Bearer None",
-            "User-Agent": f"XanaduCloudClient/{xcc.__version__}",
+            "User-Agent": f"XCC/{xcc.__version__} (API)",
         }
 
     def test_repr(self, connection):

@@ -21,7 +21,7 @@ class MockDevice(xcc.Device):
 
     @staticmethod
     def list(connection, status=None):
-        connection = xcc.Connection.load()
+        connection = xcc.commands.load_connection()
         return [MockDevice(target, connection) for target in ("foo", "bar")]
 
     @property
@@ -48,7 +48,7 @@ class MockJob(xcc.Job):
 
     @staticmethod
     def list(connection, limit=10):
-        connection = xcc.Connection.load()
+        connection = xcc.commands.load_connection()
         return [MockJob(id_, connection) for id_ in ("foo", "bar", "baz")][:limit]
 
     @staticmethod
@@ -89,6 +89,28 @@ def device(monkeypatch) -> None:
 def job(monkeypatch) -> None:
     """Replaces the :class:`xcc.Job` class with the :class:`MockJob` class in the CLI."""
     monkeypatch.setattr("xcc.commands.Job", MockJob)
+
+
+@pytest.mark.usefixtures("settings")
+def test_load_connection(monkeypatch):
+    """Tests that a connection can be loaded."""
+    monkeypatch.setattr("xcc.commands.__version__", "1.2.3-alpha")
+
+    connection = xcc.commands.load_connection()
+    assert connection.refresh_token == "j.w.t"
+    assert connection.host == "example.com"
+    assert connection.port == 80
+    assert connection.tls is False
+    assert connection.user_agent == "XCC/1.2.3-alpha (CLI)"
+
+
+def test_load_connection_without_api_key(settings):
+    """Tests that a ValueError is raised when a connection is loaded without an API key."""
+    settings.API_KEY = None
+    settings.save()
+
+    with pytest.raises(ValueError, match=r"An API key is required to connect to the Xanadu Cloud"):
+        xcc.commands.load_connection()
 
 
 # Settings CLI
