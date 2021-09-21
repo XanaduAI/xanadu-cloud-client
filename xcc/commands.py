@@ -110,6 +110,7 @@ def _resolve_setting(name: str) -> Tuple[str, Any]:
 @beautify
 def get_device(
     target: str,
+    availability: bool = False,
     certificate: bool = False,
     specification: bool = False,
     status: bool = False,
@@ -121,24 +122,27 @@ def get_device(
 
     Args:
         target (str): Name of the device target.
+        availability (bool): Show the expected uptime of the device.
         certificate (bool): Show the certificate of the device.
         specification (bool): Show the specification of the device.
         status (bool): Show the status of the device.
     """
     device = Device(target, Connection.load())
 
-    flags = sum([certificate, specification, status])
+    flags = sum([availability, certificate, specification, status])
     if flags > 1:
         raise FireError("At most one device property can be selected.")
 
     if flags == 0:
         return device.overview
-    if status:
-        return device.status
+    if availability:
+        return device.expected_uptime
     if certificate:
         return device.certificate
     if specification:
         return device.specification
+    if status:
+        return device.status
 
     raise NotImplementedError
 

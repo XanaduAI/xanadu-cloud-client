@@ -4,6 +4,7 @@ This module tests the :module:`xcc.device` module.
 """
 
 import json
+from datetime import time
 from typing import Callable
 
 import pytest
@@ -78,8 +79,10 @@ class TestDevice:
     @responses.activate
     def test_expected_uptime(self, device, add_response):
         """Tests that the correct expected uptime is returned for a device."""
-        add_response(body={"expected_uptime": {"monday": ["16:00:00+00:00", "23:59:59+00:00"]}})
-        assert device.expected_uptime == {"monday": ["16:00:00+00:00", "23:59:59+00:00"]}
+        time_up = time.fromisoformat("16:00:00+00:00")
+        time_dn = time.fromisoformat("20:00:00+00:00")
+        add_response(body={"expected_uptime": {"monday": [str(time_up), str(time_dn)]}})
+        assert device.expected_uptime == {"monday": (time_up, time_dn)}
 
     @responses.activate
     @pytest.mark.parametrize("status", ["offline", "online"])

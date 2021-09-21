@@ -3,7 +3,8 @@ This module contains the :class:`~xcc.Device` class.
 """
 from __future__ import annotations
 
-from typing import Any, List, Mapping, Optional, Sequence
+from datetime import time
+from typing import Any, Mapping, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
 from .connection import Connection
@@ -131,15 +132,18 @@ class Device:
         return self._connection.request("GET", path).json()
 
     @property
-    def expected_uptime(self) -> Mapping[str, List[str]]:
+    def expected_uptime(self) -> Mapping[str, Tuple[time, time]]:
         """Returns the expected uptime of a device.
 
         Returns:
-            Mapping[str, List[str]]: mapping from weekdays to time pairs where
-            each pair represents when the device is expected to come online and
-            offline that day
+            Mapping[str, Tuple[time, time]]: mapping from weekdays to time pairs
+            where each pair represents when the device is expected to come online
+            and offline that day
         """
-        return self._details["expected_uptime"]
+        expected_uptime = {}
+        for weekday, times in self._details["expected_uptime"].items():
+            expected_uptime[weekday] = tuple(map(time.fromisoformat, times))
+        return expected_uptime
 
     @property
     def status(self) -> str:
