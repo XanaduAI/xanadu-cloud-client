@@ -281,7 +281,9 @@ def main() -> None:
     """Entry point for the Xanadu Cloud CLI."""
     # Don't use a pager for displaying help information. For more details, see
     # https://github.com/google/python-fire/issues/188.
-    fire.core.Display = lambda lines, out: print(*lines, file=out)
+    fire.core.Display = lambda lines, out: print(
+        *lines, file=out
+    )  # pyright: reportGeneralTypeIssues=false
 
     try:
         fire.Fire(
