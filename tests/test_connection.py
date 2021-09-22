@@ -232,8 +232,8 @@ class TestConnection:
 
     @responses.activate
     def test_update_access_token_failure_due_to_invalid_refresh_token(self, connection):
-        """Tests that an HTTPError is raised when the HTTP response of an access
-        token request indicates that the refresh token is invalid.
+        """Tests that an HTTPError is raised when the HTTP response to an access
+        token request indicates that the refresh token (API key) is invalid.
         """
         responses.add(
             responses.POST,
