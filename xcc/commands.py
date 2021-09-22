@@ -129,7 +129,7 @@ def get_device(
     """
     device = Device(target, Connection.load())
 
-    flags = sum([availability, certificate, specification, status])
+    flags = sum(map(int, (availability, certificate, specification, status)))
     if flags > 1:
         raise FireError("At most one device property can be selected.")
 
@@ -143,8 +143,6 @@ def get_device(
         return device.specification
     if status:
         return device.status
-
-    raise NotImplementedError
 
 
 @beautify
@@ -195,7 +193,7 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
     """
     job = Job(id_=id, connection=Connection.load())
 
-    flags = sum([circuit, result, status])
+    flags = sum(map(int, (circuit, result, status)))
     if flags > 1:
         raise FireError("At most one job property can be selected.")
 
@@ -207,8 +205,6 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
         return job.status
     if result:
         return str(job.result)
-
-    raise NotImplementedError
 
 
 @beautify
