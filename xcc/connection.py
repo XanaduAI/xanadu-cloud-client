@@ -261,9 +261,19 @@ class Connection:
             requests.exceptions.RequestException: if there was an issue sending
                 the HTTP request
 
-        .. warning::
+        .. note::
 
             No validation is performed on the status code of the HTTP response.
+
+        .. warning::
+
+            The delay between when this function is called and when a timeout
+            exception is raised will be (slightly greater than) a multiple of
+            the ``timeout`` parameter passed to :func:`requests.request()`.
+            Specifically, if the timeout value is :math:`t` and there are
+            :math:`r` resource records listed for the hostname and port of the
+            Xanadu Cloud, then :math:`\\approx tr` seconds will elapse before a
+            timeout is detected.
         """
         try:
             timeout = kwargs.pop("timeout", 10)
