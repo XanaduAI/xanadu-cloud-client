@@ -5,6 +5,7 @@ from itertools import chain
 from typing import Dict, List, Optional
 
 import requests
+from requests.exceptions import HTTPError, RequestException
 
 from ._version import __version__
 
@@ -193,14 +194,12 @@ class Connection:
             response.raise_for_status()
 
         else:
-            # The details of a validation error are encoded in a "meta" field.
+            # The details of a validation error are encoded in the "meta" field.
             if response.status_code == 400 and body.get("code", "") == "validation-error":
                 errors: Dict[str, List[str]] = body.get("meta", {})
                 if errors:
                     message = "; ".join(chain.from_iterable(errors.values()))
-                else:
-                    message = f"Failed to validate {method} request to '{url}'."
-                raise requests.exceptions.HTTPError(message, response=response)
+                    raise requests.exceptions.HTTPError(message, response=response)
 
             # Otherwise, the details of the error may be encoded in the "detail" field.
             if not response.ok and "detail" in body:
@@ -215,8 +214,6 @@ class Connection:
         """Updates the access token of a connection using its refresh token.
 
         Raises:
-            ValueError: if the Xanadu Cloud API key is invalid or the HTTP
-                response to the access token request does not have valid JSON
             requests.exceptions.RequestException: if there was an issue sending
                 the HTTP request for the access token or the status code of the
                 HTTP response indicates that an error occurred (i.e., 4XX or 5XX)
@@ -244,7 +241,7 @@ class Connection:
             # It is worth investing in a helpful error message for invalid API
             # keys since most users will likely encounter it at some point.
             if response.status_code == 400 and body.get("error", "") == "invalid_grant":
-                raise ValueError("Xanadu Cloud API key is invalid.")
+                raise requests.exceptions.HTTPError("Xanadu Cloud API key is invalid.")
 
             response.raise_for_status()
 
@@ -270,7 +267,8 @@ class Connection:
             No validation is performed on the status code of the HTTP response.
         """
         try:
-            return requests.request(method=method, url=url, timeout=30, **kwargs)
+            timeout = kwargs.pop("timeout", 10)
+            return requests.request(method=method, url=url, timeout=timeout, **kwargs)
 
         except requests.exceptions.Timeout as exc:
             message = f"{method} request to '{url}' timed out."

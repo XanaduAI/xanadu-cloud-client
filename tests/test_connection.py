@@ -3,9 +3,11 @@
 This module tests the :module:`xcc.connection` module.
 """
 
+import json
 import pytest
 import responses
-from requests.models import HTTPError
+
+from requests.exceptions import HTTPError, RequestException
 
 import xcc
 
@@ -85,7 +87,7 @@ class TestConnection:
             connection.ping()
 
     @responses.activate
-    def test_request_with_fresh_access_token(self, connection):
+    def test_request_success_with_fresh_access_token(self, connection):
         """Tests that the correct response is returned for a connection with an
         access token that has not yet expired."""
         responses.add(responses.GET, connection.url("healthz"), status=200)
@@ -93,7 +95,7 @@ class TestConnection:
         assert len(responses.calls) == 1
 
     @responses.activate
-    def test_request_with_expired_access_token(self, connection):
+    def test_request_success_with_expired_access_token(self, connection):
         """Tests that the correct response is returned for a connection with an
         expired access token."""
         responses.add(responses.GET, connection.url("healthz"), status=401)
@@ -107,6 +109,50 @@ class TestConnection:
 
         assert connection.request("GET", "/healthz").status_code == 200
         assert len(responses.calls) == 3
+
+    @responses.activate
+    def test_request_failure_with_invalid_json(self, connection):
+        """Tests that an HTTPError is raised when the status code of the HTTP
+        response to a connection request indicates that an error has occurred
+        and the body of the response is invalid JSON.
+        """
+        responses.add(responses.GET, connection.url("healthz"), status=400)
+        with pytest.raises(HTTPError, match=r"400 Client Error: Bad Request"):
+            connection.request("GET", "/healthz")
+
+    @responses.activate
+    def test_request_failure_with_validation_error(self, connection):
+        """Tests that an HTTPError is raised when the HTTP response of a
+        connection request indicates that a validation error occurred and the
+        body of the response contains a non-empty "meta" field.
+        """
+        body = {"code": "validation-error", "meta": {"_schema": ["Foo", "Bar"], "size": ["Baz"]}}
+        responses.add(responses.GET, connection.url("healthz"), status=400, body=json.dumps(body))
+
+        with pytest.raises(HTTPError, match=r"Foo; Bar; Baz"):
+            connection.request("GET", "/healthz")
+
+    @responses.activate
+    def test_request_failure_with_detailed_error(self, connection):
+        """Tests that an HTTPError is raised when the status code of the HTTP
+        response to a connection request indicates that an error occurred and
+        the body of the response contains a "detail" field.
+        """
+        body = {"code": "invalid-request", "detail": "The request body is empty."}
+        responses.add(responses.GET, connection.url("healthz"), status=400, body=json.dumps(body))
+
+        with pytest.raises(HTTPError, match=r"The request body is empty"):
+            connection.request("GET", "/healthz")
+
+    @responses.activate
+    def test_request_failure_with_unknown_error(self, connection):
+        """Tests that an HTTPError is raised when the status code of the HTTP
+        response to a connection request indicates that an error occurred but
+        but no other details about the error are provided.
+        """
+        responses.add(responses.GET, connection.url("healthz"), status=418, body="{}")
+        with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
+            connection.request("GET", "/healthz")
 
     @responses.activate
     def test_update_access_token_success(self, connection):
@@ -123,9 +169,26 @@ class TestConnection:
         assert connection.access_token == "mock.access.token"
 
     @responses.activate
-    def test_update_access_token_failure(self, connection):
-        """Tests that a XanaduCloudConnectionError is raised when the access
-        token of a connection cannot be updated.
+    def test_update_access_token_success_with_invalid_json(self, connection):
+        """Tests that a ValueError is raised when the HTTP response to an access
+        token request has a 200 status code but the body of the response contains
+        invalid JSON.
+        """
+        responses.add(
+            responses.POST,
+            connection.url("auth/realms/platform/protocol/openid-connect/token"),
+            status=200,
+        )
+
+        match = r"Xanadu Cloud returned an invalid access token response\."
+        with pytest.raises(ValueError, match=match):
+            connection.update_access_token()
+
+    @responses.activate
+    def test_update_access_token_failure_with_invalid_json(self, connection):
+        """Tests that an HTTPError is raised when the status code of an HTTP
+        response to an access token request indicates that an error occurred and
+        the body of the response contains invalid JSON.
         """
         responses.add(
             responses.POST,
@@ -134,4 +197,35 @@ class TestConnection:
         )
 
         with pytest.raises(HTTPError, match=r"400 Client Error: Bad Request"):
+            connection.update_access_token()
+
+    @responses.activate
+    def test_update_access_token_failure_with_invalid_refresh_token(self, connection):
+        """Tests that an HTTPError is raised when the HTTP response of an access
+        token request indicates that the refresh token is invalid.
+        """
+        responses.add(
+            responses.POST,
+            connection.url("auth/realms/platform/protocol/openid-connect/token"),
+            status=400,
+            body='{"error": "invalid_grant"}',
+        )
+
+        with pytest.raises(HTTPError, match=r"Xanadu Cloud API key is invalid\."):
+            connection.update_access_token()
+
+    @responses.activate
+    def test_update_access_token_failure_with_unknown_error(self, connection):
+        """Tests that an HTTPError is raised when the HTTP response to an access
+        token request contains valid JSON but its status code indicates that an
+        error occurred.
+        """
+        responses.add(
+            responses.POST,
+            connection.url("auth/realms/platform/protocol/openid-connect/token"),
+            status=418,
+            body="{}",
+        )
+
+        with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
             connection.update_access_token()
