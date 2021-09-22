@@ -285,11 +285,6 @@ class Connection:
 
         except requests.exceptions.ConnectionError as exc:
             if "Name or service not known" in str(exc):
-                message = f"Failed to connect to '{url}': unknown hostname '{self.host}'"
+                message = f"Failed to resolve hostname '{self.host}'"
                 raise requests.exceptions.RequestException(message) from exc
             raise exc
-
-        # RequestException sits at the root of the requests exception hierarchy.
-        except requests.exceptions.RequestException as exc:
-            message = f"Failed to send {method} request to '{url}': {exc}"
-            raise requests.exceptions.RequestException(message) from exc

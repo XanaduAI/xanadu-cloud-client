@@ -178,11 +178,7 @@ class TestConnection:
 
         monkeypatch.setattr("xcc.connection.requests.request", mock_request)
 
-        match = (
-            r"Failed to connect to 'https://cloud.xanadu.ai:443/healthz': "
-            r"unknown hostname 'cloud.xanadu.ai'"
-        )
-        with pytest.raises(RequestException, match=match):
+        with pytest.raises(RequestException, match=r"Failed to resolve hostname 'cloud.xanadu.ai'"):
             connection.request("GET", "/healthz")
 
     @responses.activate
