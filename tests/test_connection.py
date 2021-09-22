@@ -12,6 +12,7 @@ from requests.exceptions import HTTPError, RequestException
 
 import xcc
 
+
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
 
