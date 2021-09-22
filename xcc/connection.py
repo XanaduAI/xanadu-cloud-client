@@ -5,7 +5,6 @@ from itertools import chain
 from typing import Dict, List, Optional
 
 import requests
-from requests.exceptions import HTTPError, RequestException
 
 from ._version import __version__
 
@@ -241,7 +240,7 @@ class Connection:
             # It is worth investing in a helpful error message for invalid API
             # keys since most users will likely encounter it at some point.
             if response.status_code == 400 and body.get("error", "") == "invalid_grant":
-                raise requests.exceptions.HTTPError("Xanadu Cloud API key is invalid.")
+                raise requests.exceptions.HTTPError("Xanadu Cloud API key is invalid")
 
             response.raise_for_status()
 
@@ -271,16 +270,13 @@ class Connection:
             return requests.request(method=method, url=url, timeout=timeout, **kwargs)
 
         except requests.exceptions.Timeout as exc:
-            message = f"{method} request to '{url}' timed out."
+            message = f"{method} request to '{url}' timed out"
             raise requests.exceptions.RequestException(message) from exc
 
         except requests.exceptions.ConnectionError as exc:
-            prefix = f"Failed to connect to '{url}'"
             if "Name or service not known" in str(exc):
-                message = f"{prefix}: hostname '{self.host}' could not be resolved"
-            else:
-                message = f"{prefix}: {exc}"
-            raise requests.exceptions.RequestException(message) from exc
+                message = f"Failed to connect to '{url}': unknown hostname '{self.host}'"
+                raise requests.exceptions.RequestException(message) from exc
 
         # RequestException sits at the root of the requests exception hierarchy.
         except requests.exceptions.RequestException as exc:

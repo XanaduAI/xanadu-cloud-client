@@ -4,13 +4,13 @@ This module tests the :module:`xcc.connection` module.
 """
 
 import json
-import pytest
-import responses
 
+import pytest
+import requests
+import responses
 from requests.exceptions import HTTPError, RequestException
 
 import xcc
-
 
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
@@ -111,7 +111,7 @@ class TestConnection:
         assert len(responses.calls) == 3
 
     @responses.activate
-    def test_request_failure_with_invalid_json(self, connection):
+    def test_request_failure_due_to_invalid_json(self, connection):
         """Tests that an HTTPError is raised when the status code of the HTTP
         response to a connection request indicates that an error has occurred
         and the body of the response is invalid JSON.
@@ -121,7 +121,7 @@ class TestConnection:
             connection.request("GET", "/healthz")
 
     @responses.activate
-    def test_request_failure_with_validation_error(self, connection):
+    def test_request_failure_due_to_validation_error(self, connection):
         """Tests that an HTTPError is raised when the HTTP response of a
         connection request indicates that a validation error occurred and the
         body of the response contains a non-empty "meta" field.
@@ -133,7 +133,7 @@ class TestConnection:
             connection.request("GET", "/healthz")
 
     @responses.activate
-    def test_request_failure_with_detailed_error(self, connection):
+    def test_request_failure_due_to_detailed_error(self, connection):
         """Tests that an HTTPError is raised when the status code of the HTTP
         response to a connection request indicates that an error occurred and
         the body of the response contains a "detail" field.
@@ -145,13 +145,43 @@ class TestConnection:
             connection.request("GET", "/healthz")
 
     @responses.activate
-    def test_request_failure_with_unknown_error(self, connection):
+    def test_request_failure_due_to_status_code(self, connection):
         """Tests that an HTTPError is raised when the status code of the HTTP
         response to a connection request indicates that an error occurred but
         but no other details about the error are provided.
         """
         responses.add(responses.GET, connection.url("healthz"), status=418, body="{}")
         with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
+            connection.request("GET", "/healthz")
+
+    def test_request_failure_due_to_timeout(self, monkeypatch, connection):
+        """Tests that a RequestException is raised when a connection request times out."""
+
+        def mock_request(*args, **kwargs):
+            raise requests.exceptions.Timeout()
+
+        monkeypatch.setattr("xcc.connection.requests.request", mock_request)
+
+        match = r"GET request to 'https://cloud.xanadu.ai:443/healthz' timed out"
+        with pytest.raises(RequestException, match=match):
+            connection.request("GET", "/healthz")
+
+    @responses.activate
+    def test_request_failure_due_to_hostname_resolution(self, monkeypatch, connection):
+        """Tests that a RequestException is raised when the hostname associated
+        with a connection request cannot be resolved.
+        """
+
+        def mock_request(*args, **kwargs):
+            raise requests.exceptions.ConnectionError("Name or service not known")
+
+        monkeypatch.setattr("xcc.connection.requests.request", mock_request)
+
+        match = (
+            r"Failed to connect to 'https://cloud.xanadu.ai:443/healthz': "
+            r"unknown hostname 'cloud.xanadu.ai'"
+        )
+        with pytest.raises(RequestException, match=match):
             connection.request("GET", "/healthz")
 
     @responses.activate
@@ -211,7 +241,7 @@ class TestConnection:
             body='{"error": "invalid_grant"}',
         )
 
-        with pytest.raises(HTTPError, match=r"Xanadu Cloud API key is invalid\."):
+        with pytest.raises(HTTPError, match=r"Xanadu Cloud API key is invalid"):
             connection.update_access_token()
 
     @responses.activate
