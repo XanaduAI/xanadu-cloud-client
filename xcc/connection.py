@@ -187,9 +187,9 @@ class Connection:
             body = response.json()
 
         except Exception:  # pylint: disable=broad-except
-            # The 2.26.0 release of requests can raise several exceptions when
-            # parsing JSON but once https://github.com/psf/requests/pull/5856 is
-            # released only one type of exception needs to be handled.
+            # Until https://github.com/psf/requests/pull/5856 is deployed, the
+            # requests package (2.26.0) can raise one of several different types
+            # of exceptions when parsing JSON (including a third-party type).
             response.raise_for_status()
 
         else:
@@ -236,13 +236,13 @@ class Connection:
         except Exception as exc:  # pylint: disable=broad-except
             # See Connection.request() for why exceptions are broadly caught.
             response.raise_for_status()
-            # If the following ValueError is raised, the authentication service
-            # is acting unexpectedly.
+            # The following ValueError is only raised if the Xanadu Cloud
+            # authentication service is acting unexpectedly.
             raise ValueError("Xanadu Cloud returned an invalid access token response.") from exc
 
         else:
             # It is worth investing in a helpful error message for invalid API
-            # keys since most users will probably encounter it at some point.
+            # keys since most users will likely encounter it at some point.
             if response.status_code == 400 and body.get("error", "") == "invalid_grant":
                 raise ValueError("Xanadu Cloud API key is invalid.")
 
@@ -265,9 +265,9 @@ class Connection:
             requests.exceptions.RequestException: if there was an issue sending
                 the HTTP request
 
-        .. note::
+        .. warning::
 
-            The status code of the HTTP response is ignored by this function.
+            No validation is performed on the status code of the HTTP response.
         """
         try:
             return requests.request(method=method, url=url, timeout=30, **kwargs)
