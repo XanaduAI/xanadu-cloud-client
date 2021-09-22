@@ -216,7 +216,7 @@ class TestConnection:
             connection.update_access_token()
 
     @responses.activate
-    def test_update_access_token_failure_with_invalid_json(self, connection):
+    def test_update_access_token_failure_due_to_invalid_json(self, connection):
         """Tests that an HTTPError is raised when the status code of an HTTP
         response to an access token request indicates that an error occurred and
         the body of the response contains invalid JSON.
@@ -231,7 +231,7 @@ class TestConnection:
             connection.update_access_token()
 
     @responses.activate
-    def test_update_access_token_failure_with_invalid_refresh_token(self, connection):
+    def test_update_access_token_failure_due_to_invalid_refresh_token(self, connection):
         """Tests that an HTTPError is raised when the HTTP response of an access
         token request indicates that the refresh token is invalid.
         """
@@ -246,7 +246,7 @@ class TestConnection:
             connection.update_access_token()
 
     @responses.activate
-    def test_update_access_token_failure_with_unknown_error(self, connection):
+    def test_update_access_token_failure_due_to_status_code(self, connection):
         """Tests that an HTTPError is raised when the HTTP response to an access
         token request contains valid JSON but its status code indicates that an
         error occurred.
