@@ -83,7 +83,7 @@ class Job:
     accessing the corresponding properties of the job:
 
     >>> job.status
-    'completed'
+    'complete'
     >>> job.result
     array([[0, 0, 0, 0],
            [0, 0, 0, 0],
@@ -279,7 +279,7 @@ class Job:
 
         Returns:
             str: status of this job ("open", "queued", "cancelled", "failed",
-            "cancel_pending", or "completed")
+            "cancel_pending", or "complete")
         """
         return self._details["status"]
 
@@ -288,10 +288,10 @@ class Job:
         """Returns whether this job has finished.
 
         Returns:
-            bool: ``True`` iff the job status is "cancelled", "completed", or
+            bool: ``True`` iff the job status is "cancelled", "complete", or
             "failed"
         """
-        return self.status in ("cancelled", "completed", "failed")
+        return self.status in ("cancelled", "complete", "failed")
 
     @cached_property
     def _details(self) -> Mapping[str, Any]:

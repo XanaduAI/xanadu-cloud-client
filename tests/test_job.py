@@ -109,7 +109,7 @@ class TestJob:
         body = {
             "id": job.id,
             "name": "foo",
-            "status": "completed",
+            "status": "complete",
             "target": "bar",
             "created_at": datetime_.isoformat(),
             "finished_at": datetime_.isoformat(),
@@ -224,8 +224,8 @@ class TestJob:
     @responses.activate
     def test_status(self, job, add_response):
         """Tests that the correct status is returned for a job."""
-        add_response(body={"status": "completed"})
-        assert job.status == "completed"
+        add_response(body={"status": "complete"})
+        assert job.status == "complete"
 
     @pytest.mark.parametrize(
         "status, finished",
@@ -235,7 +235,7 @@ class TestJob:
             ("cancelled", True),
             ("failed", True),
             ("cancel_pending", False),
-            ("completed", True),
+            ("complete", True),
         ],
     )
     @responses.activate
@@ -270,7 +270,7 @@ class TestJob:
     def test_clear(self, job, add_response):
         """Tests that the cache of a job can be cleared."""
         add_response(body={"status": "queued"})
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
 
         assert job.status == "queued"
         assert len(responses.calls) == 1
@@ -278,7 +278,7 @@ class TestJob:
         job.clear()
         assert len(responses.calls) == 1
 
-        assert job.status == "completed"
+        assert job.status == "complete"
         assert len(responses.calls) == 2
 
     @responses.activate
@@ -286,8 +286,8 @@ class TestJob:
         """Tests that caches are not shared across job instances."""
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
-        add_response(body={"status": "completed"})
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
+        add_response(body={"status": "complete"})
 
         job_1 = xcc.Job(job_id, connection)
         job_2 = xcc.Job(job_id, connection)
@@ -297,13 +297,13 @@ class TestJob:
 
         job_1.clear()
 
-        assert job_1.status == "completed"
+        assert job_1.status == "complete"
         assert job_2.status == "queued"
 
         job_2.clear()
 
-        assert job_1.status == "completed"
-        assert job_2.status == "completed"
+        assert job_1.status == "complete"
+        assert job_2.status == "complete"
 
     @responses.activate
     def test_wait_on_unfinished_job(self, job, add_response):
@@ -313,7 +313,7 @@ class TestJob:
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
         add_response(body={"status": "queued"})
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
 
         waiting_time = timeit(lambda: job.wait(delay=0.1), number=1)
         assert 0.3 <= waiting_time < 0.4
@@ -325,7 +325,7 @@ class TestJob:
         """Tests that waiting on a finished job does not trigger a polling
         cycle or send any HTTP requests to the Xanadu Cloud.
         """
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
         assert timeit(lambda: job.wait(delay=1), number=3) < 1
         assert len(responses.calls) == 1
         assert job.finished
