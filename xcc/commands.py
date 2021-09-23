@@ -34,7 +34,7 @@ def beautify(command: Callable) -> Callable:
     def beautify_(*args, **kwargs):
         output = command(*args, **kwargs)
         if isinstance(output, (list, dict)):
-            return json.dumps(output, indent=4, sort_keys=True, default=str)
+            return json.dumps(output, indent=4, default=str)
         return output
 
     return beautify_

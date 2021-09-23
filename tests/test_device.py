@@ -81,8 +81,23 @@ class TestDevice:
         """Tests that the correct expected uptime is returned for a device."""
         time_up = time.fromisoformat("16:00:00+00:00")
         time_dn = time.fromisoformat("20:00:00+00:00")
-        add_response(body={"expected_uptime": {"monday": [str(time_up), str(time_dn)]}})
-        assert device.expected_uptime == {"monday": (time_up, time_dn)}
+        times = [str(time_up), str(time_dn)]
+
+        add_response(body={"expected_uptime": {"wednesday": times}})
+
+        # Take care to verify the iteration order of the expected items.
+        have_expected_uptime = list(device.expected_uptime.items())
+        want_expected_uptime = [
+            ("monday", None),
+            ("tuesday", None),
+            ("wednesday", (time_up, time_dn)),
+            ("thursday", None),
+            ("friday", None),
+            ("saturday", None),
+            ("sunday", None)
+        ]
+
+        assert have_expected_uptime == want_expected_uptime
 
     @responses.activate
     @pytest.mark.parametrize("status", ["offline", "online"])
