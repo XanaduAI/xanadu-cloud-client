@@ -9,7 +9,7 @@ with open("requirements.txt", "r") as f:
 
 info = {
     "description": "XCC is a Python API and CLI for the Xanadu Cloud.",
-    "entry_points": {"console_scripts": ["xc=xcc.commands:main"]},
+    "entry_points": {"console_scripts": ["xcc=xcc.commands:main"]},
     "install_requires": requirements,
     "license": "Apache License 2.0",
     "long_description_content_type": "text/x-md",
