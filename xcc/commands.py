@@ -255,8 +255,10 @@ def version():
 
 def main() -> None:
     """Entry point for the Xanadu Cloud CLI."""
-    # Don't use a pager for displaying help information. For more details, see
-    # https://github.com/google/python-fire/issues/188.
+    # Using a pager to display help information can be annoying since it hides
+    # the output (and possible error messages) of previous commands. To remedy
+    # this, the assignment below replaces the pager with the print() function.
+    # See https://github.com/google/python-fire/issues/188 for more details.
     fire.core.Display = lambda lines, out: print(*lines, file=out)
 
     try:
