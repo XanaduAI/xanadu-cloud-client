@@ -175,7 +175,13 @@ class Job:
         Returns:
             Union[np.ndarray, List[Union[np.number, np.ndarray]]]: result of
             this job
+
+        Raises:
+            ValueError: if the job is not complete
         """
+        if self.status != "complete":
+            raise ValueError(f"Result for job with ID '{self.id}' is unavailable.")
+
         url = self._details["result_url"]
         path = urlparse(url).path
         response = self._connection.request("GET", path)
