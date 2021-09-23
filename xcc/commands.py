@@ -168,6 +168,9 @@ def get_device(
     if status:
         return device.status
 
+    # The alternative to raising a NotImplementedError is disabling inconsistent-return-statements.
+    raise NotImplementedError
+
 
 @beautify
 def list_devices(status: str = None):
@@ -229,6 +232,9 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
         return job.status
     if result:
         return str(job.result)
+
+    # See get_device() for why a NotImplementedError is raised.
+    raise NotImplementedError
 
 
 @beautify
