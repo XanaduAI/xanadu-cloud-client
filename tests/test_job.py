@@ -21,7 +21,7 @@ import xcc
 @pytest.fixture
 def job_id() -> str:
     """Returns a mock job ID."""
-    return "00000000-0000-4000-8000-000000000000"
+    return "00000000-0000-0000-0000-000000000000"
 
 
 @pytest.fixture
@@ -65,14 +65,14 @@ class TestJob:
         """Tests that the correct jobs are listed."""
         data = [
             {
-                "id": "00000000-0000-4000-8000-000000000001",
+                "id": "00000000-0000-0000-0000-000000000001",
                 "name": "foo",
                 "status": "queued",
                 "target": "qpu",
                 "created_at": "2020-01-03T12:34:56.789012+00:00",
             },
             {
-                "id": "00000000-0000-4000-8000-000000000002",
+                "id": "00000000-0000-0000-0000-000000000002",
                 "name": "bar",
                 "status": "complete",
                 "target": "qpu",
@@ -101,7 +101,7 @@ class TestJob:
 
     def test_id(self, job):
         """Tests that the correct ID is returned for a job."""
-        assert job.id == "00000000-0000-4000-8000-000000000000"
+        assert job.id == "00000000-0000-0000-0000-000000000000"
 
     @responses.activate
     def test_overview(self, job, add_response, datetime_):
