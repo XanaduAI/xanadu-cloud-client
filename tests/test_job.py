@@ -21,7 +21,7 @@ import xcc
 @pytest.fixture
 def job_id() -> str:
     """Returns a mock job ID."""
-    return "00000000-0000-4000-8000-000000000000"
+    return "00000000-0000-0000-0000-000000000000"
 
 
 @pytest.fixture
@@ -65,14 +65,14 @@ class TestJob:
         """Tests that the correct jobs are listed."""
         data = [
             {
-                "id": "00000000-0000-4000-8000-000000000001",
+                "id": "00000000-0000-0000-0000-000000000001",
                 "name": "foo",
                 "status": "queued",
                 "target": "qpu",
                 "created_at": "2020-01-03T12:34:56.789012+00:00",
             },
             {
-                "id": "00000000-0000-4000-8000-000000000002",
+                "id": "00000000-0000-0000-0000-000000000002",
                 "name": "bar",
                 "status": "complete",
                 "target": "qpu",
@@ -101,7 +101,7 @@ class TestJob:
 
     def test_id(self, job):
         """Tests that the correct ID is returned for a job."""
-        assert job.id == "00000000-0000-4000-8000-000000000000"
+        assert job.id == "00000000-0000-0000-0000-000000000000"
 
     @responses.activate
     def test_overview(self, job, add_response, datetime_):
@@ -109,7 +109,7 @@ class TestJob:
         body = {
             "id": job.id,
             "name": "foo",
-            "status": "completed",
+            "status": "complete",
             "target": "bar",
             "created_at": datetime_.isoformat(),
             "finished_at": datetime_.isoformat(),
@@ -129,8 +129,8 @@ class TestJob:
             buffer.seek(0)
             body = buffer.read()
 
-            add_response(body={"result_url": "https://example.com/jobs/result"})
-            responses.add(responses.GET, connection.url("/jobs/result"), status=200, body=body)
+            add_response(body={"result_url": "https://example.com/result", "status": "complete"})
+            responses.add(responses.GET, connection.url("/result"), status=200, body=body)
 
             assert job.result == pytest.approx(result)
 
@@ -147,11 +147,19 @@ class TestJob:
             buffer.seek(0)
             body = buffer.read()
 
-            add_response(body={"result_url": "https://example.com/jobs/result"})
-            responses.add(responses.GET, connection.url("/jobs/result"), status=200, body=body)
+            add_response(body={"result_url": "https://example.com/result", "status": "complete"})
+            responses.add(responses.GET, connection.url("/result"), status=200, body=body)
 
             assert len(job.result) == len(result)
             assert [have == pytest.approx(want) for have, want in zip(job.result, result)]
+
+    @pytest.mark.parametrize("status", ["open", "queued", "cancelled", "failed", "cancel_pending"])
+    @responses.activate
+    def test_result_unavailable(self, job, add_response, status):
+        """Tests that a ValueError is raised if the result of a job is unavailable."""
+        add_response(body={"status": status})
+        with pytest.raises(ValueError, match=fr"Result for job with ID '{job.id}' is unavailable"):
+            _ = job.result
 
     @responses.activate
     def test_created_at(self, job, add_response, datetime_):
@@ -198,15 +206,15 @@ class TestJob:
     @responses.activate
     def test_circuit(self, job, add_response):
         """Tests that the correct circuit is returned for a job."""
-        add_response(body={"circuit_url": "https://example.com/jobs/circuit"})
-        add_response(body={"circuit": "foo"}, path="/jobs/circuit")
+        add_response(body={"circuit_url": "https://example.com/circuit"})
+        add_response(body={"circuit": "foo"}, path="/circuit")
         assert job.circuit == "foo"
 
     @responses.activate
     def test_language(self, job, add_response):
         """Tests that the correct language is returned for a job."""
-        add_response(body={"circuit_url": "https://example.com/jobs/circuit"})
-        add_response(body={"language": "foo"}, path="/jobs/circuit")
+        add_response(body={"circuit_url": "https://example.com/circuit"})
+        add_response(body={"language": "foo"}, path="/circuit")
         assert job.language == "foo"
 
     @responses.activate
@@ -224,8 +232,8 @@ class TestJob:
     @responses.activate
     def test_status(self, job, add_response):
         """Tests that the correct status is returned for a job."""
-        add_response(body={"status": "completed"})
-        assert job.status == "completed"
+        add_response(body={"status": "complete"})
+        assert job.status == "complete"
 
     @pytest.mark.parametrize(
         "status, finished",
@@ -235,7 +243,7 @@ class TestJob:
             ("cancelled", True),
             ("failed", True),
             ("cancel_pending", False),
-            ("completed", True),
+            ("complete", True),
         ],
     )
     @responses.activate
@@ -270,7 +278,7 @@ class TestJob:
     def test_clear(self, job, add_response):
         """Tests that the cache of a job can be cleared."""
         add_response(body={"status": "queued"})
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
 
         assert job.status == "queued"
         assert len(responses.calls) == 1
@@ -278,7 +286,7 @@ class TestJob:
         job.clear()
         assert len(responses.calls) == 1
 
-        assert job.status == "completed"
+        assert job.status == "complete"
         assert len(responses.calls) == 2
 
     @responses.activate
@@ -286,8 +294,8 @@ class TestJob:
         """Tests that caches are not shared across job instances."""
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
-        add_response(body={"status": "completed"})
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
+        add_response(body={"status": "complete"})
 
         job_1 = xcc.Job(job_id, connection)
         job_2 = xcc.Job(job_id, connection)
@@ -297,13 +305,13 @@ class TestJob:
 
         job_1.clear()
 
-        assert job_1.status == "completed"
+        assert job_1.status == "complete"
         assert job_2.status == "queued"
 
         job_2.clear()
 
-        assert job_1.status == "completed"
-        assert job_2.status == "completed"
+        assert job_1.status == "complete"
+        assert job_2.status == "complete"
 
     @responses.activate
     def test_wait_on_unfinished_job(self, job, add_response):
@@ -313,7 +321,7 @@ class TestJob:
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
         add_response(body={"status": "queued"})
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
 
         waiting_time = timeit(lambda: job.wait(delay=0.1), number=1)
         assert 0.3 <= waiting_time < 0.4
@@ -325,7 +333,7 @@ class TestJob:
         """Tests that waiting on a finished job does not trigger a polling
         cycle or send any HTTP requests to the Xanadu Cloud.
         """
-        add_response(body={"status": "completed"})
+        add_response(body={"status": "complete"})
         assert timeit(lambda: job.wait(delay=1), number=3) < 1
         assert len(responses.calls) == 1
         assert job.finished

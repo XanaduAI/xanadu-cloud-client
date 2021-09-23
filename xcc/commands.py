@@ -34,7 +34,7 @@ def beautify(command: Callable) -> Callable:
     def beautify_(*args, **kwargs):
         output = command(*args, **kwargs)
         if isinstance(output, (list, dict)):
-            return json.dumps(output, indent=4, sort_keys=True, default=str)
+            return json.dumps(output, indent=4, default=str)
         return output
 
     return beautify_
@@ -134,6 +134,7 @@ def _resolve_setting(name: str) -> Tuple[str, Any]:
 @beautify
 def get_device(
     target: str,
+    availability: bool = False,
     certificate: bool = False,
     specification: bool = False,
     status: bool = False,
@@ -145,26 +146,27 @@ def get_device(
 
     Args:
         target (str): Name of the device target.
+        availability (bool): Show the expected uptime of the device.
         certificate (bool): Show the certificate of the device.
         specification (bool): Show the specification of the device.
         status (bool): Show the status of the device.
     """
     device = Device(target=target, connection=load_connection())
 
-    flags = sum([certificate, specification, status])
+    flags = sum(map(int, (availability, certificate, specification, status)))
     if flags > 1:
         raise FireError("At most one device property can be selected.")
 
     if flags == 0:
         return device.overview
-    if status:
-        return device.status
+    if availability:
+        return device.expected_uptime
     if certificate:
         return device.certificate
     if specification:
         return device.specification
-
-    raise NotImplementedError
+    if status:
+        return device.status
 
 
 @beautify
@@ -215,7 +217,7 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
     """
     job = Job(id_=id, connection=load_connection())
 
-    flags = sum([circuit, result, status])
+    flags = sum(map(int, (circuit, result, status)))
     if flags > 1:
         raise FireError("At most one job property can be selected.")
 
@@ -227,8 +229,6 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
         return job.status
     if result:
         return str(job.result)
-
-    raise NotImplementedError
 
 
 @beautify
@@ -279,8 +279,10 @@ def version():
 
 def main() -> None:
     """Entry point for the Xanadu Cloud CLI."""
-    # Don't use a pager for displaying help information. For more details, see
-    # https://github.com/google/python-fire/issues/188.
+    # Using a pager to display help information can be annoying since it hides
+    # the output (and possible error messages) of previous commands. To remedy
+    # this, the assignment below replaces the pager with the print() function.
+    # See https://github.com/google/python-fire/issues/188 for more details.
     fire.core.Display = lambda lines, out: print(
         *lines, file=out
     )  # pyright: reportGeneralTypeIssues=false
