@@ -152,7 +152,7 @@ class TestConnection:
         but no other details about the error are provided.
         """
         responses.add(responses.GET, connection.url("healthz"), status=418, body="{}")
-        with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
+        with pytest.raises(HTTPError, match=r"418 Client Error"):
             connection.request("GET", "/healthz")
 
     def test_request_failure_due_to_timeout(self, monkeypatch, connection):
@@ -254,5 +254,5 @@ class TestConnection:
             body="{}",
         )
 
-        with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
+        with pytest.raises(HTTPError, match=r"418 Client Error"):
             connection.update_access_token()
