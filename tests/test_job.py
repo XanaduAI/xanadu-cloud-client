@@ -320,12 +320,11 @@ class TestJob:
         """
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
-        add_response(body={"status": "queued"})
         add_response(body={"status": "complete"})
 
-        waiting_time = timeit(lambda: job.wait(delay=0.1), number=1)
-        assert 0.3 <= waiting_time < 0.4
-        assert len(responses.calls) == 4
+        waiting_time = timeit(lambda: job.wait(delay=0.2), number=1)
+        assert 0.4 <= waiting_time < 0.6
+        assert len(responses.calls) == 3
         assert job.finished
 
     @responses.activate
