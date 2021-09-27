@@ -1,5 +1,5 @@
 <p align="center">
-  <img height=65 alt="XCC" src="docs/_static/xcc_title.svg">
+  <img height=65 alt="XCC" src="doc/_static/xcc_title.svg">
 </p>
 
 <p align="center">
