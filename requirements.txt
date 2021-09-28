@@ -1,4 +1,6 @@
-appdirs~=1.4.4
-numpy~=1.21.2
-pydantic[dotenv]~=1.8.2
-requests~=2.26.0
+appdirs
+fire
+numpy
+pydantic[dotenv]
+python-dateutil
+requests

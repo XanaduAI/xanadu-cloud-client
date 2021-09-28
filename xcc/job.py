@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from typing import Any, List, Mapping, Optional, Sequence, Union
 from urllib.parse import urlparse
 
+import dateutil.parser
 import numpy as np
 
 from .connection import Connection
@@ -82,7 +83,7 @@ class Job:
     accessing the corresponding properties of the job:
 
     >>> job.status
-    'completed'
+    'complete'
     >>> job.result
     array([[0, 0, 0, 0],
            [0, 0, 0, 0],
@@ -174,7 +175,13 @@ class Job:
         Returns:
             Union[np.ndarray, List[Union[np.number, np.ndarray]]]: result of
             this job
+
+        Raises:
+            ValueError: if the job is not complete
         """
+        if self.status != "complete":
+            raise ValueError(f"Result for job with ID '{self.id}' is unavailable.")
+
         url = self._details["result_url"]
         path = urlparse(url).path
         response = self._connection.request("GET", path)
@@ -204,7 +211,7 @@ class Job:
         Returns:
             datetime: datetime when this job was created
         """
-        return datetime.fromisoformat(self._details["created_at"])
+        return dateutil.parser.isoparse(self._details["created_at"])
 
     @property
     def started_at(self) -> Optional[datetime]:
@@ -214,7 +221,7 @@ class Job:
             datetime, optional: datetime when this job started
         """
         datetime_ = self._details["started_at"]
-        return None if datetime_ is None else datetime.fromisoformat(datetime_)
+        return None if datetime_ is None else dateutil.parser.isoparse(datetime_)
 
     @property
     def finished_at(self) -> Optional[datetime]:
@@ -224,7 +231,7 @@ class Job:
             datetime, optional: datetime when this job finished
         """
         datetime_ = self._details["finished_at"]
-        return None if datetime_ is None else datetime.fromisoformat(datetime_)
+        return None if datetime_ is None else dateutil.parser.isoparse(datetime_)
 
     @property
     def running_time(self) -> Optional[timedelta]:
@@ -278,7 +285,7 @@ class Job:
 
         Returns:
             str: status of this job ("open", "queued", "cancelled", "failed",
-            "cancel_pending", or "completed")
+            "cancel_pending", or "complete")
         """
         return self._details["status"]
 
@@ -287,10 +294,10 @@ class Job:
         """Returns whether this job has finished.
 
         Returns:
-            bool: ``True`` iff the job status is "cancelled", "completed", or
+            bool: ``True`` iff the job status is "cancelled", "complete", or
             "failed"
         """
-        return self.status in ("cancelled", "completed", "failed")
+        return self.status in ("cancelled", "complete", "failed")
 
     @cached_property
     def _details(self) -> Mapping[str, Any]:

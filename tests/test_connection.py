@@ -8,10 +8,29 @@ import responses
 from requests.models import HTTPError
 
 import xcc
+from xcc.connection import Connection
 
 
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
+
+    @pytest.mark.usefixtures("settings")
+    def test_load(self):
+        """Tests that a connection can be loaded."""
+        connection = Connection.load()
+        assert connection.refresh_token == "j.w.t"
+        assert connection.host == "example.com"
+        assert connection.port == 80
+        assert connection.tls is False
+
+    def test_load_without_api_key(self, settings):
+        """Tests that a ValueError is raised when a connection is loaded without an API key."""
+        settings.API_KEY = None
+        settings.save()
+
+        match = r"An API key is required to connect to the Xanadu Cloud"
+        with pytest.raises(ValueError, match=match):
+            Connection.load()
 
     def test_access_token(self, connection):
         """Tests that the correct access token is returned for a connection."""
