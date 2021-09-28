@@ -45,14 +45,14 @@ def beautify(command: Callable) -> Callable:
 
 
 @beautify
-def get_setting(name: str) -> Union[str, int, bool]:
+def get_setting(name: str) -> Any:
     """Gets the value of a setting.
 
     Args:
         name (str): Name of the setting (e.g., "API_KEY").
 
     Returns:
-        Union[str, int, bool]: Value of the setting.
+        Any: Value of the setting.
     """
     key, val = _resolve_setting(name)
 
