@@ -147,7 +147,7 @@ class TestSetSetting:
             ("TLS", True, "Successfully updated TLS setting to True."),
             ("PORT", 123, "Successfully updated PORT setting to 123."),
             ("HOST", "foo", "Successfully updated HOST setting to 'foo'."),
-        ]
+        ],
     )
     def test_message(self, name, value, message):
         """Tests that the correct message is displayed when a setting is updated."""
@@ -217,7 +217,7 @@ class TestCancelJob:
     def test_cancel_success(self):
         """Tests that the correct message is displayed when a job was cancelled."""
         have_message = xcc.commands.cancel_job(id="foo")
-        want_message = "Job with ID 'foo' was successfully cancelled."
+        want_message = "Successfully cancelled job with ID 'foo'."
         assert have_message == want_message
 
     def test_cancel_failure(self, monkeypatch):

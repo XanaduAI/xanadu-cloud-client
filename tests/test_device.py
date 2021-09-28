@@ -94,7 +94,7 @@ class TestDevice:
             ("thursday", None),
             ("friday", None),
             ("saturday", None),
-            ("sunday", None)
+            ("sunday", None),
         ]
 
         assert have_expected_uptime == want_expected_uptime
