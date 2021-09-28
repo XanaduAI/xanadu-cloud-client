@@ -5,7 +5,7 @@ This module implements the Xanadu Cloud CLI.
 import functools
 import json
 import sys
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Callable, Mapping, Sequence, Tuple, Union
 
 import fire
 from fire.core import FireError
@@ -69,11 +69,14 @@ def load_connection() -> Connection:
 
 
 @beautify
-def get_setting(name: str):
+def get_setting(name: str) -> Union[str, int, bool]:
     """Gets the value of a setting.
 
     Args:
         name (str): Name of the setting (e.g., "API_KEY").
+
+    Returns:
+        Union[str, int, bool]: Value of the setting.
     """
     key, val = _resolve_setting(name)
 
@@ -84,18 +87,25 @@ def get_setting(name: str):
 
 
 @beautify
-def list_settings():
-    """Lists the current settings."""
+def list_settings() -> Mapping[str, Any]:
+    """Lists the current settings.
+
+    Returns:
+        Mapping[str, Any]: Mapping from setting names to values.
+    """
     return Settings().dict()
 
 
 @beautify
-def set_setting(name: str, value: Union[str, int, bool]):
+def set_setting(name: str, value: Union[str, int, bool]) -> str:
     """Sets the value of a setting.
 
     Args:
         name (str): Name of the setting (e.g., "PORT").
         value (str, int, bool): Value of the setting (e.g., 443).
+
+    Returns:
+        str: Message indicating the setting was successfully updated.
     """
     key, _ = _resolve_setting(name)
 
@@ -143,7 +153,7 @@ def get_device(
     certificate: bool = False,
     specification: bool = False,
     status: bool = False,
-):
+) -> Union[str, Mapping]:
     """Gets information about a device on the Xanadu Cloud.
 
     If no device property flags are specified, an overview of the device is
@@ -155,6 +165,9 @@ def get_device(
         certificate (bool): Show the certificate of the device.
         specification (bool): Show the specification of the device.
         status (bool): Show the status of the device.
+
+    Returns:
+        Union[str, Mapping]: Device overview or the selected device property.
     """
     device = Device(target=target, connection=load_connection())
 
@@ -162,8 +175,6 @@ def get_device(
     if flags > 1:
         raise FireError("At most one device property can be selected.")
 
-    if flags == 0:
-        return device.overview
     if availability:
         return device.expected_uptime
     if certificate:
@@ -173,16 +184,18 @@ def get_device(
     if status:
         return device.status
 
-    # The alternative to raising a NotImplementedError is disabling inconsistent-return-statements.
-    raise NotImplementedError
+    return device.overview
 
 
 @beautify
-def list_devices(status: str = None):
+def list_devices(status: str = None) -> Sequence[Mapping]:
     """Lists devices on the Xanadu Cloud.
 
     Args:
         status (str): Filter devices by status (e.g., "offline" or "online").
+
+    Returns:
+        Sequence[Mapping]: Overview of each device on the Xanadu Cloud.
     """
     devices = Device.list(connection=load_connection(), status=status)
     return [device.overview for device in devices]
@@ -194,11 +207,14 @@ def list_devices(status: str = None):
 
 @beautify
 # pylint: disable=invalid-name,redefined-builtin
-def cancel_job(id: str):
+def cancel_job(id: str) -> str:
     """Cancels a job on the Xanadu Cloud.
 
     Args:
         id (str): ID of the job.
+
+    Returns:
+        str: Message indicating the job was successfully cancelled.
     """
     job = Job(id_=id, connection=load_connection())
     job.cancel()
@@ -206,12 +222,14 @@ def cancel_job(id: str):
     if job.status not in ("cancel_pending", "cancelled"):
         raise ValueError(f"Job with ID '{id}' was not cancelled in time.")
 
-    return f"Job with ID '{id}' was successfully cancelled."
+    return f"Successfully cancelled job with ID '{id}'."
 
 
 @beautify
 # pylint: disable=invalid-name,redefined-builtin
-def get_job(id: str, circuit: bool = False, result: bool = False, status: bool = False):
+def get_job(
+    id: str, circuit: bool = False, result: bool = False, status: bool = False
+) -> Union[str, Mapping]:
     """Gets information about a job on the Xanadu Cloud.
 
     If no job property flags are specified, an overview of the job is
@@ -222,6 +240,9 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
         circuit (bool): Show the circuit of the job.
         result (bool): Show the result of the job.
         status (bool): Show the status of the job.
+
+    Returns:
+        Union[str, Mapping]: Job overview or the selected job property.
     """
     job = Job(id_=id, connection=load_connection())
 
@@ -229,8 +250,6 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
     if flags > 1:
         raise FireError("At most one job property can be selected.")
 
-    if flags == 0:
-        return job.overview
     if circuit:
         return {"circuit": job.circuit, "language": job.language}
     if status:
@@ -238,23 +257,25 @@ def get_job(id: str, circuit: bool = False, result: bool = False, status: bool =
     if result:
         return str(job.result)
 
-    # See get_device() for why a NotImplementedError is raised.
-    raise NotImplementedError
+    return job.overview
 
 
 @beautify
-def list_jobs(limit: int = 10):
+def list_jobs(limit: int = 10) -> Sequence[Mapping]:
     """Lists jobs submitted to the Xanadu Cloud.
 
     Args:
         limit (int): Maximum number of jobs to display.
+
+    Returns:
+        Sequence[Mapping]: Overview of each job submitted to the Xanadu Cloud.
     """
     jobs = Job.list(connection=load_connection(), limit=limit)
     return [job.overview for job in jobs]
 
 
 @beautify
-def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:1.0"):
+def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:1.0") -> Mapping:
     """Submits a job to the Xanadu Cloud.
 
     Args:
@@ -262,6 +283,9 @@ def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:
         target (str): Target of the job.
         circuit (str): Circuit of the job.
         language (str): Language of the job.
+
+    Returns:
+        Mapping: Overview of the submitted job.
     """
     job = Job.submit(
         connection=load_connection(),
@@ -277,14 +301,23 @@ def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:
 # ------------------------------------------------------------------------------
 
 
-def ping():
-    """Tests the connection to the Xanadu Cloud."""
-    load_connection().ping()
+def ping() -> str:
+    """Tests the connection to the Xanadu Cloud.
+
+    Returns:
+        str: Message indicating the ping was successful.
+    """
+    connection = load_connection()
+    connection.ping()
     return "Successfully connected to the Xanadu Cloud."
 
 
-def version():
-    """Displays the version of the Xanadu Cloud Client."""
+def version() -> str:
+    """Displays the version of the Xanadu Cloud Client.
+
+    Returns:
+        str: Message with the version of this Python package.
+    """
     return f"Xanadu Cloud Client version {__version__}"
 
 
