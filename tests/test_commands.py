@@ -163,6 +163,18 @@ class TestSetSetting:
         xcc.commands.set_setting(name="PoRt", value=123)
         assert xcc.Settings().PORT == 123
 
+    @pytest.mark.parametrize(
+        "name, value, message",
+        [
+            ("TLS", True, "Successfully updated TLS setting to True."),
+            ("PORT", 123, "Successfully updated PORT setting to 123."),
+            ("HOST", "foo", "Successfully updated HOST setting to 'foo'."),
+        ],
+    )
+    def test_message(self, name, value, message):
+        """Tests that the correct message is displayed when a setting is updated."""
+        assert xcc.commands.set_setting(name=name, value=value) == message
+
     def test_invalid_name(self):
         """Tests that a ValueError is raised when the name of a setting is invalid."""
         with pytest.raises(ValueError, match=r"The setting name 'DNE' must be one of \[.*\]\."):
@@ -227,7 +239,7 @@ class TestCancelJob:
     def test_cancel_success(self):
         """Tests that the correct message is displayed when a job was cancelled."""
         have_message = xcc.commands.cancel_job(id="foo")
-        want_message = "Job with ID 'foo' was successfully cancelled."
+        want_message = "Successfully cancelled job with ID 'foo'."
         assert have_message == want_message
 
     def test_cancel_failure(self, monkeypatch):
