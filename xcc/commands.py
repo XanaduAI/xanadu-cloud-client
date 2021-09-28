@@ -100,10 +100,15 @@ def set_setting(name: str, value: Union[str, int, bool]):
     key, _ = _resolve_setting(name)
 
     try:
-        Settings(**{key: value}).save()
+        settings = Settings(**{key: value})
+        settings.save()
     except ValidationError as exc:
         err = exc.errors()[0].get("msg", "invalid value")
         raise ValueError(f"Failed to update {key} setting: {err}") from exc
+
+    # Using repr() ensures that strings are quoted.
+    val = repr(settings.dict()[key])
+    return f"Successfully updated {key} setting to {val}."
 
 
 def _resolve_setting(name: str) -> Tuple[str, Any]:
