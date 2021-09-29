@@ -40,6 +40,30 @@ def beautify(command: Callable) -> Callable:
     return beautify_
 
 
+def load_connection() -> Connection:
+    """Loads a connection using the :class:`xcc.Settings` class.
+
+    Returns:
+        Connection: connection initialized from the configuration of a new
+        :class:`xcc.Settings` instance
+
+    Raises:
+        ValueError: if the API key is set to ``None`` in the settings
+    """
+    settings = Settings()
+
+    if settings.API_KEY is None:
+        raise ValueError("An API key is required to connect to the Xanadu Cloud.")
+
+    return Connection(
+        key=settings.API_KEY,
+        host=settings.HOST,
+        port=settings.PORT,
+        tls=settings.TLS,
+        headers={"User-Agent": f"XCC/{__version__} (CLI)"},
+    )
+
+
 # Settings CLI
 # ------------------------------------------------------------------------------
 
@@ -145,7 +169,7 @@ def get_device(
     Returns:
         Union[str, Mapping]: Device overview or the selected device property.
     """
-    device = Device(target, Connection.load())
+    device = Device(target=target, connection=load_connection())
 
     flags = sum(map(int, (availability, certificate, specification, status)))
     if flags > 1:
@@ -173,7 +197,7 @@ def list_devices(status: str = None) -> Sequence[Mapping]:
     Returns:
         Sequence[Mapping]: Overview of each device on the Xanadu Cloud.
     """
-    devices = Device.list(connection=Connection.load(), status=status)
+    devices = Device.list(connection=load_connection(), status=status)
     return [device.overview for device in devices]
 
 
@@ -192,7 +216,7 @@ def cancel_job(id: str) -> str:
     Returns:
         str: Message indicating the job was successfully cancelled.
     """
-    job = Job(id_=id, connection=Connection.load())
+    job = Job(id_=id, connection=load_connection())
     job.cancel()
 
     if job.status not in ("cancel_pending", "cancelled"):
@@ -220,7 +244,7 @@ def get_job(
     Returns:
         Union[str, Mapping]: Job overview or the selected job property.
     """
-    job = Job(id_=id, connection=Connection.load())
+    job = Job(id_=id, connection=load_connection())
 
     flags = sum(map(int, (circuit, result, status)))
     if flags > 1:
@@ -246,7 +270,7 @@ def list_jobs(limit: int = 10) -> Sequence[Mapping]:
     Returns:
         Sequence[Mapping]: Overview of each job submitted to the Xanadu Cloud.
     """
-    jobs = Job.list(connection=Connection.load(), limit=limit)
+    jobs = Job.list(connection=load_connection(), limit=limit)
     return [job.overview for job in jobs]
 
 
@@ -264,7 +288,7 @@ def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:
         Mapping: Overview of the submitted job.
     """
     job = Job.submit(
-        connection=Connection.load(),
+        connection=load_connection(),
         name=name,
         target=target,
         circuit=circuit.replace("\\n", "\n"),
@@ -283,7 +307,8 @@ def ping() -> str:
     Returns:
         str: Message indicating the ping was successful.
     """
-    Connection.load().ping()
+    connection = load_connection()
+    connection.ping()
     return "Successfully connected to the Xanadu Cloud."
 
 
