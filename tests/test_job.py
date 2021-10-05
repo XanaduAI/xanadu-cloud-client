@@ -6,7 +6,6 @@ This module tests the :module:`xcc.job` module.
 import io
 import json
 from datetime import datetime, timedelta
-from timeit import timeit
 from typing import Callable
 from unittest.mock import call, patch
 
