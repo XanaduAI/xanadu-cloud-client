@@ -96,7 +96,7 @@ to the Python API documentation.
     supplying the appropriate flag to the `xcc device get` command:
 
     ```console
-    $ xcc device get X8_01 --availability
+    $ xcc device get simulon_gaussian --availability
     ```
     ```json
     {
