@@ -1,10 +1,8 @@
 """
 This module contains the :class:`~xcc.Connection` class.
 """
-
-from __future__ import annotations
-
-from typing import Dict, Optional
+from itertools import chain
+from typing import Dict, List, Optional
 
 import requests
 
@@ -148,7 +146,9 @@ class Connection:
             requests.Response: HTTP response of the ping HTTP request
 
         Raises:
-            requests.models.HTTPError: if the connection is not successful
+            requests.exceptions.RequestException: if there was an issue sending
+                the ping request to the Xanadu Cloud or the status code of the
+                HTTP response indicates that an error occurred (i.e., 4XX or 5XX)
         """
         return self.request(method="GET", path="/healthz")
 
@@ -158,33 +158,54 @@ class Connection:
         Args:
             method (str): HTTP request method
             path (str): HTTP request path
-
-        Keyword Args:
-            Arguments to pass along to the call to ``requests.request()``.
+            **kwargs: optional arguments to pass to :func:`requests.request()`
 
         Returns:
-            requests.Response: HTTP response of the HTTP request
+            requests.Response: HTTP response to the HTTP request
 
         Raises:
-            requests.models.HTTPError: if the status code of the response
-                indicates an error has occurred (i.e., 4XX or 5XX)
+            requests.exceptions.RequestException: if there was an issue sending
+                the HTTP request or the status code of the HTTP response
+                indicates that an error occurred (i.e., 4XX or 5XX)
 
         .. note::
 
-            A second HTTP request will be made to the Xanadu Cloud if the
+            A second HTTP request will be made to the Xanadu Cloud if the HTTP
             response to the first request has a 401 status code. The second
             request will be identical to the first one except that a fresh
-            access token is used.
+            access token will be used.
         """
         url = self.url(path)
 
-        response = requests.request(method=method, url=url, headers=self.headers, **kwargs)
+        response = self._request(method=method, url=url, headers=self.headers, **kwargs)
 
         if response.status_code == 401:
             self.update_access_token()
-            response = requests.request(method=method, url=url, headers=self.headers, **kwargs)
+            response = self._request(method=method, url=url, headers=self.headers, **kwargs)
 
-        response.raise_for_status()
+        try:
+            body = response.json()
+
+        except Exception:  # pylint: disable=broad-except
+            # Until https://github.com/psf/requests/pull/5856 is deployed, the
+            # requests package (2.26.0) can raise one of several different types
+            # of exceptions when parsing JSON (including a third-party type).
+            response.raise_for_status()
+
+        else:
+            # The details of a validation error are encoded in the "meta" field.
+            if response.status_code == 400 and body.get("code", "") == "validation-error":
+                errors: Dict[str, List[str]] = body.get("meta", {})
+                if errors:
+                    message = "; ".join(chain.from_iterable(errors.values()))
+                    raise requests.exceptions.HTTPError(message, response=response)
+
+            # Otherwise, the details of the error may be encoded in the "detail" field.
+            if not response.ok and "detail" in body:
+                message = body["detail"]
+                raise requests.exceptions.HTTPError(message, response=response)
+
+            response.raise_for_status()
 
         return response
 
@@ -192,7 +213,9 @@ class Connection:
         """Updates the access token of a connection using its refresh token.
 
         Raises:
-            requests.models.HTTPError: if the access token could not be updated
+            requests.exceptions.RequestException: if there was an issue sending
+                the HTTP request for the access token or the status code of the
+                HTTP response indicates that an error occurred (i.e., 4XX or 5XX)
         """
         url = self.url("/auth/realms/platform/protocol/openid-connect/token")
         data = {
@@ -201,7 +224,67 @@ class Connection:
             "client_id": "public",
         }
 
-        response = requests.post(url=url, data=data)
-        response.raise_for_status()
+        response = self._request(method="POST", url=url, data=data)
 
-        self._access_token = response.json().get("access_token")
+        try:
+            body = response.json()
+
+        except Exception as exc:  # pylint: disable=broad-except
+            # See Connection.request() for why exceptions are broadly caught.
+            response.raise_for_status()
+            # The following ValueError is only raised if the Xanadu Cloud
+            # authentication service is acting unexpectedly.
+            raise ValueError("Xanadu Cloud returned an invalid access token response.") from exc
+
+        else:
+            # It is worth investing in a helpful error message for invalid API
+            # keys since most users will likely encounter it at some point.
+            if response.status_code == 400 and body.get("error", "") == "invalid_grant":
+                raise requests.exceptions.HTTPError("Xanadu Cloud API key is invalid")
+
+            response.raise_for_status()
+
+        self._access_token = body.get("access_token")
+
+    def _request(self, method: str, url: str, **kwargs) -> requests.Response:
+        """Sends an HTTP request.
+
+        Args:
+            method (str): HTTP request method
+            path (str): HTTP request path
+            **kwargs: optional arguments to pass to :func:`requests.request()`
+
+        Returns:
+            requests.Response: HTTP response to the HTTP request
+
+        Raises:
+            requests.exceptions.RequestException: if there was an issue sending
+                the HTTP request
+
+        .. note::
+
+            No validation is performed on the status code of the HTTP response.
+
+        .. warning::
+
+            The delay between when this function is called and when a timeout
+            exception is raised will be (slightly greater than) a multiple of
+            the ``timeout`` parameter passed to :func:`requests.request()`.
+            Specifically, if the timeout value is :math:`t` and there are
+            :math:`r` resource records listed for the hostname and port of the
+            Xanadu Cloud, then :math:`\\approx tr` seconds will elapse before a
+            timeout is detected.
+        """
+        try:
+            timeout = kwargs.pop("timeout", 10)
+            return requests.request(method=method, url=url, timeout=timeout, **kwargs)
+
+        except requests.exceptions.Timeout as exc:
+            message = f"{method} request to '{url}' timed out"
+            raise requests.exceptions.RequestException(message) from exc
+
+        except requests.exceptions.ConnectionError as exc:
+            if "Name or service not known" in str(exc):
+                message = f"Failed to resolve hostname '{self.host}'"
+                raise requests.exceptions.RequestException(message) from exc
+            raise exc

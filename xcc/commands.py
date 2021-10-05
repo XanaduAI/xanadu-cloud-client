@@ -327,7 +327,9 @@ def main() -> None:
     # the output (and possible error messages) of previous commands. To remedy
     # this, the assignment below replaces the pager with the print() function.
     # See https://github.com/google/python-fire/issues/188 for more details.
-    fire.core.Display = lambda lines, out: print(*lines, file=out)
+    fire.core.Display = lambda lines, out: print(
+        *lines, file=out
+    )  # pyright: reportGeneralTypeIssues=false
 
     try:
         fire.Fire(
