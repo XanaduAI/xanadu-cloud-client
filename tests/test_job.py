@@ -111,6 +111,7 @@ class TestJob:
             "name": "foo",
             "status": "complete",
             "target": "bar",
+            "language": "baz",
             "created_at": datetime_.isoformat(),
             "finished_at": datetime_.isoformat(),
             "running_time": 0.12345,

@@ -163,6 +163,7 @@ class Job:
             "name": self.name,
             "status": self.status,
             "target": self.target,
+            "language": self.language,
             "created_at": self.created_at,
             "finished_at": self.finished_at,
             "running_time": self.running_time,
