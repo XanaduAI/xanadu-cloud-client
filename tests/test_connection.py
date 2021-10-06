@@ -149,10 +149,10 @@ class TestConnection:
     def test_request_failure_due_to_status_code(self, connection):
         """Tests that an HTTPError is raised when the status code of the HTTP
         response to a connection request indicates that an error occurred but
-        but no other details about the error are provided.
+        no "detail" field is included in the JSON body of the response.
         """
-        responses.add(responses.GET, connection.url("healthz"), status=418, body="{}")
-        with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
+        responses.add(responses.GET, connection.url("healthz"), status=403, body="{}")
+        with pytest.raises(HTTPError, match=r"403 Client Error: Forbidden"):
             connection.request("GET", "/healthz")
 
     def test_request_failure_due_to_timeout(self, monkeypatch, connection):
@@ -250,9 +250,9 @@ class TestConnection:
         responses.add(
             responses.POST,
             connection.url("auth/realms/platform/protocol/openid-connect/token"),
-            status=418,
+            status=403,
             body="{}",
         )
 
-        with pytest.raises(HTTPError, match=r"418 Client Error: I'm a Teapot"):
+        with pytest.raises(HTTPError, match=r"403 Client Error: Forbidden"):
             connection.update_access_token()

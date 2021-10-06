@@ -11,6 +11,7 @@ help:
 	@echo "  wheel              to build the XCC wheel"
 	@echo "  dist               to package the source distribution"
 	@echo "  docs               to generate the Sphinx documentation"
+	@echo "  lint               to lint the Python source files"
 	@echo "  format             to format the Python source files"
 	@echo "  clean              to delete all temporary, cache, and build files"
 	@echo "  clean-docs         to delete all generated documentation"
@@ -20,15 +21,18 @@ help:
 .PHONY: install
 install:
 ifndef PYTHON3
-	@echo "To install XCC you need to have Python 3 installed"
+	@echo "To install the XCC you need to have Python 3 installed"
 endif
-	$(PYTHON) setup.py install
+	$(PYTHON) -m pip install -e .
+
+.PHONY: lint
+lint:
+	$(PYTHON) -m pylint xcc tests/*.py
 
 .PHONY: format
 format:
 	$(PYTHON) -m black -l 100 xcc tests
 	$(PYTHON) -m isort --profile black xcc tests
-	$(PYTHON) -m pylint xcc tests/*.py
 
 .PHONY: wheel
 wheel:

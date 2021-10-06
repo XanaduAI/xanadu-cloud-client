@@ -6,8 +6,8 @@ This module tests the :module:`xcc.job` module.
 import io
 import json
 from datetime import datetime, timedelta
-from timeit import timeit
 from typing import Callable
+from unittest.mock import call, patch
 
 import dateutil.parser
 import numpy as np
@@ -313,27 +313,32 @@ class TestJob:
         assert job_1.status == "complete"
         assert job_2.status == "complete"
 
+    @patch("xcc.job.time.sleep")
     @responses.activate
-    def test_wait_on_unfinished_job(self, job, add_response):
+    def test_wait_on_unfinished_job(self, sleep, job, add_response):
         """Tests that waiting on an unfinished job triggers the correct number
         of polling cycles and that each polling cycle has the correct latency.
         """
         add_response(body={"status": "open"})
         add_response(body={"status": "queued"})
-        add_response(body={"status": "queued"})
         add_response(body={"status": "complete"})
 
-        waiting_time = timeit(lambda: job.wait(delay=0.1), number=1)
-        assert 0.3 <= waiting_time < 0.4
-        assert len(responses.calls) == 4
+        job.wait(delay=0.123)
+        sleep.assert_has_calls([call(0.123), call(0.123)])
+
+        assert len(responses.calls) == 3
         assert job.finished
 
+    @patch("xcc.job.time.sleep")
     @responses.activate
-    def test_wait_on_finished_job(self, job, add_response):
+    def test_wait_on_finished_job(self, sleep, job, add_response):
         """Tests that waiting on a finished job does not trigger a polling
         cycle or send any HTTP requests to the Xanadu Cloud.
         """
         add_response(body={"status": "complete"})
-        assert timeit(lambda: job.wait(delay=1), number=3) < 1
+
+        job.wait(delay=1)
+        sleep.assert_not_called()
+
         assert len(responses.calls) == 1
         assert job.finished
