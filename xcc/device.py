@@ -6,7 +6,6 @@ from __future__ import annotations
 import calendar
 from datetime import time
 from typing import Any, Mapping, Optional, Sequence, Tuple
-from urllib.parse import urlparse
 
 from .connection import Connection
 from .util import cached_property

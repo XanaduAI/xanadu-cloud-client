@@ -120,7 +120,7 @@ class TestJob:
         assert set(job.overview) == set(body)
 
     @responses.activate
-    def test_result_npy(self, connection, job, add_response):
+    def test_result_npy(self, connection, job):
         """Tests that the correct .npy result is returned for a job."""
         result = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
 
@@ -136,7 +136,7 @@ class TestJob:
             assert job.result == pytest.approx(result)
 
     @responses.activate
-    def test_result_npz(self, connection, job, add_response):
+    def test_result_npz(self, connection, job):
         """Tests that the correct .npz result is returned for a job."""
         result = [np.complex64(1 + 2j), np.arange(5)]
 

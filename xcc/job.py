@@ -8,7 +8,6 @@ import io
 import time
 from datetime import datetime, timedelta
 from typing import Any, List, Mapping, Optional, Sequence, Union
-from urllib.parse import urlparse
 
 import dateutil.parser
 import numpy as np
