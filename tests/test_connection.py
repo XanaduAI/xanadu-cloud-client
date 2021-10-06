@@ -149,7 +149,7 @@ class TestConnection:
     def test_request_failure_due_to_status_code(self, connection):
         """Tests that an HTTPError is raised when the status code of the HTTP
         response to a connection request indicates that an error occurred but
-        but no other details about the error are provided.
+        no "detail" field is included in the JSON body of the response.
         """
         responses.add(responses.GET, connection.url("healthz"), status=403, body="{}")
         with pytest.raises(HTTPError, match=r"403 Client Error: Forbidden"):
