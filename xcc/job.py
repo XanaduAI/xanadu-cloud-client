@@ -137,7 +137,7 @@ class Job:
 
         # pylint: disable=protected-access
         job._details = details
-        job._circuit = {"circuit": circuit, "language": language}
+        job._circuit = {"circuit": circuit}
 
         return job
 
