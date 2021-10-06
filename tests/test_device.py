@@ -71,7 +71,7 @@ class TestDevice:
     @responses.activate
     def test_specification(self, device, add_response):
         """Tests that the correct specification is returned for a device."""
-        add_response(body={"compiler": "LLVM", "modes": 42}, path="/devices/qpu/specification")
+        add_response(body={"compiler": "LLVM", "modes": 42}, path="/devices/qpu/specifications")
         assert device.specification == {"compiler": "LLVM", "modes": 42}
 
     @responses.activate

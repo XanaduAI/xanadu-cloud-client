@@ -126,7 +126,7 @@ class Device:
         Returns:
             Mapping[str, Any]: specification of this device
         """
-        return self._connection.request("GET", f"/devices/{self.target}/specification").json()
+        return self._connection.request("GET", f"/devices/{self.target}/specifications").json()
 
     @property
     def expected_uptime(self) -> Mapping[str, Optional[Tuple[time, time]]]:
