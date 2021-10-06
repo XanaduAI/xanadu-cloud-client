@@ -129,8 +129,8 @@ class TestJob:
             buffer.seek(0)
             body = buffer.read()
 
-            add_response(body={"result_url": "https://example.com/result", "status": "complete"})
-            responses.add(responses.GET, connection.url("/result"), status=200, body=body)
+            path = f"/jobs/{job.id}/result"
+            responses.add(responses.GET, connection.url(path), status=200, body=body)
 
             assert job.result == pytest.approx(result)
 
@@ -147,19 +147,11 @@ class TestJob:
             buffer.seek(0)
             body = buffer.read()
 
-            add_response(body={"result_url": "https://example.com/result", "status": "complete"})
-            responses.add(responses.GET, connection.url("/result"), status=200, body=body)
+            path = f"/jobs/{job.id}/result"
+            responses.add(responses.GET, connection.url(path), status=200, body=body)
 
             assert len(job.result) == len(result)
             assert [have == pytest.approx(want) for have, want in zip(job.result, result)]
-
-    @pytest.mark.parametrize("status", ["open", "queued", "cancelled", "failed", "cancel_pending"])
-    @responses.activate
-    def test_result_unavailable(self, job, add_response, status):
-        """Tests that a ValueError is raised if the result of a job is unavailable."""
-        add_response(body={"status": status})
-        with pytest.raises(ValueError, match=fr"Result for job with ID '{job.id}' is unavailable"):
-            _ = job.result
 
     @responses.activate
     def test_created_at(self, job, add_response, datetime_):
@@ -206,15 +198,13 @@ class TestJob:
     @responses.activate
     def test_circuit(self, job, add_response):
         """Tests that the correct circuit is returned for a job."""
-        add_response(body={"circuit_url": "https://example.com/circuit"})
-        add_response(body={"circuit": "foo"}, path="/circuit")
+        add_response(body={"circuit": "foo"}, path=f"/jobs/{job.id}/circuit")
         assert job.circuit == "foo"
 
     @responses.activate
     def test_language(self, job, add_response):
         """Tests that the correct language is returned for a job."""
-        add_response(body={"circuit_url": "https://example.com/circuit"})
-        add_response(body={"language": "foo"}, path="/circuit")
+        add_response(body={"language": "foo"})
         assert job.language == "foo"
 
     @responses.activate
