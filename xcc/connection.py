@@ -41,20 +41,31 @@ class Connection:
     >>> response = connection.request(method="GET", path="/devices/X8_01")
     >>> response
     <Response [200]>
-    >>> import pprint
-    >>> pp = pprint.PrettyPrinter(indent=4)
-    >>> pp.pprint(response.json())
-    {   'certificate_url': 'https://platform.strawberryfields.ai/devices/X8_01/certificate',
-        'created_at': '2021-01-27T15:15:25.801308Z',
-        'expected_uptime': {   'monday': ['16:00:00+00:00', '23:59:59+00:00'],
-                               'thursday': ['16:00:00+00:00', '23:59:59+00:00'],
-                               'tuesday': ['16:00:00+00:00', '23:59:59+00:00'],
-                               'wednesday': ['16:00:00+00:00', '23:59:59+00:00']},
-        'specifications_url': 'https://platform.strawberryfields.ai/devices/X8_01/specifications',
-        'state': 'online',
-        'target': 'X8_01',
-        'up': True,
-        'url': 'https://platform.strawberryfields.ai/devices/X8_01'}
+    >>> import json
+    >>> print(json.dumps(response.json(), indent=4))
+    {
+        "expected_uptime": {
+            "monday": [
+                "15:00:00+00:00",
+                "22:59:59+00:00"
+            ],
+            "tuesday": [
+                "15:00:00+00:00",
+                "22:59:59+00:00"
+            ],
+            "thursday": [
+                "15:00:00+00:00",
+                "22:59:59+00:00"
+            ],
+            "wednesday": [
+                "15:00:00+00:00",
+                "22:59:59+00:00"
+            ]
+        },
+        "created_at": "2021-01-27T15:15:25.801308Z",
+        "target": "X8_01",
+        "status": "online"
+    }
     """
 
     def __init__(
