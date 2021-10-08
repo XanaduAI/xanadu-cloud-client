@@ -8,7 +8,6 @@ import io
 import time
 from datetime import datetime, timedelta
 from typing import Any, List, Mapping, Optional, Sequence, Union
-from urllib.parse import urlparse
 
 import dateutil.parser
 import numpy as np
@@ -137,7 +136,7 @@ class Job:
 
         # pylint: disable=protected-access
         job._details = details
-        job._circuit = {"circuit": circuit, "language": language}
+        job._circuit = {"circuit": circuit}
 
         return job
 
@@ -163,6 +162,7 @@ class Job:
             "name": self.name,
             "status": self.status,
             "target": self.target,
+            "language": self.language,
             "created_at": self.created_at,
             "finished_at": self.finished_at,
             "running_time": self.running_time,
@@ -179,12 +179,7 @@ class Job:
         Raises:
             ValueError: if the job is not complete
         """
-        if self.status != "complete":
-            raise ValueError(f"Result for job with ID '{self.id}' is unavailable.")
-
-        url = self._details["result_url"]
-        path = urlparse(url).path
-        response = self._connection.request("GET", path)
+        response = self._connection.request("GET", f"/jobs/{self.id}/result")
 
         # Adapted from strawberryfields.api.Connection.get_job_result().
         # The result of a job on the Xanadu Cloud is an HTTP response with a
@@ -259,7 +254,7 @@ class Job:
         Returns:
             str: language of this job
         """
-        return self._circuit["language"]
+        return self._details["language"]
 
     @property
     def name(self) -> str:
@@ -317,20 +312,16 @@ class Job:
 
     @cached_property
     def _circuit(self) -> Mapping[str, str]:
-        """Returns the circuit and language of a job.
+        """Returns the circuit of a job.
 
         Returns:
-            Mapping[str, str]: mapping with "circuit" and "language" fields
+            Mapping[str, str]: mapping with a "circuit" field
 
         .. note::
 
-            The circuit and language should be retrieved through the
-            :attr:`Device.circuit` and :attr:`Device.language` properties,
-            respectively.
+            The circuit should be retrieved through the :attr:`Device.circuit` property.
         """
-        url = self._details["circuit_url"]
-        path = urlparse(url).path
-        return self._connection.request("GET", path).json()
+        return self._connection.request("GET", f"/jobs/{self.id}/circuit").json()
 
     def __repr__(self) -> str:
         """Returns a printable representation of a job."""

@@ -6,7 +6,6 @@ from __future__ import annotations
 import calendar
 from datetime import time
 from typing import Any, Mapping, Optional, Sequence, Tuple
-from urllib.parse import urlparse
 
 from .connection import Connection
 from .util import cached_property
@@ -73,7 +72,7 @@ class Device:
             """Returns ``True`` if a device with the given details should be
             included in the response.  Otherwise, ``False`` is returned.
             """
-            return status is None or details["state"] == status
+            return status is None or details["status"] == status
 
         devices = []
 
@@ -117,9 +116,7 @@ class Device:
 
             The structure of a certificate may vary from device to device.
         """
-        url = self._details["certificate_url"]
-        path = urlparse(url).path
-        return self._connection.request("GET", path).json()
+        return self._connection.request("GET", f"/devices/{self.target}/certificate").json()
 
     @cached_property
     def specification(self) -> Mapping[str, Any]:
@@ -128,9 +125,7 @@ class Device:
         Returns:
             Mapping[str, Any]: specification of this device
         """
-        url = self._details["specifications_url"]
-        path = urlparse(url).path
-        return self._connection.request("GET", path).json()
+        return self._connection.request("GET", f"/devices/{self.target}/specifications").json()
 
     @property
     def expected_uptime(self) -> Mapping[str, Optional[Tuple[time, time]]]:
@@ -156,7 +151,7 @@ class Device:
         Returns:
             str: status of this device ("online" or "offline")
         """
-        return self._details["state"]
+        return self._details["status"]
 
     @property
     def up(self) -> bool:  # pylint: disable=invalid-name

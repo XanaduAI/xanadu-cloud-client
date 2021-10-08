@@ -251,7 +251,7 @@ def get_job(
         raise FireError("At most one job property can be selected.")
 
     if circuit:
-        return {"circuit": job.circuit, "language": job.language}
+        return job.circuit
     if status:
         return job.status
     if result:

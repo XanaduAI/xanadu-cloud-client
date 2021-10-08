@@ -264,9 +264,7 @@ class TestGetJob:
 
     def test_circuit(self):
         """Tests that the circuit of a job can be retrieved."""
-        have_circuit = json.loads(xcc.commands.get_job(id="foo", circuit=True))
-        want_circuit = {"circuit": "MeasureFock() | [0, 1, 2, 3]", "language": "blackbird:1.0"}
-        assert have_circuit == want_circuit
+        assert xcc.commands.get_job(id="foo", circuit=True) == "MeasureFock() | [0, 1, 2, 3]"
 
     def test_result(self):
         """Tests that the result of a job can be retrieved."""

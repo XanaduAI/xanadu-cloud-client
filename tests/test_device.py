@@ -44,8 +44,8 @@ class TestDevice:
     def test_list(self, connection, add_response, status, want_targets):
         """Tests that the correct devices are listed for a status."""
         data = [
-            {"target": "foo", "state": "online"},
-            {"target": "bar", "state": "offline"},
+            {"target": "foo", "status": "online"},
+            {"target": "bar", "status": "offline"},
         ]
         add_response(body={"data": data}, path="/devices")
 
@@ -59,21 +59,19 @@ class TestDevice:
     @responses.activate
     def test_overview(self, device, add_response):
         """Tests that the correct overview is returned for a device."""
-        add_response(body={"target": "qpu", "state": "online"})
+        add_response(body={"target": "qpu", "status": "online"})
         assert device.overview == {"target": "qpu", "status": "online"}
 
     @responses.activate
     def test_certificate(self, device, add_response):
         """Tests that the correct certificate is returned for a device."""
-        add_response(body={"certificate_url": "https://example.com/devices/qpu/certificate"})
         add_response(body={"conditions": "nominal"}, path="/devices/qpu/certificate")
         assert device.certificate == {"conditions": "nominal"}
 
     @responses.activate
     def test_specification(self, device, add_response):
         """Tests that the correct specification is returned for a device."""
-        add_response(body={"specifications_url": "https://example.com/devices/qpu/specification"})
-        add_response(body={"compiler": "LLVM", "modes": 42}, path="/devices/qpu/specification")
+        add_response(body={"compiler": "LLVM", "modes": 42}, path="/devices/qpu/specifications")
         assert device.specification == {"compiler": "LLVM", "modes": 42}
 
     @responses.activate
@@ -103,14 +101,14 @@ class TestDevice:
     @pytest.mark.parametrize("status", ["offline", "online"])
     def test_status(self, device, add_response, status):
         """Tests that the correct status is returned for a device."""
-        add_response(body={"state": status})
+        add_response(body={"status": status})
         assert device.status == status
 
     @responses.activate
     @pytest.mark.parametrize("status, up", [("offline", False), ("online", True)])
     def test_up(self, device, add_response, status, up):  # pylint: disable=invalid-name
         """Tests that the correct "up" indicator is returned for a device."""
-        add_response(body={"state": status})
+        add_response(body={"status": status})
         assert device.up == up
 
     def test_repr(self, device):
@@ -120,8 +118,8 @@ class TestDevice:
     @responses.activate
     def test_clear(self, device, add_response):
         """Tests that the cache of a device can be cleared."""
-        add_response(body={"state": "offline"})
-        add_response(body={"state": "online"})
+        add_response(body={"status": "offline"})
+        add_response(body={"status": "online"})
 
         assert device.status == "offline"
         assert device.status == "offline"
@@ -135,10 +133,10 @@ class TestDevice:
     @responses.activate
     def test_cache_independence(self, connection, add_response):
         """Tests that caches are not shared across device instances."""
-        add_response(body={"state": "offline"})
-        add_response(body={"state": "online"})
-        add_response(body={"state": "online"})
-        add_response(body={"state": "offline"})
+        add_response(body={"status": "offline"})
+        add_response(body={"status": "online"})
+        add_response(body={"status": "online"})
+        add_response(body={"status": "offline"})
 
         device_1 = xcc.Device("qpu", connection)
         device_2 = xcc.Device("qpu", connection)
