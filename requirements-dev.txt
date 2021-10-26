@@ -1,6 +1,6 @@
-black==21.7b0
-isort==5.9.3
-pylint==2.10.2
-pytest-cov
-responses
-wheel
+black==21.9b0
+build==0.7.0
+isort[colors]==5.9.3
+pylint==2.11.1
+pytest-cov==3.0.0
+responses==0.14.0
