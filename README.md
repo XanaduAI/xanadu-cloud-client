@@ -25,36 +25,36 @@ pip install git+https://github.com/XanaduAI/xanadu-cloud-client#egg=xanadu-cloud
 
 ## Setup
 
-To use the XCC, a Xanadu Cloud API key is required. There are several ways to
-register your API key with the XCC:
+To use the XCC, a Xanadu Cloud API key (or equivalent JWT refresh token) is
+required. There are several ways to register your API key with the XCC:
 
 1. Save your API key to the XCC configuration file using the CLI:
     ```console
-    xcc config set API_KEY "Xanadu Cloud API key goes here"
+    xcc config set REFRESH_TOKEN "Xanadu Cloud API key goes here"
     ```
 
-2. Set the `XANADU_CLOUD_API_KEY` environment variable:
+2. Set the `XANADU_CLOUD_REFRESH_TOKEN` environment variable:
     ```console
-    export XANADU_CLOUD_API_KEY="Xanadu Cloud API key goes here"
+    export XANADU_CLOUD_REFRESH_TOKEN="Xanadu Cloud API key goes here"
     ```
 
 3. Save your API key to the XCC configuration file using the Python API:
     ```python
     import xcc
 
-    settings = xcc.Settings(API_KEY="Xanadu Cloud API key goes here")
+    settings = xcc.Settings(REFRESH_TOKEN="Xanadu Cloud API key goes here")
     settings.save()
     ```
 
-Afterwards, you can verify that your API key was set correctly using the CLI or Python API:
+Afterwards, you can verify that your API key was set correctly using either:
 
-1. Using the CLI:
+1. The CLI:
     ```console
     $ xcc ping
     Successfully connected to the Xanadu Cloud.
     ```
 
-2. Using the Python API:
+2. The Python API:
     ```python
     import xcc
 
@@ -78,10 +78,6 @@ to the Python API documentation.
     [
         {
             "target": "simulon_gaussian",
-            "status": "online"
-        },
-        {
-            "target": "simulon_jet",
             "status": "online"
         },
         {

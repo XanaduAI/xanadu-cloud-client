@@ -46,17 +46,11 @@ def load_connection() -> Connection:
     Returns:
         Connection: connection initialized from the configuration of a new
         :class:`xcc.Settings` instance
-
-    Raises:
-        ValueError: if the API key is set to ``None`` in the settings
     """
     settings = Settings()
-
-    if settings.API_KEY is None:
-        raise ValueError("An API key is required to connect to the Xanadu Cloud.")
-
     return Connection(
-        key=settings.API_KEY,
+        refresh_token=settings.REFRESH_TOKEN,
+        access_token=settings.ACCESS_TOKEN,
         host=settings.HOST,
         port=settings.PORT,
         tls=settings.TLS,
@@ -73,7 +67,7 @@ def get_setting(name: str) -> Any:
     """Gets the value of a setting.
 
     Args:
-        name (str): Name of the setting (e.g., "API_KEY").
+        name (str): Name of the setting (e.g., "PORT").
 
     Returns:
         Any: Value of the setting.
