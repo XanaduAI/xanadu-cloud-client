@@ -148,7 +148,7 @@ to the Python API documentation.
     $ xcc job submit --name example \
         --target simulon_gaussian \
         --language "blackbird:1.0" \
-        --circuit `cat circuit.xbb`
+        --circuit "$(cat circuit.xbb)"
     ```
     ```json
     {
