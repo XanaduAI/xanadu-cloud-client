@@ -27,13 +27,15 @@ class TestConnection:
         with pytest.raises(ValueError, match=match):
             xcc.Connection()
 
-    def test_access_token(self, connection):
+    def test_access_token(self):
         """Tests that the correct access token is returned for a connection."""
-        assert connection.access_token is None
+        assert xcc.Connection(refresh_token="j.w.t").access_token is None
+        assert xcc.Connection(access_token="j.w.t").access_token == "j.w.t"
 
-    def test_refresh_token(self, connection):
+    def test_refresh_token(self):
         """Tests that the correct refresh token is returned for a connection."""
-        assert connection.refresh_token == "j.w.t"
+        assert xcc.Connection(refresh_token="j.w.t").refresh_token == "j.w.t"
+        assert xcc.Connection(access_token="j.w.t").refresh_token is None
 
     def test_tls(self, connection):
         """Tests that the correct TLS setting is returned for a connection."""
