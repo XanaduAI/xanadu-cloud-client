@@ -104,15 +104,6 @@ def test_load_connection(monkeypatch):
     assert connection.user_agent == "XCC/1.2.3-alpha (CLI)"
 
 
-def test_load_connection_without_api_key(settings):
-    """Tests that a ValueError is raised when a connection is loaded without an API key."""
-    settings.API_KEY = None
-    settings.save()
-
-    with pytest.raises(ValueError, match=r"An API key is required to connect to the Xanadu Cloud"):
-        xcc.commands.load_connection()
-
-
 # Settings CLI
 # ------------------------------------------------------------------------------
 
@@ -135,18 +126,24 @@ class TestGetSetting:
 
     def test_missing_value(self, settings):
         """Tests that a ValueError is raised when the value of a setting is ``None``."""
-        settings.API_KEY = None
+        settings.ACCESS_TOKEN = None
         settings.save()
 
-        match = r"The API_KEY setting does not currently have a value"
+        match = r"The ACCESS_TOKEN setting does not currently have a value"
         with pytest.raises(ValueError, match=match):
-            xcc.commands.get_setting(name="API_KEY")
+            xcc.commands.get_setting(name="ACCESS_TOKEN")
 
 
 def test_list_settings():
     """Tests that the :func:`xcc.commands.list_settings()` CLI command lists settings."""
     have_settings = json.loads(xcc.commands.list_settings())
-    want_settings = {"API_KEY": "j.w.t", "HOST": "example.com", "PORT": 80, "TLS": False}
+    want_settings = {
+        "REFRESH_TOKEN": "j.w.t",
+        "ACCESS_TOKEN": None,
+        "HOST": "example.com",
+        "PORT": 80,
+        "TLS": False,
+    }
     assert have_settings == want_settings
 
 

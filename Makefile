@@ -31,16 +31,16 @@ lint:
 
 .PHONY: format
 format:
-	$(PYTHON) -m black -l 100 xcc tests
-	$(PYTHON) -m isort --profile black xcc tests
+	$(PYTHON) -m black --check --diff --color -l 100 xcc tests
+	$(PYTHON) -m isort --check --diff --color --profile black xcc tests
 
 .PHONY: wheel
 wheel:
-	$(PYTHON) setup.py bdist_wheel
+	$(PYTHON) -m build --no-isolation --wheel
 
 .PHONY: dist
 dist:
-	$(PYTHON) setup.py sdist
+	$(PYTHON) -m build --no-isolation --sdist
 
 .PHONY : clean
 clean:

@@ -16,13 +16,26 @@ import xcc
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
 
-    def test_access_token(self, connection):
-        """Tests that the correct access token is returned for a connection."""
-        assert connection.access_token is None
+    def test_missing_access_token_and_refresh_token(self):
+        """Tests that a ValueError is raised when a connection is created
+        without a refresh token or an access token.
+        """
+        match = (
+            r"A refresh token \(e\.g\.\, Xanadu Cloud API key\) or an access "
+            r"token must be provided to connect to the Xanadu Cloud"
+        )
+        with pytest.raises(ValueError, match=match):
+            xcc.Connection()
 
-    def test_refresh_token(self, connection):
+    def test_access_token(self):
+        """Tests that the correct access token is returned for a connection."""
+        assert xcc.Connection(refresh_token="j.w.t").access_token is None
+        assert xcc.Connection(access_token="j.w.t").access_token == "j.w.t"
+
+    def test_refresh_token(self):
         """Tests that the correct refresh token is returned for a connection."""
-        assert connection.refresh_token == "j.w.t"
+        assert xcc.Connection(refresh_token="j.w.t").refresh_token == "j.w.t"
+        assert xcc.Connection(access_token="j.w.t").refresh_token is None
 
     def test_tls(self, connection):
         """Tests that the correct TLS setting is returned for a connection."""
@@ -30,8 +43,8 @@ class TestConnection:
 
     def test_scheme(self):
         """Tests that the correct scheme is returned for a connection."""
-        assert xcc.Connection(key="j.w.t", tls=False).scheme == "http"
-        assert xcc.Connection(key="j.w.t", tls=True).scheme == "https"
+        assert xcc.Connection(refresh_token="j.w.t", tls=False).scheme == "http"
+        assert xcc.Connection(refresh_token="j.w.t", tls=True).scheme == "https"
 
     def test_host(self, connection):
         """Tests that the correct host is returned for a connection."""
@@ -238,7 +251,8 @@ class TestConnection:
             body='{"error": "invalid_grant"}',
         )
 
-        with pytest.raises(HTTPError, match=r"Xanadu Cloud API key is invalid"):
+        match = r"Refresh token \(e\.g\.\, Xanadu Cloud API key\) is invalid"
+        with pytest.raises(HTTPError, match=match):
             connection.update_access_token()
 
     @responses.activate

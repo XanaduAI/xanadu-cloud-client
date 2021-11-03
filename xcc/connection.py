@@ -13,11 +13,18 @@ class Connection:
     """Manages remote connections to the Xanadu Cloud.
 
     Args:
-        key (str): Xanadu Cloud API key used for authentication
+        refresh_token (str, optional): JWT refresh token, such as a Xanadu Cloud
+            API key, that is used to fetch access tokens from the Xanadu Cloud
+        access_token (str, optional): JWT access token that is used to
+            authenticate requests to the Xanadu Cloud; missing, invalid, or
+            expired access tokens are replaced using the refresh token
         host (str): hostname of the Xanadu Cloud server
         port (int): port of the Xanadu Cloud server
         tls (bool): whether to use HTTPS for the connection
         headers (Dict[str, str], optional): HTTP request headers to override
+
+    Raises:
+        ValueError: if both the refresh token and access token are ``None``
 
     **Example:**
 
@@ -26,7 +33,7 @@ class Connection:
     Xanadu Cloud API key:
 
     >>> import xcc
-    >>> connection = xcc.Connection(key="Xanadu Cloud API key goes here")
+    >>> connection = xcc.Connection(refresh_token="Xanadu Cloud API key goes here")
 
     This connection can be tested using :meth:`~xcc.Connection.ping`. If there
     is an issue with the connection, a :exc:`requests.models.HTTPError` will be
@@ -70,14 +77,21 @@ class Connection:
 
     def __init__(
         self,
-        key: str,
+        refresh_token: Optional[str] = None,
+        access_token: Optional[str] = None,
         host: str = "platform.strawberryfields.ai",
         port: int = 443,
         tls: bool = True,
         headers: Optional[Dict[str, str]] = None,
     ) -> None:
-        self._access_token = None
-        self._refresh_token = key
+        if refresh_token is None and access_token is None:
+            raise ValueError(
+                "A refresh token (e.g., Xanadu Cloud API key) or an access "
+                "token must be provided to connect to the Xanadu Cloud."
+            )
+
+        self._access_token = access_token
+        self._refresh_token = refresh_token
 
         self._tls = tls
         self._host = host
@@ -87,12 +101,12 @@ class Connection:
 
     @property
     def access_token(self) -> Optional[str]:
-        """Returns the access token used to authorize requests to the Xanadu Cloud."""
+        """Returns the access token used to authenticate requests to the Xanadu Cloud."""
         return self._access_token
 
     @property
-    def refresh_token(self) -> str:
-        """Returns the refresh token (API key) used to fetch access tokens."""
+    def refresh_token(self) -> Optional[str]:
+        """Returns the refresh token used to fetch access tokens."""
         return self._refresh_token
 
     @property
@@ -251,7 +265,9 @@ class Connection:
             # It is worth investing in a helpful error message for invalid API
             # keys since most users will likely encounter it at some point.
             if response.status_code == 400 and body.get("error", "") == "invalid_grant":
-                raise requests.exceptions.HTTPError("Xanadu Cloud API key is invalid")
+                raise requests.exceptions.HTTPError(
+                    "Refresh token (e.g., Xanadu Cloud API key) is invalid"
+                )
 
             response.raise_for_status()
 

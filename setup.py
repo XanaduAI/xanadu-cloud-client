@@ -1,11 +1,16 @@
 from setuptools import setup, find_packages
-import re
 
 with open("xcc/_version.py") as f:
     version = f.readlines()[-1].split()[-1].strip("\"'")
 
-with open("requirements.txt", "r") as f:
-    requirements = re.sub(r"#.*", "", f.read()).split()
+requirements = [
+    "appdirs",
+    "fire",
+    "numpy",
+    "pydantic[dotenv]",
+    "python-dateutil",
+    "requests",
+]
 
 info = {
     "description": "XCC is a Python API and CLI for the Xanadu Cloud.",

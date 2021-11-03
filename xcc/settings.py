@@ -24,7 +24,8 @@ def get_name_of_env_var(key: str = "") -> str:
 class Settings(BaseSettings):
     """Represents the configuration for connecting to the Xanadu Cloud."""
 
-    API_KEY: Optional[str] = None
+    REFRESH_TOKEN: Optional[str] = None
+    ACCESS_TOKEN: Optional[str] = None
     HOST: str = "platform.strawberryfields.ai"
     PORT: int = 443
     TLS: bool = True

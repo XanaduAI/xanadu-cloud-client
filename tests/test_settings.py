@@ -50,11 +50,11 @@ class TestSettings:
 
     def test_save(self, env_file):
         """Tests that settings can be saved to a .env file."""
-        settings = xcc.Settings(API_KEY="j.w.t", HOST="example.com", PORT=80, TLS=False)
+        settings = xcc.Settings(REFRESH_TOKEN="j.w.t", HOST="example.com", PORT=80, TLS=False)
         settings.save()
 
         assert dotenv_values(env_file.name) == {
-            "XANADU_CLOUD_API_KEY": "j.w.t",
+            "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t",
             "XANADU_CLOUD_HOST": "example.com",
             "XANADU_CLOUD_PORT": "80",
             "XANADU_CLOUD_TLS": "False",
@@ -64,21 +64,21 @@ class TestSettings:
         """Tests that settings can be saved to a .env file multiple times."""
         path_to_env_file = xcc.Settings.Config.env_file
 
-        settings.API_KEY = None
+        settings.REFRESH_TOKEN = None
         settings.save()
-        assert "XANADU_CLOUD_API_KEY" not in dotenv_values(path_to_env_file)
+        assert "XANADU_CLOUD_REFRESH_TOKEN" not in dotenv_values(path_to_env_file)
 
-        settings.API_KEY = "f.o.o"
+        settings.REFRESH_TOKEN = "f.o.o"
         settings.save()
-        assert dotenv_values(path_to_env_file)["XANADU_CLOUD_API_KEY"] == "f.o.o"
+        assert dotenv_values(path_to_env_file)["XANADU_CLOUD_REFRESH_TOKEN"] == "f.o.o"
 
-        settings.API_KEY = "b.a.r"
+        settings.REFRESH_TOKEN = "b.a.r"
         settings.save()
-        assert dotenv_values(path_to_env_file)["XANADU_CLOUD_API_KEY"] == "b.a.r"
+        assert dotenv_values(path_to_env_file)["XANADU_CLOUD_REFRESH_TOKEN"] == "b.a.r"
 
-        settings.API_KEY = None
+        settings.REFRESH_TOKEN = None
         settings.save()
-        assert "XANADU_CLOUD_API_KEY" not in dotenv_values(path_to_env_file)
+        assert "XANADU_CLOUD_REFRESH_TOKEN" not in dotenv_values(path_to_env_file)
 
     def test_save_to_nonexistent_directory(self, monkeypatch):
         """Tests that settings can be saved to a .env file in a nonexistent directory."""
