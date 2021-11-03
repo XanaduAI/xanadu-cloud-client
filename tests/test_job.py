@@ -149,7 +149,7 @@ class TestJob:
     @responses.activate
     def test_result_npy(self, connection, job):
         """Tests that a TypeError is raised when the result of a job is an .npy file."""
-        result = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
+        result = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
 
         with io.BytesIO() as buffer:
             np.save(file=buffer, arr=result, allow_pickle=False)
