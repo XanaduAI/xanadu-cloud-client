@@ -120,8 +120,35 @@ class TestJob:
         assert set(job.overview) == set(body)
 
     @responses.activate
+    def test_result(self, connection, job):
+        """Tests that the correct result is returned for a job."""
+        output = [np.complex64(1 + 2j), np.arange(5, dtype=np.int16)]
+        metadata = {"params": np.arange(3, dtype=np.int8)}
+
+        with io.BytesIO() as buffer:
+            # The public savez() function does not allow pickling to be disabled.
+            savez = numpy.lib.npyio._savez  # pylint: disable=protected-access
+            savez(file=buffer, args=output, kwds=metadata, compress=False, allow_pickle=False)
+
+            buffer.seek(0)
+            body = buffer.read()
+
+            path = f"/jobs/{job.id}/result"
+            responses.add(responses.GET, connection.url(path), status=200, body=body)
+
+            assert job.result.keys() == {"output", "params"}
+
+            assert len(job.result["output"]) == 2
+            assert job.result["output"][0] == 1 + 2j
+            assert job.result["output"][1] == pytest.approx([0, 1, 2, 3, 4])
+            assert job.result["output"][1].dtype == np.int64
+
+            assert job.result["params"] == pytest.approx([0, 1, 2])
+            assert job.result["params"].dtype == np.int64
+
+    @responses.activate
     def test_result_npy(self, connection, job):
-        """Tests that the correct .npy result is returned for a job."""
+        """Tests that a TypeError is raised when the result of a job is an .npy file."""
         result = np.array([[0, 1, 2, 3], [4, 5, 6, 7]], dtype=np.int64)
 
         with io.BytesIO() as buffer:
@@ -133,26 +160,7 @@ class TestJob:
             path = f"/jobs/{job.id}/result"
             responses.add(responses.GET, connection.url(path), status=200, body=body)
 
-            assert job.result == pytest.approx(result)
-
-    @responses.activate
-    def test_result_npz(self, connection, job):
-        """Tests that the correct .npz result is returned for a job."""
-        result = [np.complex64(1 + 2j), np.arange(5)]
-
-        with io.BytesIO() as buffer:
-            # The public savez() function does not allow pickling to be disabled.
-            savez = numpy.lib.npyio._savez  # pylint: disable=protected-access
-            savez(file=buffer, args=result, kwds={}, compress=False, allow_pickle=False)
-
-            buffer.seek(0)
-            body = buffer.read()
-
-            path = f"/jobs/{job.id}/result"
-            responses.add(responses.GET, connection.url(path), status=200, body=body)
-
-            assert len(job.result) == len(result)
-            assert [have == pytest.approx(want) for have, want in zip(job.result, result)]
+            pytest.raises(TypeError, lambda: job.result, match=r"Job result is not an .npz file")
 
     @responses.activate
     def test_created_at(self, job, add_response, datetime_):
