@@ -78,7 +78,9 @@ class TestConnection:
 
     def test_repr(self, connection):
         """Tests that the printable representation of a connection is correct."""
-        assert repr(connection) == "<Connection: refresh_token=j.w.t, access_token=None, url=https://cloud.xanadu.ai:443/>"
+        assert repr(connection) == (
+            "<Connection: refresh_token=j.w.t, access_token=None, url=https://cloud.xanadu.ai:443/>"
+        )
 
     def test_url(self, connection):
         """Tests that the correct URL is derived for a connection path."""
