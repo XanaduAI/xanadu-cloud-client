@@ -73,7 +73,7 @@ class MockJob(xcc.Job):
 
     @cached_property
     def result(self):
-        return np.zeros((4, 4))
+        return {"output": np.zeros((4, 4))}
 
     def cancel(self):
         pass
@@ -266,7 +266,7 @@ class TestGetJob:
     def test_result(self):
         """Tests that the result of a job can be retrieved."""
         have_result = xcc.commands.get_job(id="foo", result=True)
-        want_result = str(np.zeros((4, 4)))
+        want_result = json.dumps({"output": str(np.zeros((4, 4)))}, indent=4)
         assert have_result == want_result
 
     def test_invalid_number_of_flags(self):

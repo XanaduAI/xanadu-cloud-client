@@ -7,6 +7,7 @@ from __future__ import annotations
 import io
 import time
 from datetime import datetime, timedelta
+from itertools import count, takewhile
 from typing import Any, List, Mapping, Optional, Sequence, Union
 
 import dateutil.parser
@@ -168,35 +169,41 @@ class Job:
         }
 
     @cached_property
-    def result(self) -> Union[np.ndarray, List[Union[np.number, np.ndarray]]]:
+    def result(self) -> Mapping[str, Union[np.ndarray, List[np.ndarray]]]:
         """Returns the result of a job.
 
         Returns:
-            Union[np.ndarray, List[Union[np.number, np.ndarray]]]: result of
-            this job
+            Mapping[str, Union[np.ndarray, List[np.ndarray]]]: The result of
+            this job. Each job result has an "output" key associated with a list
+            of NumPy arrays representing the output of the job; all other keys
+            represent metadata related to the interpretation of the job output.
 
         Raises:
-            ValueError: if the job is not complete
+            TypeError: if the job result is not stored in the .npz file format
         """
         response = self._connection.request("GET", f"/jobs/{self.id}/result")
 
-        # Adapted from strawberryfields.api.Connection.get_job_result().
-        # The result of a job on the Xanadu Cloud is an HTTP response with a
-        # payload containing the bytes of either an .npy or .npz file depending
-        # on the language of the submitted job.
         with io.BytesIO(response.content) as buffer:
             result = np.load(buffer, allow_pickle=False)
 
-            if not isinstance(result, np.ndarray):
-                # The payload is a .npz file.
-                result = [result[fname] for fname in result.files]
+            if not isinstance(result, np.lib.npyio.NpzFile):
+                raise TypeError("Job result is not an .npz file")
 
-            elif np.issubdtype(result.dtype, np.integer):
-                # The payload is a .npy file with integral entries.
-                # Convert to int64 to avoid surprises during post-processing.
-                result = result.astype(np.int64)
+            result = dict(result)
 
-            return result
+        # Convert integral entries to int64 to avoid surprises during post-processing.
+        for key, array in result.items():
+            if np.issubdtype(array.dtype, np.integer):
+                result[key] = array.astype(np.int64)
+
+        # For convenience, move all positional arguments (i.e., those that have
+        # an "arr_" prefix) to a separate key named "output".
+        result["output"] = []
+        for i in takewhile(lambda i: f"arr_{i}" in result, count()):
+            array = result.pop(f"arr_{i}")
+            result["output"].append(array)
+
+        return result
 
     @property
     def created_at(self) -> datetime:
