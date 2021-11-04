@@ -1,0 +1,14 @@
+name: Documentation Check
+on:
+- pull_request
+
+jobs:
+  sphinx:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: josh146/sphinx-action@master
+      with:
+        docs-folder: "docs/"
+        pre-build-command: "apt install -y graphviz && pip3 install . && pip3 install -r docs/requirements.txt"
+        build-command: "sphinx-build -b html . _build -W --keep-going"
