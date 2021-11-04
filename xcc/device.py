@@ -38,7 +38,7 @@ class Device:
     connection is established to the Xanadu Cloud:
 
     >>> import xcc
-    >>> connection = xcc.Connection(key="Xanadu Cloud API key goes here")
+    >>> connection = xcc.Connection(refresh_token="Xanadu Cloud API key goes here")
 
     Next, a reference to the ``X8_01`` device is created using the connection.
 
