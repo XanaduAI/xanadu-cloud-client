@@ -249,7 +249,7 @@ def get_job(
     if status:
         return job.status
     if result:
-        return str(job.result)
+        return job.result
 
     return job.overview
 
