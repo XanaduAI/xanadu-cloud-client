@@ -158,7 +158,6 @@ refer to the Python API documentation.
     .. code-block:: console
 
         $ cat circuit.xbb
-
         name example
         version 1.0
         target simulon_gaussian (shots=4)
