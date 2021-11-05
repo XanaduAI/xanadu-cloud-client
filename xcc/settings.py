@@ -25,10 +25,19 @@ class Settings(BaseSettings):
     """Represents the configuration for connecting to the Xanadu Cloud."""
 
     REFRESH_TOKEN: Optional[str] = None
+    """JWT refresh token that can be used to fetch access tokens from the Xanadu Cloud."""
+
     ACCESS_TOKEN: Optional[str] = None
+    """JWT access token that can be used to authenticate requests to the Xanadu Cloud."""
+
     HOST: str = "platform.strawberryfields.ai"
+    """Hostname of the Xanadu Cloud server."""
+
     PORT: int = 443
+    """Port of the Xanadu Cloud server."""
+
     TLS: bool = True
+    """Whether to use HTTPS for requests to the Xanadu Cloud."""
 
     class Config:  # pylint: disable=missing-class-docstring
         case_sensitive = True
