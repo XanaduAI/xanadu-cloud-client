@@ -15,7 +15,6 @@ aims to support the following workflows:
 
 * Submit jobs to the Xanadu Cloud and retrieve their results.
 
-Follow the `development guide <../dev/guide.html>`_ to get the XCC up and
-running and then have a look at the `README
-<https://github.com/XanaduAI/xanadu-cloud-client/blob/main/README.md>`_ to see
+Follow the `development guide <../dev/guide.html>`_ to get the XCC ready for
+local development or have a look at the `walkthrough <walkthrough.rst>`_ to see
 what you can do with the XCC.

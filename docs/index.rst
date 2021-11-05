@@ -79,36 +79,16 @@ XCC Documentation
                 </div>
             </a>
             </div>
-	    
         </div>
     </div>
 
-Features
-========
+.. include:: ../README.rst
+    :start-after: inclusion-marker-for-features-start
+    :end-before: inclusion-marker-for-features-end
 
-* *Simple.* Easy to setup, explore, and use.
-
-..
-
-* *Efficient.* Lazy fetching and caching by default.
-
-..
-
-* *Structured.* Parse Xanadu Cloud responses into JSON or Python objects.
-
-Support
-=======
-
-- **Source Code:** https://github.com/XanaduAI/xanadu-cloud-client
-- **Issue Tracker:** https://github.com/XanaduAI/xanadu-cloud-client/issues
-
-If you are having issues, please let us know, either by email or by posting the
-issue on our GitHub issue tracker.
-
-License
-=======
-
-The XCC is **free** and **open source**, released under the Apache License, Version 2.0.
+.. include:: ../README.rst
+    :start-after: inclusion-marker-for-license-start
+    :end-before: inclusion-marker-for-license-end
 
 .. toctree::
    :maxdepth: 2
@@ -116,6 +96,7 @@ The XCC is **free** and **open source**, released under the Apache License, Vers
    :hidden:
 
    use/introduction
+   use/walkthrough
 
 .. toctree::
    :maxdepth: 2
