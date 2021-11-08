@@ -1,4 +1,4 @@
-.. image:: docs/_static/xcc_title.svg
+.. image:: https://raw.githubusercontent.com/XanaduAI/xanadu-cloud-client/main/docs/_static/xcc_title.svg
     :alt: XCC
     :height: 65
     :width: 100%
@@ -218,12 +218,13 @@ Contributions
 We welcome contributions - simply fork the XCC repository and make a `pull
 request <https://help.github.com/articles/about-pull-requests/>`_ containing
 your contribution. All contributors to the XCC will be listed as authors on the
-releases. See our `changelog <.github/CHANGELOG.md>`_ for more details.
+releases. See our `changelog <https://github.com/XanaduAI/xanadu-cloud-client/blob/main/.github/CHANGELOG.md>`_
+for more details.
 
 We also encourage bug reports, suggestions for new features and enhancements,
 and even links to cool projects or applications built on top of the XCC. Visit
-the `contributions page <.github/CONTRIBUTING.md>`_ to learn more about sharing
-your ideas with the XCC team.
+the `contributions page <https://github.com/XanaduAI/xanadu-cloud-client/blob/main/.github/CONTRIBUTING.md>`_
+to learn more about sharing your ideas with the XCC team.
 
 Support
 -------
