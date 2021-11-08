@@ -1,0 +1,5 @@
+docutils
+m2r2
+nbsphinx
+sphinx-copybutton
+sphinx>=3.1.0

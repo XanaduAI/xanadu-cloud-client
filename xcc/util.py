@@ -25,9 +25,14 @@ class cached_property:  # pylint: disable=invalid-name
     def __init__(self, func: Callable[[Any], Any]) -> None:
         self.func = func
         self.caches = {}
+        self.__doc__ = func.__doc__
 
     def __get__(self, instance: Any, _) -> Any:
         """Returns the (cached) value associated with the given instance."""
+        # Edge case to support getattr() and generate Sphinx documentation.
+        if instance is None:
+            return self
+
         if instance not in self.caches:
             self.caches[instance] = self.func(instance)
         return self.caches[instance]

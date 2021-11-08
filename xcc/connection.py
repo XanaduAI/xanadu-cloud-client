@@ -151,7 +151,12 @@ class Connection:
 
     def __repr__(self) -> str:
         """Returns a printable representation of a connection."""
-        return f"<{self.__class__.__name__}: key={self.refresh_token}, url={self.url()}>"
+        return (
+            f"<{self.__class__.__name__}: "
+            f"refresh_token={self.refresh_token}, "
+            f"access_token={self.access_token}, "
+            f"url={self.url()}>"
+        )
 
     def url(self, path: str = "") -> str:
         """Returns the URL to a Xanadu Cloud endpoint.
