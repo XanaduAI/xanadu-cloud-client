@@ -1,7 +1,7 @@
 .. image:: docs/_static/xcc_title.svg
-    :align: center
     :alt: XCC
     :height: 65
+    :width: 100%
 
 The `Xanadu Cloud Client <https://xanadu-cloud-client.readthedocs.io>`_ (XCC) is
 a Python API and CLI for the Xanadu Cloud.
