@@ -12,7 +12,7 @@ from pydantic import BaseSettings
 
 def get_path_to_env_file() -> str:
     """Returns the path to the .env file containing the Xanadu Cloud connection settings."""
-    path_to_config_dir = user_config_dir("xanadu-cloud")
+    path_to_config_dir = user_config_dir(appname="xanadu-cloud", appauthor="Xanadu")
     return os.path.join(path_to_config_dir, ".env")
 
 
