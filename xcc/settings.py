@@ -22,7 +22,17 @@ def get_name_of_env_var(key: str = "") -> str:
 
 
 class Settings(BaseSettings):
-    """Represents the configuration for connecting to the Xanadu Cloud."""
+    """Represents the configuration for connecting to the Xanadu Cloud.
+
+    The location where this configuration is saved depends on the current
+    operating system. Specifically,
+
+    * Windows: ``C:\\Users\\%USERNAME%\\AppData\\Local\\Xanadu\\xanadu-cloud\\.env``
+
+    * MacOS: ``/home/$USER/Library/Application\\ Support/xanadu-cloud/.env``
+
+    * Linux: ``/home/$USER/.config/xanadu-cloud/.env``
+    """
 
     REFRESH_TOKEN: Optional[str] = None
     """JWT refresh token that can be used to fetch access tokens from the Xanadu Cloud."""
