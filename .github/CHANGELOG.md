@@ -1,4 +1,4 @@
-## Release 0.1.1 (development release)
+## Release 0.1.1 (current release)
 
 ### New features since last release
 
@@ -16,13 +16,22 @@
 * On Windows, the XCC configuration file is now stored at `...\Xanadu\xanadu-cloud\.env`.
   [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
 
+### Documentation
+
+* Individual modules are now listed in the *API* section of the Sphinx sidebar.
+  [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
+
+* The `Settings` class docstring now includes an example walkthrough as well as
+  the location of the XCC configuration file.
+  [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
 [Mikhail Andrenkov](https://github.com/Mandrenkov).
 
-## Release 0.1.0 (current release)
+## Release 0.1.0
 
 ### New features since last release
 
