@@ -1,6 +1,9 @@
 name: Formatting Check
 on:
-- pull_request
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   format:
