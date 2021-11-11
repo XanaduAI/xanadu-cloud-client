@@ -21,6 +21,7 @@ def env_file(monkeypatch):
 
 def test_get_path_to_env_file(monkeypatch):
     """Tests that the path to the .env file is derived correctly."""
+
     def user_config_dir(appname: str, appauthor: str) -> str:
         return f"foo/bar/{appauthor}/{appname}"
 

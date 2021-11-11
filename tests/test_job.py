@@ -261,7 +261,6 @@ class TestJob:
         add_response(body={"meta": {"foo": "bar", "baz": 123}})
         assert job.metadata == {"foo": "bar", "baz": 123}
 
-
     def test_repr(self, job):
         """Tests that the correct printable representation is returned for a job."""
         assert repr(job) == f"<Job: id={job.id}>"
