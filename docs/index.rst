@@ -113,3 +113,7 @@ XCC Documentation
    :hidden:
 
    api/xcc
+   api/xcc.Connection
+   api/xcc.Device
+   api/xcc.Job
+   api/xcc.Settings
