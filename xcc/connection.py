@@ -10,7 +10,7 @@ from ._version import __version__
 
 
 class Connection:
-    """Manages remote connections to the Xanadu Cloud.
+    """Represents a connection to the Xanadu Cloud.
 
     Args:
         refresh_token (str, optional): JWT refresh token, such as a Xanadu Cloud
