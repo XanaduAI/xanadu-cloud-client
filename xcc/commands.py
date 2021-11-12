@@ -94,7 +94,7 @@ def list_settings() -> Mapping[str, Any]:
 def set_setting(name: str, value: Union[str, int, bool]) -> str:
     """Sets the value of a setting.
 
-    To configure your Xanadu Cloud credentials, it is usually sufficient to run
+    To configure your Xanadu Cloud credentials, simply run
 
     $ xcc config set REFRESH_TOKEN "Xanadu Cloud API key goes here"
 
