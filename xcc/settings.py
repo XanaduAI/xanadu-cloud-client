@@ -12,7 +12,7 @@ from pydantic import BaseSettings
 
 def get_path_to_env_file() -> str:
     """Returns the path to the .env file containing the Xanadu Cloud connection settings."""
-    path_to_config_dir = user_config_dir("xanadu-cloud")
+    path_to_config_dir = user_config_dir(appname="xanadu-cloud", appauthor="Xanadu")
     return os.path.join(path_to_config_dir, ".env")
 
 
@@ -22,7 +22,50 @@ def get_name_of_env_var(key: str = "") -> str:
 
 
 class Settings(BaseSettings):
-    """Represents the configuration for connecting to the Xanadu Cloud."""
+    """Represents the configuration for connecting to the Xanadu Cloud.
+
+    The location where this configuration is saved depends on the current
+    operating system. Specifically,
+
+    * Windows: ``C:\\Users\\%USERNAME%\\AppData\\Local\\Xanadu\\xanadu-cloud\\.env``
+
+    * MacOS: ``/home/$USER/Library/Application\\ Support/xanadu-cloud/.env``
+
+    * Linux: ``/home/$USER/.config/xanadu-cloud/.env``
+
+    **Example:**
+
+    The following example shows how to use the :class:`Settings` class to load
+    and save a Xanadu Cloud configuration. To begin, loading a configuration is
+    as simple as instantiating a settings object:
+
+    >>> import xcc
+    >>> settings = xcc.Settings()
+    >>> settings
+    REFRESH_TOKEN=None ACCESS_TOKEN=None HOST='platform.strawberryfields.ai' PORT=443 TLS=True
+
+    Now, individual options can be accessed or assigned through their
+    corresponding attribute:
+
+    >>> settings.PORT
+    443
+    >>> settings.PORT = 80
+    >>> settings.PORT
+    80
+
+    .. note::
+
+        Several aggregate representations of options are also available, such as
+
+        >>> settings.dict()
+        {'REFRESH_TOKEN': None, 'ACCESS_TOKEN': None, ..., 'TLS': True}
+        >>> settings.json()
+        '{"REFRESH_TOKEN": null, "ACCESS_TOKEN": null, ..., "TLS": true}'
+
+    Finally, saving a configuration can be done by invoking :meth:`Settings.save`:
+
+    >>> settings.save()
+    """
 
     REFRESH_TOKEN: Optional[str] = None
     """JWT refresh token that can be used to fetch access tokens from the Xanadu Cloud."""

@@ -21,8 +21,12 @@ def env_file(monkeypatch):
 
 def test_get_path_to_env_file(monkeypatch):
     """Tests that the path to the .env file is derived correctly."""
-    monkeypatch.setattr("xcc.settings.user_config_dir", lambda path: f"foo/bar/{path}")
-    assert xcc.settings.get_path_to_env_file() == "foo/bar/xanadu-cloud/.env"
+
+    def user_config_dir(appname: str, appauthor: str) -> str:
+        return f"foo/bar/{appauthor}/{appname}"
+
+    monkeypatch.setattr("xcc.settings.user_config_dir", user_config_dir)
+    assert xcc.settings.get_path_to_env_file() == "foo/bar/Xanadu/xanadu-cloud/.env"
 
 
 def test_get_name_of_env_var():

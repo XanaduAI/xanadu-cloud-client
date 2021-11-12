@@ -166,6 +166,7 @@ class Job:
             "created_at": self.created_at,
             "finished_at": self.finished_at,
             "running_time": self.running_time,
+            "metadata": self.metadata,
         }
 
     @cached_property
@@ -299,6 +300,19 @@ class Job:
             "failed"
         """
         return self.status in ("cancelled", "complete", "failed")
+
+    @property
+    def metadata(self) -> Mapping[str, Any]:
+        """Returns the metadata of a job.
+
+        Returns:
+            Mapping[str, Any]: metadata of this job
+
+        .. note::
+
+            Error details for failed jobs are reported here.
+        """
+        return self._details["meta"]
 
     @cached_property
     def _details(self) -> Mapping[str, Any]:

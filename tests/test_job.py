@@ -115,9 +115,13 @@ class TestJob:
             "created_at": datetime_.isoformat(),
             "finished_at": datetime_.isoformat(),
             "running_time": 0.12345,
+            "meta": {},
         }
         add_response(body=body)
-        assert set(job.overview) == set(body)
+
+        have_keys = set(job.overview)
+        want_keys = set(body) ^ {"meta", "metadata"}
+        assert have_keys == want_keys
 
     @responses.activate
     def test_result(self, connection, job):
@@ -250,6 +254,12 @@ class TestJob:
         """Tests that the correct finished indicator is returned for a job."""
         add_response(body={"status": status})
         assert job.finished is finished
+
+    @responses.activate
+    def test_metadata(self, job, add_response):
+        """Tests that the correct metadata is returned for a job."""
+        add_response(body={"meta": {"foo": "bar", "baz": 123}})
+        assert job.metadata == {"foo": "bar", "baz": 123}
 
     def test_repr(self, job):
         """Tests that the correct printable representation is returned for a job."""

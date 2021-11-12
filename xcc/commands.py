@@ -94,6 +94,10 @@ def list_settings() -> Mapping[str, Any]:
 def set_setting(name: str, value: Union[str, int, bool]) -> str:
     """Sets the value of a setting.
 
+    To configure your Xanadu Cloud credentials, simply run
+
+    $ xcc config set REFRESH_TOKEN "Xanadu Cloud API key goes here"
+
     Args:
         name (str): Name of the setting (e.g., "PORT").
         value (str, int, bool): Value of the setting (e.g., 443).
