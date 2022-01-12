@@ -89,15 +89,16 @@ class TestJob:
         want_params = {"size": str(limit)}
         assert have_params == want_params
 
+    @pytest.mark.parametrize("name", [None, "foo"])
     @responses.activate
-    def test_submit(self, job_id, connection):
+    def test_submit(self, job_id, connection, name):
         """Tests that a job can be submitted."""
-        details = json.dumps({"id": job_id, "name": "foo"})
+        details = json.dumps({"id": job_id, "name": name})
         responses.add(responses.POST, connection.url("/jobs"), status=200, body=details)
 
-        job = xcc.Job.submit(connection, name="foo", target="bar", circuit="baz", language="qux")
+        job = xcc.Job.submit(connection, name=name, target="bar", circuit="baz", language="qux")
         assert job.id == job_id
-        assert job.name == "foo"
+        assert job.name == name
 
     def test_id(self, job):
         """Tests that the correct ID is returned for a job."""
@@ -220,11 +221,12 @@ class TestJob:
         add_response(body={"language": "foo"})
         assert job.language == "foo"
 
+    @pytest.mark.parametrize("name", [None, "foo"])
     @responses.activate
-    def test_name(self, job, add_response):
+    def test_name(self, job, add_response, name):
         """Tests that the correct name is returned for a job."""
-        add_response(body={"name": "foo"})
-        assert job.name == "foo"
+        add_response(body={"name": name})
+        assert job.name == name
 
     @responses.activate
     def test_target(self, job, add_response):
