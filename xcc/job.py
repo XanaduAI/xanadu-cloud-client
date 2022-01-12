@@ -115,12 +115,14 @@ class Job:
         return jobs
 
     @staticmethod
-    def submit(connection: Connection, name: str, target: str, circuit: str, language: str) -> Job:
+    def submit(
+        connection: Connection, name: Optional[str], target: str, circuit: str, language: str
+    ) -> Job:
         """Submits a job to the Xanadu Cloud.
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
-            name (str): name of the job
+            name (str, optional): name of the job
             target (str): target of the job
             circuit (str): circuit of the job
             language (str): language of the job
@@ -264,11 +266,11 @@ class Job:
         return self._details["language"]
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         """Returns the name of a job.
 
         Returns:
-            str: name of this job
+            str, optional: name of this job
         """
         return self._details["name"]
 

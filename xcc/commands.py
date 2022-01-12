@@ -5,7 +5,7 @@ This module implements the Xanadu Cloud CLI.
 import functools
 import json
 import sys
-from typing import Any, Callable, Mapping, Sequence, Tuple, Union
+from typing import Any, Callable, Mapping, Optional, Sequence, Tuple, Union
 
 import fire
 from fire.core import FireError
@@ -273,14 +273,16 @@ def list_jobs(limit: int = 10) -> Sequence[Mapping]:
 
 
 @beautify
-def submit_job(name: str, target: str, circuit: str, language: str = "blackbird:1.0") -> Mapping:
+def submit_job(
+    target: str, circuit: str, language: str = "blackbird:1.0", name: str = None
+) -> Mapping:
     """Submits a job to the Xanadu Cloud.
 
     Args:
-        name (str): Name of the job.
         target (str): Target of the job.
         circuit (str): Circuit of the job.
         language (str): Language of the job.
+        name (str, optional): Name of the job.
 
     Returns:
         Mapping: Overview of the submitted job.
