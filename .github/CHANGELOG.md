@@ -1,11 +1,11 @@
-## Release 0.2.0 (development release)
+## Release 0.1.2 (current release)
 
 ### Improvements
 
 * Following an update to the Xanadu Cloud 0.4.0 API, names are no longer required to submit jobs.
   [(#16)](https://github.com/XanaduAI/xanadu-cloud-client/pull/16)
 
-## Release 0.1.1 (current release)
+## Release 0.1.1
 
 ### New features since last release
 
