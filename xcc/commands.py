@@ -5,7 +5,7 @@ This module implements the Xanadu Cloud CLI.
 import functools
 import json
 import sys
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Mapping, Sequence, Tuple, Union
 
 import fire
 from fire.core import FireError
