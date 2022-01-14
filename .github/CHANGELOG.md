@@ -1,5 +1,15 @@
 ## Release 0.2.0 (development release)
 
+### New features since last release
+
+### Breaking Changes
+
+### Bug fixes
+
+### Documentation
+
+### Contributors
+
 ## Release 0.1.2 (current release)
 
 ### Improvements
