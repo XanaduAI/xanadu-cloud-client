@@ -4,3 +4,4 @@ isort[colors]==5.9.3
 pylint==2.11.1
 pytest-cov==3.0.0
 responses==0.14.0
+wheel==0.37.1
