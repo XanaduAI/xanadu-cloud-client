@@ -1,3 +1,5 @@
+## Release 0.2.0 (development release)
+
 ## Release 0.1.2 (current release)
 
 ### Improvements
