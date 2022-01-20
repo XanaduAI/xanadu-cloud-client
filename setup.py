@@ -17,6 +17,7 @@ info = {
     "entry_points": {"console_scripts": ["xcc=xcc.commands:main"]},
     "install_requires": requirements,
     "license": "Apache License 2.0",
+    "license_files": ("LICENSE"),
     "long_description_content_type": "text/x-rst",
     "long_description": open("README.rst").read(),
     "maintainer_email": "software@xanadu.ai",
