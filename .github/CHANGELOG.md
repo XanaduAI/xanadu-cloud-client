@@ -6,9 +6,16 @@
 
 ### Bug fixes
 
+* The license file is included in the source distribution, even when using `setuptools <56.0.0`.
+   [(#20)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
+
 ### Documentation
 
 ### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+[Bastian Zimmermann](https://github.com/BastianZim)
 
 ## Release 0.1.2 (current release)
 
