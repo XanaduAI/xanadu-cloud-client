@@ -2,7 +2,7 @@
 
 ### New features since last release
 
-* The `Connection` class can now load connections from `Settings` instances.
+* The Connection class can now load a Connection from a Settings instance.
   [(#22)](https://github.com/XanaduAI/xanadu-cloud-client/pull/22)
 
   ```python
@@ -47,7 +47,7 @@ This release contains contributions from (in alphabetical order):
 
 ### New features since last release
 
-* The `Job` class now has a `metadata` property which, by convention, returns
+* The Job class now has a `metadata` property which, by convention, returns
   information about job failures.
   [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
 
@@ -66,7 +66,7 @@ This release contains contributions from (in alphabetical order):
 * Individual modules are now listed in the *API* section of the Sphinx sidebar.
   [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
 
-* The `Settings` class docstring now includes an example walkthrough as well as
+* The Settings class docstring now includes an example walkthrough as well as
   the location of the XCC configuration file.
   [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
 
