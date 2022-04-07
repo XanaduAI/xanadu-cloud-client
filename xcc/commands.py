@@ -47,6 +47,11 @@ def load_connection() -> Connection:
     Returns:
         Connection: connection with a "User-Agent" header that is appropriate
         for the CLI, loaded from a new :class:`xcc.Settings` instance
+
+    .. warning::
+
+        This is an internal XCC utility function and should _not_ be called from
+        outside the XCC package. Use :func:`xcc.Connection.load()` instead.
     """
     return Connection.load(headers={"User-Agent": f"XCC/{__version__} (CLI)"})
 
