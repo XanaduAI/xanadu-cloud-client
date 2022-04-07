@@ -136,16 +136,42 @@ class TestConnection:
         with pytest.raises(HTTPError, match=r"400 Client Error: Bad Request"):
             connection.request("GET", "/healthz")
 
+    @pytest.mark.parametrize(
+        "meta, match",
+        [
+            (
+                {
+                    "_schema": ["Foo", "Bar"],
+                    "size": ["Baz"],
+                },
+                r"Foo; Bar; Baz",
+            ),
+            (
+                {
+                    "head": {"0": ["Foo", "Bar"]},
+                    "tail": {"0": ["Baz"], "1": ["Bud"]},
+                },
+                r"Foo; Bar; Baz; Bud",
+            ),
+            (
+                {
+                    "List": ["Foo"],
+                    "Dict": {"0": ["Bar"]},
+                },
+                r"Foo; Bar",
+            ),
+        ],
+    )
     @responses.activate
-    def test_request_failure_due_to_validation_error(self, connection):
+    def test_request_failure_due_to_validation_error(self, connection, meta, match):
         """Tests that an HTTPError is raised when the HTTP response of a
         connection request indicates that a validation error occurred and the
         body of the response contains a non-empty "meta" field.
         """
-        body = {"code": "validation-error", "meta": {"_schema": ["Foo", "Bar"], "size": ["Baz"]}}
+        body = {"code": "validation-error", "meta": meta}
         responses.add(responses.GET, connection.url("healthz"), status=400, body=json.dumps(body))
 
-        with pytest.raises(HTTPError, match=r"Foo; Bar; Baz"):
+        with pytest.raises(HTTPError, match=match):
             connection.request("GET", "/healthz")
 
     @responses.activate

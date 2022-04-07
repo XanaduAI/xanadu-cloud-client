@@ -2,7 +2,7 @@
 This module contains the :class:`~xcc.Connection` class.
 """
 from itertools import chain
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import requests
 
@@ -225,9 +225,16 @@ class Connection:
         else:
             # The details of a validation error are encoded in the "meta" field.
             if response.status_code == 400 and body.get("code", "") == "validation-error":
-                errors: Dict[str, List[str]] = body.get("meta", {})
-                if errors:
-                    message = "; ".join(chain.from_iterable(errors.values()))
+                meta: Dict[str, Union[List[str], Dict[str, List[str]]]] = body.get("meta", {})
+                if meta:
+                    errors = []
+                    for entry in meta.values():
+                        if isinstance(entry, list):
+                            errors.extend(entry)
+                        else:
+                            errors.extend(chain.from_iterable(entry.values()))
+
+                    message = "; ".join(errors)
                     raise requests.exceptions.HTTPError(message, response=response)
 
             # Otherwise, the details of the error may be encoded in the "detail" field.
