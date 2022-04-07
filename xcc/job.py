@@ -92,18 +92,21 @@ class Job:
     """
 
     @staticmethod
-    def list(connection: Connection, limit: int = 5) -> Sequence[Job]:
+    def list(
+        connection: Connection, limit: int = 5, ids: Optional[Sequence[str]] = None
+    ) -> Sequence[Job]:
         """Returns jobs submitted to the Xanadu Cloud.
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
             limit (int): maximum number of jobs to retrieve
+            ids (Sequence[str], optional): IDs of the jobs to retrieve
 
         Returns:
             Sequence[Job]: jobs which were submitted on the Xanadu Cloud by the
             user associated with the Xanadu Cloud connection
         """
-        response = connection.request("GET", "/jobs", params={"size": limit})
+        response = connection.request("GET", "/jobs", params={"size": limit, "id": ids})
 
         jobs = []
 
