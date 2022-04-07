@@ -16,6 +16,45 @@ import xcc
 class TestConnection:
     """Tests the :class:`xcc.Connection` class."""
 
+    @pytest.mark.usefixtures("settings")
+    def test_load_with_implicit_settings(self):
+        """Tests that a connection can be loaded with an implicit settings configuration."""
+        connection = xcc.Connection.load()
+        assert connection.refresh_token == "j.w.t"
+        assert connection.access_token is None
+        assert connection.host == "example.com"
+        assert connection.port == 80
+        assert connection.tls is False
+
+    @pytest.mark.usefixtures("settings")
+    def test_load_with_explicit_settings(self):
+        """Tests that a connection can be loaded with an explicit settings configuration."""
+        settings = xcc.Settings(
+            REFRESH_TOKEN=None,
+            ACCESS_TOKEN="j.w.t",
+            HOST="not.example.com",
+            PORT=443,
+            TLS=True,
+        )
+
+        connection = xcc.Connection.load(settings)
+        assert connection.refresh_token is None
+        assert connection.access_token == "j.w.t"
+        assert connection.host == "not.example.com"
+        assert connection.port == 443
+        assert connection.tls is True
+
+    @pytest.mark.usefixtures("settings")
+    def test_load_with_keyword_arguments(self):
+        """Tests that a connection can be loaded with new or overriden keyword arguments."""
+        connection = xcc.Connection.load(host="not.example.com", headers={"User-Agent": "Bond"})
+        assert connection.refresh_token == "j.w.t"
+        assert connection.access_token is None
+        assert connection.host == "not.example.com"
+        assert connection.port == 80
+        assert connection.tls is False
+        assert connection.user_agent == "Bond"
+
     def test_missing_access_token_and_refresh_token(self):
         """Tests that a ValueError is raised when a connection is created
         without a refresh token or an access token.
