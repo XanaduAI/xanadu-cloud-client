@@ -3,7 +3,7 @@
 ### New features since last release
 
 * Following an update to the Xanadu Cloud 0.4.0 API, job lists can now be filtered by ID.
-  [(#21)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
+  [(#21)](https://github.com/XanaduAI/xanadu-cloud-client/pull/21)
 
   Using the CLI:
 
