@@ -2,9 +2,9 @@
 This module implements the Xanadu Cloud CLI.
 """
 
-import functools
 import json
 import sys
+from functools import wraps
 from typing import Any, Callable, Mapping, Sequence, Tuple, Union
 
 import fire
@@ -30,7 +30,7 @@ def beautify(command: Callable) -> Callable:
         CLI command into a JSON string if the value is a list or dictionary
     """
 
-    @functools.wraps(command)
+    @wraps(command)
     def beautify_(*args, **kwargs):
         output = command(*args, **kwargs)
         if isinstance(output, (list, dict)):
@@ -41,21 +41,14 @@ def beautify(command: Callable) -> Callable:
 
 
 def load_connection() -> Connection:
-    """Loads a connection using the :class:`xcc.Settings` class.
+    """Loads a connection using :func:`xcc.Connection.load()` with a "User-Agent"
+    header that specifies the Xanadu Cloud Client CLI.
 
     Returns:
-        Connection: connection initialized from the configuration of a new
-        :class:`xcc.Settings` instance
+        Connection: connection with a "User-Agent" header that is appropriate
+        for the CLI, loaded from a new :class:`xcc.Settings` instance
     """
-    settings = Settings()
-    return Connection(
-        refresh_token=settings.REFRESH_TOKEN,
-        access_token=settings.ACCESS_TOKEN,
-        host=settings.HOST,
-        port=settings.PORT,
-        tls=settings.TLS,
-        headers={"User-Agent": f"XCC/{__version__} (CLI)"},
-    )
+    return Connection.load(headers={"User-Agent": f"XCC/{__version__} (CLI)"})
 
 
 # Settings CLI
