@@ -2,12 +2,25 @@
 
 ### New features since last release
 
+* The `Connection` class can now load connections from `Settings` instances.
+  [(#22)](https://github.com/XanaduAI/xanadu-cloud-client/pull/22)
+
+  ```python
+  import xcc
+
+  # Initialize a Connection using an implicit Settings instance.
+  connection = xcc.Connection.load()
+
+  # Initialize a Connection using an explicit Settings instance.
+  connection = xcc.Connection.load(settings=xcc.Settings())
+  ```
+
 ### Breaking Changes
 
 ### Bug fixes
 
 * The license file is included in the source distribution, even when using `setuptools <56.0.0`.
-   [(#20)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
+  [(#20)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
 
 ### Documentation
 
@@ -34,7 +47,7 @@ This release contains contributions from (in alphabetical order):
 
 ### New features since last release
 
-* The Job class now has a `metadata` property which, by convention, returns
+* The `Job` class now has a `metadata` property which, by convention, returns
   information about job failures.
   [(#15)](https://github.com/XanaduAI/xanadu-cloud-client/pull/15)
 
