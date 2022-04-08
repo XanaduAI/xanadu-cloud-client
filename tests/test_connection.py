@@ -46,7 +46,7 @@ class TestConnection:
 
     @pytest.mark.usefixtures("settings")
     def test_load_with_keyword_arguments(self):
-        """Tests that a connection can be loaded with new or overriden keyword arguments."""
+        """Tests that a connection can be loaded with new or overridden keyword arguments."""
         connection = xcc.Connection.load(host="not.example.com", headers={"User-Agent": "Bond"})
         assert connection.refresh_token == "j.w.t"
         assert connection.access_token is None

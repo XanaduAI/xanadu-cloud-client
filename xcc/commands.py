@@ -50,7 +50,7 @@ def load_connection() -> Connection:
 
     .. warning::
 
-        This is an internal XCC utility function and should _not_ be called from
+        This is an internal XCC utility function and should *not* be called from
         outside the XCC package. Use :func:`xcc.Connection.load()` instead.
     """
     return Connection.load(headers={"User-Agent": f"XCC/{__version__} (CLI)"})
