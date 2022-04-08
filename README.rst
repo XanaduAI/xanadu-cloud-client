@@ -75,7 +75,7 @@ Afterwards, you can verify that your API key was set correctly using either:
 
         import xcc
 
-        connection = xcc.commands.load_connection()
+        connection = xcc.Connection.load()
         assert connection.ping().ok
 
 .. inclusion-marker-for-setup-end
