@@ -5,7 +5,7 @@ This module implements the Xanadu Cloud CLI.
 import functools
 import json
 import sys
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, List, Mapping, Sequence, Tuple, Union
 
 import fire
 from fire.core import FireError
@@ -259,12 +259,13 @@ def get_job(
 
 
 @beautify
-def list_jobs(limit: int = 5, ids: Optional[Sequence[str]] = None) -> Sequence[Mapping]:
+def list_jobs(limit: int = 5, ids: List[str] = None) -> Sequence[Mapping]:
     """Lists jobs submitted to the Xanadu Cloud.
 
     Args:
         limit (int): Maximum number of jobs to display.
-        ids (Sequence[str], optional): IDs of the jobs to display.
+        ids (List[str], optional): IDs of the jobs to display. If at least one
+            ID is specified, the limit flag will be set to the number of IDs.
 
     Returns:
         Sequence[Mapping]: Overview of each job submitted to the Xanadu Cloud.

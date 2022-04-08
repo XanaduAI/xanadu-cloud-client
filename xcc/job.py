@@ -8,7 +8,7 @@ import io
 import time
 from datetime import datetime, timedelta
 from itertools import count, takewhile
-from typing import Any, List, Mapping, Optional, Sequence, Union
+from typing import Any, Collection, List, Mapping, Optional, Sequence, Union
 
 import dateutil.parser
 import numpy as np
@@ -93,20 +93,23 @@ class Job:
 
     @staticmethod
     def list(
-        connection: Connection, limit: int = 5, ids: Optional[Sequence[str]] = None
+        connection: Connection, limit: int = 5, ids: Optional[Collection[str]] = None
     ) -> Sequence[Job]:
         """Returns jobs submitted to the Xanadu Cloud.
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
             limit (int): maximum number of jobs to retrieve
-            ids (Sequence[str], optional): IDs of the jobs to retrieve
+            ids (Collection[str], optional): IDs of the jobs to retrieve; if at
+                least one ID is specified, ``limit`` will be set to the length
+                of the ID collection
 
         Returns:
             Sequence[Job]: jobs which were submitted on the Xanadu Cloud by the
             user associated with the Xanadu Cloud connection
         """
-        response = connection.request("GET", "/jobs", params={"size": limit, "id": ids})
+        size = len(ids) if ids else limit
+        response = connection.request("GET", "/jobs", params={"size": size, "id": ids})
 
         jobs = []
 
