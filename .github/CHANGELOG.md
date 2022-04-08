@@ -14,6 +14,21 @@
   # Initialize a Connection using an explicit Settings instance.
   connection = xcc.Connection.load(settings=xcc.Settings())
   ```
+  
+* Following an update to the Xanadu Cloud 0.4.0 API, job lists can now be filtered by ID.
+  [(#21)](https://github.com/XanaduAI/xanadu-cloud-client/pull/21)
+
+  Using the CLI:
+
+  ```bash
+  xcc job list --ids '["<UUID 1>", "<UUID 2>", ...]'
+  ```
+
+  Using the Python API:
+
+  ```python
+  xcc.Job.list(connection, ids=["<UUID 1>", "<UUID 2>", ...])
+  ```
 
 ### Breaking Changes
 

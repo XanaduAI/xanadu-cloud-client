@@ -54,15 +54,50 @@ class TestJob:
     """Tests the :class:`xcc.Job` class."""
 
     @pytest.mark.parametrize(
-        "limit, want_names",
+        "limit, ids, want_params, want_names",
         [
-            (1, ["foo"]),
-            (2, ["foo", "bar"]),
+            (
+                1,
+                None,
+                {"size": "1"},
+                ["foo"],
+            ),
+            (
+                2,
+                None,
+                {"size": "2"},
+                ["foo", "bar"],
+            ),
+            (
+                1,
+                ["00000000-0000-0000-0000-000000000001"],
+                {"size": "1", "id": "00000000-0000-0000-0000-000000000001"},
+                ["foo"],
+            ),
+            (
+                2,
+                [
+                    "00000000-0000-0000-0000-000000000001",
+                    "00000000-0000-0000-0000-000000000002",
+                    "00000000-0000-0000-0000-000000000003",
+                ],
+                {
+                    "size": "3",
+                    "id": [
+                        "00000000-0000-0000-0000-000000000001",
+                        "00000000-0000-0000-0000-000000000002",
+                        "00000000-0000-0000-0000-000000000003",
+                    ],
+                },
+                ["foo", "bar"],
+            ),
         ],
     )
     @responses.activate
-    def test_list(self, connection, add_response, limit, want_names):
-        """Tests that the correct jobs are listed."""
+    def test_list(self, connection, add_response, limit, ids, want_params, want_names):
+        """Tests that the correct jobs are listed and that the correct query
+        parameters are encoded in the HTTP request to the Xanadu Cloud platform.
+        """
         data = [
             {
                 "id": "00000000-0000-0000-0000-000000000001",
@@ -82,11 +117,10 @@ class TestJob:
         ][:limit]
         add_response(body={"data": data}, path="/jobs")
 
-        have_names = [job.name for job in xcc.Job.list(connection, limit=limit)]
+        have_names = [job.name for job in xcc.Job.list(connection, limit=limit, ids=ids)]
         assert have_names == want_names
 
         have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
-        want_params = {"size": str(limit)}
         assert have_params == want_params
 
     @pytest.mark.parametrize("name", [None, "foo"])
