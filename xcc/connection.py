@@ -241,6 +241,11 @@ class Connection:
             self.update_access_token()
             response = self._request(method=method, url=url, headers=self.headers, **kwargs)
 
+        if kwargs.get("stream", False) is True:
+            # Avoid eagerly fetching the content for streaming requests.
+            response.raise_for_status()
+            return response
+
         try:
             body = response.json()
 
