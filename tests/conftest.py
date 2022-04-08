@@ -25,4 +25,8 @@ def settings(monkeypatch) -> Iterator[xcc.Settings]:
         # Saving ensures that new Settings instances are loaded with the same values.
         settings_.save()
 
+        # Environment variables take precedence over fields in the .env file.
+        for env_var in map(xcc.settings.get_name_of_env_var, settings_.dict()):
+            monkeypatch.delenv(env_var, raising=False)
+
         yield settings_

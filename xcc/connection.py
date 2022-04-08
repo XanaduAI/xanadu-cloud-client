@@ -1,12 +1,15 @@
 """
 This module contains the :class:`~xcc.Connection` class.
 """
+from __future__ import annotations
+
 from itertools import chain
 from typing import Dict, List, Optional
 
 import requests
 
 from ._version import __version__
+from .settings import Settings
 
 
 class Connection:
@@ -74,6 +77,31 @@ class Connection:
         "status": "online"
     }
     """
+
+    @staticmethod
+    def load(settings: Optional[Settings] = None, **kwargs) -> Connection:
+        """Loads a connection using the given :class:`xcc.Settings` instance,
+        or a new :class:`xcc.Settings` instance if one is not provided.
+
+        Args:
+            settings (Settings, optional): Xanadu Cloud connection settings
+            kwargs: keyword arguments to override in the call to :func:`xcc.Connection.__init__()`
+
+        Returns:
+            Connection: connection initialized from the configuration of the
+            provided (or created) :class:`xcc.Settings` instance
+        """
+        settings = settings or Settings()
+        return Connection(
+            **{
+                "refresh_token": settings.REFRESH_TOKEN,
+                "access_token": settings.ACCESS_TOKEN,
+                "host": settings.HOST,
+                "port": settings.PORT,
+                "tls": settings.TLS,
+                **kwargs,
+            }
+        )
 
     def __init__(
         self,
