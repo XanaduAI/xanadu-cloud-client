@@ -32,6 +32,11 @@
 
 ### Breaking Changes
 
+### Improvements
+
+* Job results are now streamed in chunks to support large payloads.
+  [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
+
 ### Bug fixes
 
 * The license file is included in the source distribution, even when using `setuptools <56.0.0`.
