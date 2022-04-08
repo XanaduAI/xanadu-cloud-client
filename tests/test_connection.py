@@ -235,6 +235,16 @@ class TestConnection:
         with pytest.raises(HTTPError, match=r"403 Client Error: Forbidden"):
             connection.request("GET", "/healthz")
 
+    @responses.activate
+    def test_request_failure_due_to_status_code_while_streaming(self, connection):
+        """Tests that an HTTPError is raised when the status code of the HTTP
+        response to a connection request where ``stream=True`` indicates that
+        an error has occurred.
+        """
+        responses.add(responses.GET, connection.url("healthz"), status=403, body="{}")
+        with pytest.raises(HTTPError, match=r"403 Client Error: Forbidden"):
+            connection.request("GET", "/healthz", stream=True)
+
     def test_request_failure_due_to_timeout(self, monkeypatch, connection):
         """Tests that a RequestException is raised when a connection request times out."""
 
