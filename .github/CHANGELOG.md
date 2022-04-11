@@ -14,7 +14,7 @@
   # Initialize a Connection using an explicit Settings instance.
   connection = xcc.Connection.load(settings=xcc.Settings())
   ```
-  
+
 * Following an update to the Xanadu Cloud 0.4.0 API, job lists can now be filtered by ID.
   [(#21)](https://github.com/XanaduAI/xanadu-cloud-client/pull/21)
 
@@ -38,6 +38,10 @@
   [(#20)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
 
 ### Documentation
+
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
+  is now used to style the Sphinx documentation.
+  [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
 
 ### Contributors
 
