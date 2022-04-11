@@ -65,7 +65,7 @@ mathjax_path = (
 nbsphinx_requirejs_path = ""
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates", "xanadu_theme"]
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -76,7 +76,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Xanadu Cloud Client"
-copyright = "2021, Xanadu Quantum Technologies Inc"
+copyright = "2022, Xanadu Quantum Technologies"
 author = "Xanadu Inc."
 
 # The version info for the project you're documenting, acts as replacement for
@@ -188,21 +188,10 @@ html_static_path = ["_static"]
 #
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-# html_sidebars = {
-#    '**': [
-#        'about.html',
-#        'navigation.html',
-#        'relations.html',  # needs 'show_related': True theme option to display
-#        'searchbox.html',
-#        'donate.html',
-#    ]
-# }
 html_sidebars = {
     "**": [
-        "logo-text.html",
         "searchbox.html",
         "globaltoc.html",
-        # 'sourcelink.html'
     ]
 }
 
@@ -251,39 +240,32 @@ html_sidebars = {
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "xccdoc"
-
-# # -- Xanadu theme ---------------------------------------------------------
-html_theme = "xanadu_theme"
-html_theme_path = ["."]
-
-# Register the theme as an extension to generate a sitemap.xml
-# extensions.append("guzzle_sphinx_theme")
-
-# xanadu theme options (see theme.conf for more information)
-html_theme_options = {
-    # Set the path to a special layout to include for the homepage
-    # "homepage": "special_index.html",
-    # Set the name of the project to appear in the left sidebar.
-    "project_nav_name": "XCC",
-    "touch_icon": "_static/logo_new.png",
-    # TODO: Set Google Analytics ID to enable tracking.
-    # "google_analytics_account": "UA-116279123-2",
-    # colors
-    "navigation_button": "#607d8b",
-    "navigation_button_hover": "#34515e",
-    "toc_caption": "#78909c",
-    "toc_hover": "#78909c",
-    "table_header_bg": "#ffdce5",
-    "table_header_border": "#78909c",
-    "download_button": "#78909c",
-}
+htmlhelp_basename = "XanaduCloudClientdoc"
 
 edit_on_github_project = "XanaduAI/xanadu-cloud-client"
 edit_on_github_branch = "main/docs"
 
 inheritance_node_attrs = dict(color="lightskyblue1", fillcolor="lightskyblue1", style="filled")
 
+# -- Xanadu theme ---------------------------------------------------------
+html_theme = "xanadu"
 
-def setup(app):
-    app.add_css_file("xanadu_gallery.css")
+html_theme_options = {
+    "navbar_name": "Xanadu Cloud Client",
+    "navbar_logo_colour": "#78909c",
+
+    "navbar_right_links": [
+        {
+            "name": "GitHub",
+            "href": "https://github.com/XanaduAI/xanadu-cloud-client",
+            "icon": "fab fa-github",
+        }
+    ],
+
+    "border_colour": "#78909c",
+    "prev_next_button_colour": "#607d8b",
+    "prev_next_button_hover_colour": "#34515e",
+    "toc_marker_colour": "#78909c",
+    "table_header_background_colour": "#78909c",
+    "text_accent_colour": "#78909c",
+}

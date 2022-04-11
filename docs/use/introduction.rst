@@ -1,7 +1,7 @@
 Introduction
 ============
 
-.. image:: ../_static/xanadu_x.svg
+.. image:: /_static/xcc_logo.svg
     :align: right
     :width: 200px
     :target: javascript:void(0);

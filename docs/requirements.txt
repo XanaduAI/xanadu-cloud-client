@@ -3,3 +3,5 @@ m2r2
 nbsphinx
 sphinx-copybutton
 sphinx>=3.1.0
+git+ssh://git@github.com/XanaduAI/xanadu-sphinx-theme@phoenix#egg=xanadu_sphinx_theme
+
