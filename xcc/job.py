@@ -190,9 +190,18 @@ class Job:
         Raises:
             TypeError: if the job result is not stored in the .npz file format
         """
-        response = self._connection.request("GET", f"/jobs/{self.id}/result")
+        # Streaming the response in chunks is necessary to fetch large results.
+        response = self._connection.request("GET", f"/jobs/{self.id}/result", stream=True)
 
-        with io.BytesIO(response.content) as buffer:
+        with io.BytesIO() as buffer:
+            # The chunk size below (i.e., 2^15 bytes) is less than the maximum
+            # size of a TCP packet (i.e., 2^16 bytes) but is otherwise arbitrary.
+            for chunk in response.iter_content(chunk_size=32768):
+                buffer.write(chunk)
+
+            # Seeking to 0 prepares the buffer for reading.
+            buffer.seek(0)
+
             result = np.load(buffer, allow_pickle=False)
 
             if not isinstance(result, np.lib.npyio.NpzFile):
