@@ -250,6 +250,7 @@ inheritance_node_attrs = dict(color="lightskyblue1", fillcolor="lightskyblue1", 
 # -- Xanadu theme ---------------------------------------------------------
 html_theme = "xanadu"
 
+# Xanadu theme options (see theme.conf for more information).
 html_theme_options = {
     "navbar_name": "Xanadu Cloud Client",
     "navbar_logo_colour": "#78909c",
