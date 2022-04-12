@@ -44,7 +44,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-[Bastian Zimmermann](https://github.com/BastianZim)
+[Mikhail Andrenkov](https://github.com/Mandrenkov), [Bastian Zimmermann](https://github.com/BastianZim).
 
 ## Release 0.1.2 (current release)
 
