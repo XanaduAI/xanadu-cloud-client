@@ -1,0 +1,52 @@
+name: Post-Release Version Bump
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  post_release_version_bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Derive versions
+        id: versions
+        run: |
+          old_version=`grep -oP '(?<=__version__ = ").*(?=")' xcc/_version.py`
+          new_version=`echo $old_version | awk '{split($0,v,"."); print v[1] "." v[2]+1 ".0-dev"}'`
+
+          echo "::set-output name=old_version::$old_version"
+          echo "::set-output name=new_version::$new_version"
+
+      - name: Bump version in _version.py
+        run:
+          sed -i 's/${{ steps.versions.outputs.old_version }}/${{ steps.versions.outputs.new_version }}/' xcc/_version.py
+
+      - name: Bump version in changelog
+        run: |
+          next_release_version=${{ steps.versions.outputs.new_version }}
+          next_release_version=${next_release_version%-dev}
+
+          header="## Release ${next_release_version} (development release)
+
+          ### Contributors
+
+          This release contains contributions from (in alphabetical order):
+          "
+
+          printf '%s\n%s\n' "$header" "$(cat .github/CHANGELOG.md)" > .github/CHANGELOG.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: main
+          title: Post-release version bump to `${{ steps.versions.outputs.new_version }}`
+          body: >
+            This PR bumps the XCC version from `${{ steps.versions.outputs.old_version }}`
+            to `${{ steps.versions.outputs.new_version }}`.
+          commit-message: Bump version to `${{ steps.versions.outputs.new_version }}`
+          branch: post-release-version-bump
+          reviewers: doctorperceptron, mandrenkov

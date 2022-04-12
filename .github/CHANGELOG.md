@@ -30,8 +30,6 @@
   xcc.Job.list(connection, ids=["<UUID 1>", "<UUID 2>", ...])
   ```
 
-### Breaking Changes
-
 ### Improvements
 
 * Job results are now streamed in chunks to support large payloads.
@@ -41,8 +39,6 @@
 
 * The license file is included in the source distribution, even when using `setuptools <56.0.0`.
   [(#20)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
-
-### Documentation
 
 ### Contributors
 
