@@ -1,3 +1,9 @@
+## Release 0.3.0 (development release)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
 ## Release 0.2.0 (current release)
 
 ### New features since last release
