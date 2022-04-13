@@ -5,12 +5,12 @@
 * The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
   is now used to style the Sphinx documentation.
   [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
-  
-[Mikhail Andrenkov](https://github.com/Mandrenkov).
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+[Mikhail Andrenkov](https://github.com/Mandrenkov).
 
 ## Release 0.2.0 (current release)
 
