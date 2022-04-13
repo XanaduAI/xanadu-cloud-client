@@ -1,4 +1,18 @@
-## Release 0.2.0 (development release)
+## Release 0.3.0 (development release)
+
+### Documentation
+
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
+  is now used to style the Sphinx documentation.
+  [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
+  
+[Mikhail Andrenkov](https://github.com/Mandrenkov).
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+## Release 0.2.0 (current release)
 
 ### New features since last release
 
@@ -30,18 +44,15 @@
   xcc.Job.list(connection, ids=["<UUID 1>", "<UUID 2>", ...])
   ```
 
-### Breaking Changes
+### Improvements
+
+* Job results are now streamed in chunks to support large payloads.
+  [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
 
 ### Bug fixes
 
 * The license file is included in the source distribution, even when using `setuptools <56.0.0`.
   [(#20)](https://github.com/XanaduAI/xanadu-cloud-client/pull/20)
-
-### Documentation
-
-* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
-  is now used to style the Sphinx documentation.
-  [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
 
 ### Contributors
 
@@ -49,7 +60,7 @@ This release contains contributions from (in alphabetical order):
 
 [Mikhail Andrenkov](https://github.com/Mandrenkov), [Bastian Zimmermann](https://github.com/BastianZim).
 
-## Release 0.1.2 (current release)
+## Release 0.1.2
 
 ### Improvements
 

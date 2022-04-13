@@ -1,0 +1,41 @@
+name: Pre-Release Version Bump
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pre_release_version_bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Derive versions
+        id: versions
+        run: |
+          old_version=`grep -oP '(?<=__version__ = ").*(?=")' xcc/_version.py`
+          new_version=${old_version%-dev}
+
+          echo "::set-output name=old_version::$old_version"
+          echo "::set-output name=new_version::$new_version"
+
+      - name: Bump version in _version.py
+        run:
+          sed -i 's/${{ steps.versions.outputs.old_version }}/${{ steps.versions.outputs.new_version }}/' xcc/_version.py
+
+      - name: Bump version in changelog
+        run: |
+          sed -i 's/ (current release)//' .github/CHANGELOG.md
+          sed -i 's/ (development release)/ (current release)/' .github/CHANGELOG.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: main
+          title: Pre-release version bump to `${{ steps.versions.outputs.new_version }}`
+          body: >
+            This PR bumps the XCC version from `${{ steps.versions.outputs.old_version }}`
+            to `${{ steps.versions.outputs.new_version }}`.
+          commit-message: Bump version to `${{ steps.versions.outputs.new_version }}`
+          branch: pre-release-version-bump
+          reviewers: doctorperceptron, mandrenkov
