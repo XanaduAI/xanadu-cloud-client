@@ -9,8 +9,8 @@ jobs:
   sphinx:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: josh146/sphinx-action@master
+    - uses: actions/checkout@v2
+    - uses: XanaduAI/sphinx-action@master
       with:
         docs-folder: "docs/"
         pre-build-command: "apt install -y graphviz && pip3 install . && pip3 install -r docs/requirements.txt"

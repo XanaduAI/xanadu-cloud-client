@@ -3,3 +3,4 @@ m2r2
 nbsphinx
 sphinx-copybutton
 sphinx>=3.1.0
+xanadu-sphinx-theme==0.1.0

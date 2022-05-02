@@ -1,8 +1,16 @@
 ## Release 0.3.0 (development release)
 
+### Documentation
+
+* The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
+  is now used to style the Sphinx documentation.
+  [(#23)](https://github.com/XanaduAI/xanadu-cloud-client/pull/23)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+[Mikhail Andrenkov](https://github.com/Mandrenkov).
 
 ## Release 0.2.0 (current release)
 
@@ -20,7 +28,7 @@ This release contains contributions from (in alphabetical order):
   # Initialize a Connection using an explicit Settings instance.
   connection = xcc.Connection.load(settings=xcc.Settings())
   ```
-  
+
 * Following an update to the Xanadu Cloud 0.4.0 API, job lists can now be filtered by ID.
   [(#21)](https://github.com/XanaduAI/xanadu-cloud-client/pull/21)
 
