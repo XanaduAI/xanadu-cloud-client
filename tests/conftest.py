@@ -12,7 +12,7 @@ import xcc
 @pytest.fixture
 def connection() -> xcc.Connection:
     """Returns a mock connection."""
-    return xcc.Connection(refresh_token="j.w.t", host="cloud.xanadu.ai", port=443, tls=True)
+    return xcc.Connection(refresh_token="j.w.t", host="test.xanadu.ai", port=443, tls=True)
 
 
 @pytest.fixture(autouse=True)
