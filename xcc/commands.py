@@ -251,7 +251,7 @@ def get_job(
     if status:
         return job.status
     if result:
-        return job.result
+        return job.get_result(integer_overflow_protection=False)
 
     return job.overview
 
