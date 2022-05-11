@@ -1,5 +1,23 @@
 ## Release 0.2.1 (current release)
 
+### New features since last release
+
+* Job results can now be retrieved without converting integers to `np.int64` objects.
+  [(#24)](https://github.com/XanaduAI/xanadu-cloud-client/pull/24)
+
+  ```python
+  import xcc
+
+  job = xcc.Job("<UUID>", xcc.Connection.load())
+
+  result = job.get_result(integer_overflow_protection=False)
+  ```
+
+### Improvements
+
+* The default HOST setting now points to `platform.xanadu.ai`.
+  [(#24)](https://github.com/XanaduAI/xanadu-cloud-client/pull/24)
+
 ### Documentation
 
 * The centralized [Xanadu Sphinx Theme](https://github.com/XanaduAI/xanadu-sphinx-theme)
