@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     >>> import xcc
     >>> settings = xcc.Settings()
     >>> settings
-    REFRESH_TOKEN=None ACCESS_TOKEN=None HOST='platform.strawberryfields.ai' PORT=443 TLS=True
+    REFRESH_TOKEN=None ACCESS_TOKEN=None HOST='platform.xanadu.ai' PORT=443 TLS=True
 
     Now, individual options can be accessed or assigned through their
     corresponding attribute:
@@ -73,7 +73,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN: Optional[str] = None
     """JWT access token that can be used to authenticate requests to the Xanadu Cloud."""
 
-    HOST: str = "platform.strawberryfields.ai"
+    HOST: str = "platform.xanadu.ai"
     """Hostname of the Xanadu Cloud server."""
 
     PORT: int = 443

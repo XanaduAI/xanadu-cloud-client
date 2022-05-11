@@ -107,7 +107,7 @@ class Connection:
         self,
         refresh_token: Optional[str] = None,
         access_token: Optional[str] = None,
-        host: str = "platform.strawberryfields.ai",
+        host: str = "platform.xanadu.ai",
         port: int = 443,
         tls: bool = True,
         headers: Optional[Dict[str, str]] = None,
