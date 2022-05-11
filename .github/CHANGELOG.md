@@ -1,4 +1,4 @@
-## Release 0.3.0 (development release)
+## Release 0.2.1 (current release)
 
 ### Documentation
 
@@ -12,7 +12,7 @@ This release contains contributions from (in alphabetical order):
 
 [Mikhail Andrenkov](https://github.com/Mandrenkov).
 
-## Release 0.2.0 (current release)
+## Release 0.2.0
 
 ### New features since last release
 
