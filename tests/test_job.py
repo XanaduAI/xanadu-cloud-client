@@ -303,8 +303,8 @@ class TestJob:
 
     @responses.activate
     def test_get_result_without_integer_overflow_protection(self, connection, job):
-        """Tests that the conversion of NumPy integers into ``np.int64`` objects
-        while retrieving a job result can be disabled.
+        """Tests that the result of a job can be retrieved without converting
+        integral entries into ``np.int64`` objects.
         """
         output = [np.uint8(1), np.int16(2), np.int32(3)]
 
@@ -326,7 +326,6 @@ class TestJob:
         assert result["output"][0].dtype == np.uint8
         assert result["output"][1].dtype == np.int16
         assert result["output"][2].dtype == np.int32
-
 
     @responses.activate
     def test_cancel(self, connection, job, add_response):

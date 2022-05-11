@@ -88,7 +88,7 @@ class Job:
        [0, 0, 0, 0],
        [0, 0, 0, 0]])]}
     >>> job.running_time
-    datetime.timedelta(microseconds=178768)
+    datetime.timedelta(microseconds=123456)
     """
 
     @staticmethod
