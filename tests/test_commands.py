@@ -71,8 +71,7 @@ class MockJob(xcc.Job):
     def language(self):
         return "blackbird:1.0"
 
-    @cached_property
-    def result(self):
+    def get_result(self, integer_overflow_protection):
         return {"output": np.zeros((4, 4))}
 
     def cancel(self):
