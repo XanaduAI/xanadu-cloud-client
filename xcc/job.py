@@ -43,7 +43,7 @@ class Job:
     established to the Xanadu Cloud:
 
     >>> import xcc
-    >>> connection = xcc.Connection(refresh_token="Xanadu Cloud API key goes here")
+    >>> connection = xcc.Connection.load()
 
     Next, the parameters of the desired job are prepared. At present, this
     includes the name, target, circuit, and language of the job:
@@ -56,7 +56,7 @@ class Job:
             name {name}
             version 1.0
             target {target} (shots=3)
-            MeasureFock() | [0, 1, 2, 3];
+            MeasureFock() | [0, 1, 2, 3]
             \"\"\"
         )
     >>> language = "blackbird:1.0"
@@ -84,11 +84,11 @@ class Job:
     >>> job.status
     'complete'
     >>> job.result
-    array([[0, 0, 0, 0],
-           [0, 0, 0, 0],
-           [0, 0, 0, 0]], dtype=uint64)
+    {'output': [array([[0, 0, 0, 0],
+       [0, 0, 0, 0],
+       [0, 0, 0, 0]])]}
     >>> job.running_time
-    0.123456
+    datetime.timedelta(microseconds=178768)
     """
 
     @staticmethod
