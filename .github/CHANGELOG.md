@@ -3,7 +3,7 @@
 ### New features since last release
 
 * Job results can now be retrieved without converting integers to `np.int64` objects.
-  [(#24)](https://github.com/XanaduAI/xanadu-cloud-client/pull/24)
+  [(#28)](https://github.com/XanaduAI/xanadu-cloud-client/pull/28)
 
   ```python
   import xcc
@@ -16,7 +16,7 @@
 ### Improvements
 
 * The default HOST setting now points to `platform.xanadu.ai`.
-  [(#24)](https://github.com/XanaduAI/xanadu-cloud-client/pull/24)
+  [(#28)](https://github.com/XanaduAI/xanadu-cloud-client/pull/28)
 
 ### Documentation
 
