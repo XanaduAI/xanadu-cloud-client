@@ -345,9 +345,9 @@ class Job:
 
         Args:
             integer_overflow_protection (bool): convert all NumPy integers into
-                64-bit NumPy integers to avoid surprises during post-processing;
-                setting this option to ``False`` can significantly reduce memory
-                consumption
+                64-bit NumPy integers during post-processing; setting this
+                option to ``False`` can significantly reduce memory consumption
+                at the risk of introducing bugs during e.g. cubing operations
 
         Returns:
             Mapping[str, Union[np.ndarray, List[np.ndarray]]]: The result of
