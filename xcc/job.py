@@ -43,7 +43,7 @@ class Job:
     established to the Xanadu Cloud:
 
     >>> import xcc
-    >>> connection = xcc.Connection(refresh_token="Xanadu Cloud API key goes here")
+    >>> connection = xcc.Connection.load()
 
     Next, the parameters of the desired job are prepared. At present, this
     includes the name, target, circuit, and language of the job:
@@ -56,7 +56,7 @@ class Job:
             name {name}
             version 1.0
             target {target} (shots=3)
-            MeasureFock() | [0, 1, 2, 3];
+            MeasureFock() | [0, 1, 2, 3]
             \"\"\"
         )
     >>> language = "blackbird:1.0"
@@ -84,11 +84,11 @@ class Job:
     >>> job.status
     'complete'
     >>> job.result
-    array([[0, 0, 0, 0],
-           [0, 0, 0, 0],
-           [0, 0, 0, 0]], dtype=uint64)
+    {'output': [array([[0, 0, 0, 0],
+       [0, 0, 0, 0],
+       [0, 0, 0, 0]])]}
     >>> job.running_time
-    0.123456
+    datetime.timedelta(microseconds=123456)
     """
 
     @staticmethod
@@ -183,45 +183,18 @@ class Job:
 
         Returns:
             Mapping[str, Union[np.ndarray, List[np.ndarray]]]: The result of
-            this job. Each job result has an "output" key associated with a list
-            of NumPy arrays representing the output of the job; all other keys
-            represent metadata related to the interpretation of the job output.
+            this job.
 
-        Raises:
-            TypeError: if the job result is not stored in the .npz file format
+        .. seealso::
+
+            Implemented in terms of :meth:`Job.get_result`.
+
+        .. note::
+
+            NumPy integers will be converted to ``np.int64`` objects to
+            facilitate safer post-processing.
         """
-        # Streaming the response in chunks is necessary to fetch large results.
-        response = self._connection.request("GET", f"/jobs/{self.id}/result", stream=True)
-
-        with io.BytesIO() as buffer:
-            # The chunk size below (i.e., 2^15 bytes) is less than the maximum
-            # size of a TCP packet (i.e., 2^16 bytes) but is otherwise arbitrary.
-            for chunk in response.iter_content(chunk_size=32768):
-                buffer.write(chunk)
-
-            # Seeking to 0 prepares the buffer for reading.
-            buffer.seek(0)
-
-            result = np.load(buffer, allow_pickle=False)
-
-            if not isinstance(result, np.lib.npyio.NpzFile):
-                raise TypeError("Job result is not an .npz file")
-
-            result = dict(result)
-
-        # Convert integral entries to int64 to avoid surprises during post-processing.
-        for key, array in result.items():
-            if np.issubdtype(array.dtype, np.integer):
-                result[key] = array.astype(np.int64)
-
-        # For convenience, move all positional arguments (i.e., those that have
-        # an "arr_" prefix) to a separate key named "output".
-        result["output"] = []
-        for i in takewhile(lambda i: f"arr_{i}" in result, count()):
-            array = result.pop(f"arr_{i}")
-            result["output"].append(array)
-
-        return result
+        return self.get_result(integer_overflow_protection=True)
 
     @property
     def created_at(self) -> datetime:
@@ -363,6 +336,64 @@ class Job:
     def __repr__(self) -> str:
         """Returns a printable representation of a job."""
         return f"<{self.__class__.__name__}: id={self.id}>"
+
+    def get_result(
+        self,
+        integer_overflow_protection: bool = True,
+    ) -> Mapping[str, Union[np.ndarray, List[np.ndarray]]]:
+        """Returns the result of a job.
+
+        Args:
+            integer_overflow_protection (bool): convert all NumPy integers into
+                64-bit NumPy integers during post-processing; setting this
+                option to ``False`` can significantly reduce memory consumption
+                at the risk of introducing bugs during e.g. cubing operations
+
+        Returns:
+            Mapping[str, Union[np.ndarray, List[np.ndarray]]]: The result of
+            this job. Each job result has an "output" key associated with a list
+            of NumPy arrays representing the output of the job; all other keys
+            represent metadata related to the interpretation of the job output.
+
+        Raises:
+            TypeError: if the job result is not stored in the .npz file format
+
+        .. warning::
+
+            The value returned by this method is not cached.
+        """
+        # Streaming the response in chunks is necessary to fetch large results.
+        response = self._connection.request("GET", f"/jobs/{self.id}/result", stream=True)
+
+        with io.BytesIO() as buffer:
+            # The chunk size below (i.e., 2^15 bytes) is less than the maximum
+            # size of a TCP packet (i.e., 2^16 bytes) but is otherwise arbitrary.
+            for chunk in response.iter_content(chunk_size=32768):
+                buffer.write(chunk)
+
+            # Seeking to 0 prepares the buffer for reading.
+            buffer.seek(0)
+
+            result = np.load(buffer, allow_pickle=False)
+
+            if not isinstance(result, np.lib.npyio.NpzFile):
+                raise TypeError("Job result is not an .npz file")
+
+            result = dict(result)
+
+        if integer_overflow_protection:
+            for key, array in result.items():
+                if np.issubdtype(array.dtype, np.integer):
+                    result[key] = array.astype(np.int64)
+
+        # For convenience, move all positional arguments (i.e., those that have
+        # an "arr_" prefix) to a separate key named "output".
+        result["output"] = []
+        for i in takewhile(lambda i: f"arr_{i}" in result, count()):
+            array = result.pop(f"arr_{i}")
+            result["output"].append(array)
+
+        return result
 
     def cancel(self) -> None:
         """Cancels a job."""

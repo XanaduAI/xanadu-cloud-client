@@ -87,7 +87,7 @@ class TestConnection:
 
     def test_host(self, connection):
         """Tests that the correct host is returned for a connection."""
-        assert connection.host == "cloud.xanadu.ai"
+        assert connection.host == "test.xanadu.ai"
 
     def test_port(self, connection):
         """Tests that the correct port is returned for a connection."""
@@ -118,14 +118,14 @@ class TestConnection:
     def test_repr(self, connection):
         """Tests that the printable representation of a connection is correct."""
         assert repr(connection) == (
-            "<Connection: refresh_token=j.w.t, access_token=None, url=https://cloud.xanadu.ai:443/>"
+            "<Connection: refresh_token=j.w.t, access_token=None, url=https://test.xanadu.ai:443/>"
         )
 
     def test_url(self, connection):
         """Tests that the correct URL is derived for a connection path."""
-        assert connection.url() == "https://cloud.xanadu.ai:443/"
-        assert connection.url("/") == "https://cloud.xanadu.ai:443/"
-        assert connection.url("/path/to/thing") == "https://cloud.xanadu.ai:443/path/to/thing"
+        assert connection.url() == "https://test.xanadu.ai:443/"
+        assert connection.url("/") == "https://test.xanadu.ai:443/"
+        assert connection.url("/path/to/thing") == "https://test.xanadu.ai:443/path/to/thing"
 
     @responses.activate
     def test_ping_success(self, connection):
@@ -253,7 +253,7 @@ class TestConnection:
 
         monkeypatch.setattr("xcc.connection.requests.request", mock_request)
 
-        match = r"GET request to 'https://cloud.xanadu.ai:443/healthz' timed out"
+        match = r"GET request to 'https://test.xanadu.ai:443/healthz' timed out"
         with pytest.raises(RequestException, match=match):
             connection.request("GET", "/healthz")
 
@@ -268,7 +268,7 @@ class TestConnection:
 
         monkeypatch.setattr("xcc.connection.requests.request", mock_request)
 
-        with pytest.raises(RequestException, match=r"Failed to resolve hostname 'cloud.xanadu.ai'"):
+        with pytest.raises(RequestException, match=r"Failed to resolve hostname 'test.xanadu.ai'"):
             connection.request("GET", "/healthz")
 
     @responses.activate

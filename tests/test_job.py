@@ -302,6 +302,32 @@ class TestJob:
         assert repr(job) == f"<Job: id={job.id}>"
 
     @responses.activate
+    def test_get_result_without_integer_overflow_protection(self, connection, job):
+        """Tests that the result of a job can be retrieved without converting
+        integral entries into ``np.int64`` objects.
+        """
+        output = [np.uint8(1), np.int16(2), np.int32(3)]
+
+        with io.BytesIO() as buffer:
+            # The public savez() function does not allow pickling to be disabled.
+            savez = numpy.lib.npyio._savez  # pylint: disable=protected-access
+            savez(file=buffer, args=output, kwds={}, compress=False, allow_pickle=False)
+
+            buffer.seek(0)
+            body = buffer.read()
+
+            path = f"/jobs/{job.id}/result"
+            responses.add(responses.GET, connection.url(path), status=200, body=body)
+
+            result = job.get_result(integer_overflow_protection=False)
+
+        assert result.keys() == {"output"}
+        assert result["output"] == pytest.approx([1, 2, 3])
+        assert result["output"][0].dtype == np.uint8
+        assert result["output"][1].dtype == np.int16
+        assert result["output"][2].dtype == np.int32
+
+    @responses.activate
     def test_cancel(self, connection, job, add_response):
         """Tests that a job can be cancelled."""
         add_response(body={"status": "open"})
