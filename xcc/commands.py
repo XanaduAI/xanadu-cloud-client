@@ -257,18 +257,19 @@ def get_job(
 
 
 @beautify
-def list_jobs(limit: int = 5, ids: List[str] = None) -> Sequence[Mapping]:
+def list_jobs(limit: int = 5, ids: List[str] = None, status: str = None) -> Sequence[Mapping]:
     """Lists jobs submitted to the Xanadu Cloud.
 
     Args:
         limit (int): Maximum number of jobs to display.
         ids (List[str], optional): IDs of the jobs to display. If at least one
             ID is specified, the limit flag will be set to the number of IDs.
+        status (str): Status parameter used to filter returned jobs based on given status. 
 
     Returns:
         Sequence[Mapping]: Overview of each job submitted to the Xanadu Cloud.
     """
-    jobs = Job.list(connection=load_connection(), limit=limit, ids=ids)
+    jobs = Job.list(connection=load_connection(), limit=limit, ids=ids, status=status)
     return [job.overview for job in jobs]
 
 

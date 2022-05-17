@@ -5,6 +5,7 @@ This module contains the :class:`~xcc.Job` class.
 from __future__ import annotations
 
 import io
+from os import stat
 import time
 from datetime import datetime, timedelta
 from itertools import count, takewhile
@@ -93,9 +94,13 @@ class Job:
 
     @staticmethod
     def list(
-        connection: Connection, limit: int = 5, ids: Optional[Collection[str]] = None
+        connection: Connection, 
+        limit: int = 5, 
+        ids: Optional[Collection[str]] = None,
+        test: str = None
     ) -> Sequence[Job]:
         """Returns jobs submitted to the Xanadu Cloud.
+
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
@@ -103,12 +108,15 @@ class Job:
             ids (Collection[str], optional): IDs of the jobs to retrieve; if at
                 least one ID is specified, ``limit`` will be set to the length
                 of the ID collection
+            status (str): optional status parameter used to filter the jobs list. 
+                If status is empty, return all the jobs 
 
         Returns:
             Sequence[Job]: jobs which were submitted on the Xanadu Cloud by the
             user associated with the Xanadu Cloud connection
         """
-        size = len(ids) if ids else limit
+        size = len(ids) if ids else limit # fix this to find all jobs instead. 
+        # size = len(ids)
         response = connection.request("GET", "/jobs", params={"size": size, "id": ids})
 
         jobs = []
@@ -118,7 +126,9 @@ class Job:
             job._details = details  # pylint: disable=protected-access
             jobs.append(job)
 
-        return jobs
+        filtered_jobs = list(filter(lambda job: (job.status == test), jobs))
+
+        return filtered_jobs if test else jobs
 
     @staticmethod
     def submit(
