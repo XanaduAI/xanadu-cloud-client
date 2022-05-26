@@ -47,7 +47,7 @@ class MockJob(xcc.Job):
     """
 
     @staticmethod
-    def list(connection, limit=10, ids=None):
+    def list(connection, limit=10, ids=None, status= None):
         connection = xcc.commands.load_connection()
         return [MockJob(id_, connection) for id_ in ("foo", "bar", "baz")][:limit]
 
