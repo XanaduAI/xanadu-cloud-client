@@ -127,9 +127,7 @@ class Job:
             job._details = details  # pylint: disable=protected-access
             jobs.append(job)
 
-        filtered_jobs = list(filter(lambda job: (job.status == status), jobs))
-
-        return filtered_jobs if status else jobs
+        return jobs
 
     @staticmethod
     def submit(

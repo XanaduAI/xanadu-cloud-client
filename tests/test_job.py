@@ -136,7 +136,7 @@ class TestJob:
             (
                 2,
                 None,
-                "",
+                None,
                 {"size": "2"},
                 ["foo", "bar"],
             ),
@@ -195,10 +195,15 @@ class TestJob:
         ][:limit]
 
         add_response(body={"data": data}, path="/jobs")
+        if status is not None:
+            have_names = [
+                job.name
+                for job in xcc.Job.list(connection, limit=limit, ids=ids, status=status)
+                if status is not None and job.status == status
+            ]
+        else:
+            have_names = [job.name for job in xcc.Job.list(connection, limit=limit, ids=ids)]
 
-        have_names = [
-            job.name for job in xcc.Job.list(connection, limit=limit, ids=ids, status=status)
-        ]
         assert have_names == want_names
 
         have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
