@@ -40,6 +40,21 @@ This release contains contributions from (in alphabetical order):
 
 ### New features since last release
 
+* Job lists can now be filtered by status as well.
+  [(#30)](https://github.com/XanaduAI/xanadu-cloud-client/pull/30)
+
+  Using the CLI:
+
+  ```bash
+  xcc job list --status '<status>'
+  ```
+
+  Using the Python API:
+
+   ```python
+  xcc.Job.list(connection, status='<status>')
+  ```
+
 * The Connection class can now load a Connection from a Settings instance.
   [(#22)](https://github.com/XanaduAI/xanadu-cloud-client/pull/22)
 
