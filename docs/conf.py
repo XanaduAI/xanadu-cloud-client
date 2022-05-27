@@ -59,9 +59,7 @@ primary_domain = "py"
 # Tell sphinx what the pygments highlight language should be.
 highlight_language = "py"
 
-mathjax_path = (
-    "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"
-)
+mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"
 nbsphinx_requirejs_path = ""
 
 # Add any paths that contain templates here, relative to this directory.
@@ -85,6 +83,7 @@ author = "Xanadu Inc."
 #
 # The full version, including alpha/beta/rc tags.
 import xcc
+
 release = xcc.__version__
 
 # The short X.Y version.
@@ -253,7 +252,6 @@ html_theme = "xanadu"
 html_theme_options = {
     "navbar_name": "Xanadu Cloud Client",
     "navbar_logo_colour": "#78909c",
-
     "navbar_right_links": [
         {
             "name": "GitHub",
@@ -261,14 +259,12 @@ html_theme_options = {
             "icon": "fab fa-github",
         }
     ],
-
     "border_colour": "#78909c",
     "prev_next_button_colour": "#607d8b",
     "prev_next_button_hover_colour": "#34515e",
     "toc_marker_colour": "#78909c",
     "table_header_background_colour": "#78909c",
     "text_accent_colour": "#78909c",
-
 }
 
 edit_on_github_project = "XanaduAI/xanadu-cloud-client"

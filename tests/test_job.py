@@ -123,6 +123,87 @@ class TestJob:
         have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
         assert have_params == want_params
 
+    @pytest.mark.parametrize(
+        "limit, ids, status, want_params, want_names",
+        [
+            (
+                1,
+                None,
+                "queued",
+                {"size": "1", "status": "queued"},
+                ["foo"],
+            ),
+            (
+                2,
+                None,
+                "",
+                {"size": "2"},
+                ["foo", "bar"],
+            ),
+            (
+                2,
+                None,
+                "invalid",
+                {"size": "2", "status": "invalid"},
+                [],
+            ),
+            (
+                2,
+                [
+                    "00000000-0000-0000-0000-000000000001",
+                    "00000000-0000-0000-0000-000000000002",
+                    "00000000-0000-0000-0000-000000000003",
+                ],
+                "complete",
+                {
+                    "size": "3",
+                    "id": [
+                        "00000000-0000-0000-0000-000000000001",
+                        "00000000-0000-0000-0000-000000000002",
+                        "00000000-0000-0000-0000-000000000003",
+                    ],
+                    "status": "complete",
+                },
+                ["bar"],
+            ),
+        ],
+    )
+    @responses.activate
+    def test_list_status(
+        self, connection, add_response, limit, ids, status, want_params, want_names
+    ):
+        """Tests that the correct jobs are listed and that the correct query
+        parameters are encoded in the HTTP request to the Xanadu Cloud platform.
+        We ensure that the jobs are filtered by the given status.
+        """
+        data = [
+            {
+                "id": "00000000-0000-0000-0000-000000000001",
+                "name": "foo",
+                "status": "queued",
+                "target": "qpu",
+                "created_at": "2020-01-03T12:34:56.789012+00:00",
+            },
+            {
+                "id": "00000000-0000-0000-0000-000000000002",
+                "name": "bar",
+                "status": "complete",
+                "target": "qpu",
+                "created_at": "2020-01-03T12:34:56.789012+00:00",
+                "finished_at": "2020-01-03T12:34:56.789013+00:00",
+            },
+        ][:limit]
+
+        add_response(body={"data": data}, path="/jobs")
+
+        have_names = [
+            job.name for job in xcc.Job.list(connection, limit=limit, ids=ids, status=status)
+        ]
+        assert have_names == want_names
+
+        have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
+        assert have_params == want_params
+
     @pytest.mark.parametrize("name", [None, "foo"])
     @responses.activate
     def test_submit(self, job_id, connection, name):
@@ -167,7 +248,13 @@ class TestJob:
         with io.BytesIO() as buffer:
             # The public savez() function does not allow pickling to be disabled.
             savez = numpy.lib.npyio._savez  # pylint: disable=protected-access
-            savez(file=buffer, args=output, kwds=metadata, compress=False, allow_pickle=False)
+            savez(
+                file=buffer,
+                args=output,
+                kwds=metadata,
+                compress=False,
+                allow_pickle=False,
+            )
 
             buffer.seek(0)
             body = buffer.read()
