@@ -40,7 +40,7 @@ This release contains contributions from (in alphabetical order):
 
 ### New features since last release
 
-* Job lists can now be filtered by status.
+* Job lists can now be filtered by status as well.
   [(#30)](https://github.com/XanaduAI/xanadu-cloud-client/pull/30)
 
   Using the CLI:
