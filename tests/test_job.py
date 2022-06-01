@@ -124,30 +124,24 @@ class TestJob:
         assert have_params == want_params
 
     @pytest.mark.parametrize(
-        "limit, ids, status, want_status_param",
+        "limit, status, want_status_param",
         [
-            (1, None, "queued", "queued"),
+            (1, "queued", "queued"),
             (
                 2,
-                None,
                 None,
                 None,
             ),
-            (2, None, "invalid", "invalid"),
+            (2, "invalid", "invalid"),
             (
                 2,
-                [
-                    "00000000-0000-0000-0000-000000000001",
-                    "00000000-0000-0000-0000-000000000002",
-                    "00000000-0000-0000-0000-000000000003",
-                ],
                 "complete",
                 "complete",
             ),
         ],
     )
     @responses.activate
-    def test_list_status(self, connection, add_response, limit, ids, status, want_status_param):
+    def test_list_status(self, connection, add_response, limit, status, want_status_param):
         """Tests that the correct jobs are listed and that the correct status
         parameter is encoded in the HTTP request to the Xanadu Cloud platform.
         """
