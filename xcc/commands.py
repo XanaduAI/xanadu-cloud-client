@@ -264,7 +264,7 @@ def list_jobs(limit: int = 5, ids: List[str] = None, status: str = None) -> Sequ
         limit (int): Maximum number of jobs to display.
         ids (List[str], optional): IDs of the jobs to display. If at least one
             ID is specified, the limit flag will be set to the number of IDs.
-        status (str): Status parameter used to filter returned jobs based on given status.
+        status (str, optional): If specificed, filter returned jobs by the given status.
 
     Returns:
         Sequence[Mapping]: Overview of each job submitted to the Xanadu Cloud.

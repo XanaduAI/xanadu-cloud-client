@@ -96,7 +96,7 @@ class Job:
         connection: Connection,
         limit: int = 5,
         ids: Optional[Collection[str]] = None,
-        status: str = None,
+        status: Optional[str] = None,
     ) -> Sequence[Job]:
         """Returns jobs submitted to the Xanadu Cloud.
 
@@ -107,8 +107,7 @@ class Job:
             ids (Collection[str], optional): IDs of the jobs to retrieve; if at
                 least one ID is specified, ``limit`` will be set to the length
                 of the ID collection
-            status (str, optional): status parameter used to filter the jobs list.
-                If status is empty, return all the jobs
+            status (str, optional): filter jobs by the given status (if not ``None``)
 
         Returns:
             Sequence[Job]: jobs which were submitted on the Xanadu Cloud by the
@@ -116,10 +115,10 @@ class Job:
         """
         size = len(ids) if ids else limit
 
-        response = connection.request(
-            "GET", "/jobs", params={"size": size, "id": ids, "status": status}
-        )
+        params = {"size": size, "id": ids, "status": status}
+        response = connection.request("GET", "/jobs", params=params)
 
+        print(response.url)
         jobs = []
 
         for details in response.json()["data"]:
