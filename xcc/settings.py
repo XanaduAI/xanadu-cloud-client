@@ -125,7 +125,7 @@ class Settings(BaseSettings):
         saved = dotenv_values(dotenv_path=env_file)
 
         for key, val in self.dict().items():
-            self._sanity_check(key, val)  # check for obviously bad settings
+            self._sanity_check(key, val)
             field = get_name_of_env_var(key)
 
             # Remove keys that are assigned to None.
