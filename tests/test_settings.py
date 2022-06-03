@@ -54,11 +54,30 @@ class TestSettings:
 
     def test_save(self, env_file):
         """Tests that settings can be saved to a .env file."""
-        settings = xcc.Settings(REFRESH_TOKEN="j.w.t", HOST="example.com", PORT=80, TLS=False)
+        settings = xcc.Settings(
+            REFRESH_TOKEN="j.w.t", HOST="example.com", PORT=80, TLS=False
+        )
         settings.save()
 
         assert dotenv_values(env_file.name) == {
             "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t",
+            "XANADU_CLOUD_HOST": "example.com",
+            "XANADU_CLOUD_PORT": "80",
+            "XANADU_CLOUD_TLS": "False",
+        }
+
+    def test_save_unprintable(self, env_file):
+        """Tests that settings won't be saved to a .env file
+        if REFRESH_TOKEN contains non_printables.
+        Note blank space at end of token below.
+        """
+        settings = xcc.Settings(
+            REFRESH_TOKEN="j.w.t ", HOST="example.com", PORT=80, TLS=False
+        )
+        settings.save()
+
+        assert dotenv_values(env_file.name) == {
+            "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t ",
             "XANADU_CLOUD_HOST": "example.com",
             "XANADU_CLOUD_PORT": "80",
             "XANADU_CLOUD_TLS": "False",

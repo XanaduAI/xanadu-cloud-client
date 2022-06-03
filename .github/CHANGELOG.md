@@ -1,8 +1,10 @@
 ## Release 0.3.0 (development release)
+* REFRESH_TOKEN entries that have unprintable characters should now raise.
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+* [Jack Woehr](https://github.com/jwoehr)
 
 ## Release 0.2.1 (current release)
 
