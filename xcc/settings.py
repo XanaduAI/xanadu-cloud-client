@@ -92,22 +92,12 @@ class Settings(BaseSettings):
         Check for conditions that make saving the env_file
         dangerous to the user.
 
-        Parameters
-        ----------
-        key : str
-            env file key
-        val : str
-            env file value
+        Args:
+            key (str): .env file key
+            val (str): .env file value
 
-        Raises
-        ------
-        Exception
-            When the value should not be saved to the env_file.
-
-        Returns
-        -------
-        None
-            Has no effect if all is safe.
+        Raises:
+            Exception: if the value should not be saved to the .env file
 
         """
         # Unprintables in REFRESH_TOKEN assumed never to be valid (0x0a, 0x20, etc.)
