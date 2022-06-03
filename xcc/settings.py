@@ -113,7 +113,7 @@ class Settings(BaseSettings):
         # Unprintables in REFRESH_TOKEN assumed never to be valid (0x0a, 0x20, etc.)
 
         if key == "REFRESH_TOKEN" and val is not None and not val.isprintable():
-            raise Exception("REFRESH_TOKEN contains non-printable character(s)")
+            raise ValueError("REFRESH_TOKEN contains non-printable character(s)")
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""
