@@ -61,7 +61,7 @@ highlight_language = "py"
 
 mathjax_path = (
     "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"
-    )
+)
 nbsphinx_requirejs_path = ""
 
 # Add any paths that contain templates here, relative to this directory.
