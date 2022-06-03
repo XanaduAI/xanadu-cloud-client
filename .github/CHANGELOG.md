@@ -1,5 +1,6 @@
 ## Release 0.3.0 (development release)
 * REFRESH_TOKEN entries that have unprintable characters should now raise.
+  [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
 ### Contributors
 
