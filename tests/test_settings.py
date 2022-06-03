@@ -74,7 +74,9 @@ class TestSettings:
         settings = xcc.Settings(
             REFRESH_TOKEN="j.w.t ", HOST="example.com", PORT=80, TLS=False
         )
-        settings.save()
+        match = r"The REFRESH_TOKEN setting contains non-printable character(s)\."
+        with pytest.raises(ValueError, match=match):
+            settings.save()
 
         assert dotenv_values(env_file.name) == {
             "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t ",
