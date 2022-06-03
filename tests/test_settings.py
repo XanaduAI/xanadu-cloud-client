@@ -72,7 +72,7 @@ class TestSettings:
         Note blank space at end of token below.
         """
         settings = xcc.Settings(
-            REFRESH_TOKEN="j.w.t ", HOST="example.com", PORT=80, TLS=False
+            REFRESH_TOKEN="j.w.t\n", HOST="example.com", PORT=80, TLS=False
         )
         match = r"The REFRESH_TOKEN setting contains non-printable character(s)\."
         with pytest.raises(ValueError, match=match):
