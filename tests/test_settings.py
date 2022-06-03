@@ -67,7 +67,7 @@ class TestSettings:
         }
 
     def test_save_unprintable(self, env_file):
-        """Tests that settings won't be saved to a .env file
+        """Tests that a ValueError will be raised
         if REFRESH_TOKEN contains a non-printable character.
         Note blank space at end of token below.
         """
