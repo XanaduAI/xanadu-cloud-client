@@ -118,7 +118,6 @@ class Job:
         params = {"size": size, "id": ids, "status": status}
         response = connection.request("GET", "/jobs", params=params)
 
-        print(response.url)
         jobs = []
 
         for details in response.json()["data"]:
