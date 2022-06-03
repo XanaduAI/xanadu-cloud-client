@@ -127,17 +127,9 @@ class TestJob:
         "limit, status, want_status_param",
         [
             (1, "queued", "queued"),
-            (
-                2,
-                None,
-                None,
-            ),
+            (2, None, None),
             (2, "invalid", "invalid"),
-            (
-                2,
-                "complete",
-                "complete",
-            ),
+            (2, "complete", "complete"),
         ],
     )
     @responses.activate
