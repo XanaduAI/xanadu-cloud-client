@@ -1,5 +1,8 @@
 ## Release 0.3.0 (development release)
-* REFRESH_TOKEN entries that have unprintable characters should now raise.
+
+### Improvements
+
+* An exception is now raised when saving a refresh token with unprintable characters.
   [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
 ### Contributors
