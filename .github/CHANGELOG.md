@@ -5,11 +5,30 @@
 * An exception is now raised when saving a refresh token with unprintable characters.
   [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
+### New features since last release
+
+* Job lists can now be filtered by status.
+  [(#30)](https://github.com/XanaduAI/xanadu-cloud-client/pull/30)
+
+  Using the CLI:
+
+  ```bash
+  xcc job list --status '<Status>'
+  ```
+
+  Using the Python API:
+
+   ```python
+  xcc.Job.list(connection, status="<Status>")
+  ```
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
 [Jack Woehr](https://github.com/jwoehr)
+[Hudhayfa Zaheem](https://github.com/HudZah).
+
 
 ## Release 0.2.1 (current release)
 
@@ -44,8 +63,6 @@ This release contains contributions from (in alphabetical order):
 [Mikhail Andrenkov](https://github.com/Mandrenkov).
 
 ## Release 0.2.0
-
-### New features since last release
 
 * The Connection class can now load a Connection from a Settings instance.
   [(#22)](https://github.com/XanaduAI/xanadu-cloud-client/pull/22)

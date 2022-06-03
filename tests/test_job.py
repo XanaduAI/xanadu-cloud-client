@@ -123,6 +123,27 @@ class TestJob:
         have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
         assert have_params == want_params
 
+    @pytest.mark.parametrize(
+        "limit, status, want_status_param",
+        [
+            (1, "queued", "queued"),
+            (2, None, None),
+            (2, "invalid", "invalid"),
+            (2, "complete", "complete"),
+        ],
+    )
+    @responses.activate
+    def test_list_status(self, connection, add_response, limit, status, want_status_param):
+        """Tests that the correct status parameter is encoded in the HTTP
+        request to the Xanadu Cloud platform when listing jobs.
+        """
+        add_response(body={"data": []}, path="/jobs")
+        xcc.Job.list(connection, limit=limit, status=status)
+
+        have_params = responses.calls[0].request.params  # pyright: reportGeneralTypeIssues=false
+        have_status_param = have_params.get("status")
+        assert have_status_param == want_status_param
+
     @pytest.mark.parametrize("name", [None, "foo"])
     @responses.activate
     def test_submit(self, job_id, connection, name):
@@ -167,7 +188,13 @@ class TestJob:
         with io.BytesIO() as buffer:
             # The public savez() function does not allow pickling to be disabled.
             savez = numpy.lib.npyio._savez  # pylint: disable=protected-access
-            savez(file=buffer, args=output, kwds=metadata, compress=False, allow_pickle=False)
+            savez(
+                file=buffer,
+                args=output,
+                kwds=metadata,
+                compress=False,
+                allow_pickle=False,
+            )
 
             buffer.seek(0)
             body = buffer.read()
