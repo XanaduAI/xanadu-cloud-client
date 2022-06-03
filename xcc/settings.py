@@ -87,8 +87,36 @@ class Settings(BaseSettings):
         env_file = get_path_to_env_file()
         env_prefix = get_name_of_env_var()
 
+    def _sanity_check(self, key: str, val: str) -> None:
+        """
+        Check for conditions that make saving the env_file
+        dangerous to the user.
+
+        Parameters
+        ----------
+        key : str
+            env file key
+        val : str
+            env file value
+
+        Raises
+        ------
+        Exception
+            When the value should not be saved to the env_file.
+
+        Returns
+        -------
+        None
+            Has no effect if all is safe.
+
+        """
+        # Unprintables in REFRESH_TOKEN assumed never to be valid (0x0a, 0x20, etc.)
+        if key == "REFRESH_TOKEN" and not val.isprintable():
+            raise Exception("REFRESH_TOKEN contains non-printable character(s)")
+
     def save(self) -> None:
         """Saves the current settings to the .env file."""
+
         env_file = Settings.Config.env_file
         env_dir = os.path.dirname(env_file)
         os.makedirs(env_dir, exist_ok=True)
@@ -96,6 +124,7 @@ class Settings(BaseSettings):
         saved = dotenv_values(dotenv_path=env_file)
 
         for key, val in self.dict().items():
+            self._sanity_check(key, val)  # check for obviously bad settings
             field = get_name_of_env_var(key)
 
             # Remove keys that are assigned to None.
