@@ -134,8 +134,8 @@ class TestJob:
     )
     @responses.activate
     def test_list_status(self, connection, add_response, limit, status, want_status_param):
-        """Tests that the correct jobs are listed and that the correct status
-        parameter is encoded in the HTTP request to the Xanadu Cloud platform.
+        """Tests that the correct status parameter is encoded in the HTTP
+        request to the Xanadu Cloud platform when listing jobs.
         """
         add_response(body={"data": []}, path="/jobs")
         xcc.Job.list(connection, limit=limit, status=status)
