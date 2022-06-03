@@ -8,7 +8,8 @@
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
-* [Jack Woehr](https://github.com/jwoehr)
+
+[Jack Woehr](https://github.com/jwoehr)
 
 ## Release 0.2.1 (current release)
 
