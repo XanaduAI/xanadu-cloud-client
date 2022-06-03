@@ -1,4 +1,5 @@
 ## Release 0.3.0 (development release)
+
 ### New features since last release
 
 * Job lists can now be filtered by status.
