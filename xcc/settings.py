@@ -3,11 +3,18 @@ This module contains the :class:`~xcc.Settings` class and related helper functio
 """
 
 import os
+import re
 from typing import Optional
 
 from appdirs import user_config_dir
 from dotenv import dotenv_values, set_key, unset_key
 from pydantic import BaseSettings
+
+# Matches when string contains chars outside Base64URL set
+# https://base64.guru/standards/base64url
+# https://en.wikipedia.org/wiki/Base64#Variants_summary_table
+# Also, the dot '.' to separate sections.
+_BASE64URLRE = re.compile(r"[^\.A-Za-z0-9_-]+")
 
 
 def get_path_to_env_file() -> str:
@@ -92,6 +99,8 @@ class Settings(BaseSettings):
         Check for conditions that make saving the env_file
         dangerous to the user.
 
+        - REFRESH_TOKEN must not contain characters outside Base64URL set
+
         Args:
             key (str): .env file key
             val (str): .env file value
@@ -100,10 +109,13 @@ class Settings(BaseSettings):
             Exception: if the value should not be saved to the .env file
 
         """
-        # Unprintables in REFRESH_TOKEN assumed never to be valid (0x0a, 0x20, etc.)
 
-        if key == "REFRESH_TOKEN" and val is not None and not val.isprintable():
-            raise ValueError("REFRESH_TOKEN contains non-printable character(s)")
+        if (
+            key == "REFRESH_TOKEN"
+            and val is not None
+            and re.search(_BASE64URLRE, val) is not None
+        ):
+            raise ValueError("REFRESH_TOKEN contains non-Base64URL character(s)")
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""

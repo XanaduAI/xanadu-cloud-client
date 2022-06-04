@@ -66,24 +66,18 @@ class TestSettings:
             "XANADU_CLOUD_TLS": "False",
         }
 
-    def test_save_unprintable(self, env_file):
+    def test_save_bad_Base64URL(self, env_file):
         """Tests that a ValueError will be raised
-        if REFRESH_TOKEN contains a non-printable character.
-        Note blank space at end of token below.
+        if REFRESH_TOKEN contains a character outside the Base64URL with
+        the addition that the '.' dot character is part of the token as a
+        section separator.
         """
         settings = xcc.Settings(
             REFRESH_TOKEN="j.w.t\n", HOST="example.com", PORT=80, TLS=False
         )
-        match = r"The REFRESH_TOKEN setting contains non-printable character(s)\."
+        match = r"REFRESH_TOKEN contains non-Base64URL character\(s\)"
         with pytest.raises(ValueError, match=match):
             settings.save()
-
-        assert dotenv_values(env_file.name) == {
-            "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t ",
-            "XANADU_CLOUD_HOST": "example.com",
-            "XANADU_CLOUD_PORT": "80",
-            "XANADU_CLOUD_TLS": "False",
-        }
 
     def test_save_multiple_times(self, settings):
         """Tests that settings can be saved to a .env file multiple times."""
