@@ -79,6 +79,14 @@ class TestSettings:
         with pytest.raises(ValueError, match=match):
             settings.save()
 
+        # # Check that the .env file was not modified since there was a "\n" in the refresh token.
+        # assert dotenv_values(env_file.name) == {
+        #     "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t",
+        #     "XANADU_CLOUD_HOST": "example.com",
+        #     "XANADU_CLOUD_PORT": "80",
+        #     "XANADU_CLOUD_TLS": "False",
+        # }
+
     def test_save_multiple_times(self, settings):
         """Tests that settings can be saved to a .env file multiple times."""
         path_to_env_file = xcc.Settings.Config.env_file

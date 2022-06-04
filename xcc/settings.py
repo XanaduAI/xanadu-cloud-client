@@ -94,7 +94,7 @@ class Settings(BaseSettings):
         env_file = get_path_to_env_file()
         env_prefix = get_name_of_env_var()
 
-    def _sanity_check(self, key: str, val: str) -> None:
+    def _check_for_invalid_values(self, key: str, val: str) -> None:
         """
         Check for conditions that make saving the env_file
         dangerous to the user.
@@ -126,8 +126,11 @@ class Settings(BaseSettings):
 
         saved = dotenv_values(dotenv_path=env_file)
 
+        # must be done first as dict is not ordered
         for key, val in self.dict().items():
-            self._sanity_check(key, val)
+            self._check_for_invalid_values(key, val)
+
+        for key, val in self.dict().items():
             field = get_name_of_env_var(key)
 
             # Remove keys that are assigned to None.
