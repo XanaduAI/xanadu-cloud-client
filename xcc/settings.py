@@ -106,7 +106,7 @@ class Settings(BaseSettings):
             val (str): .env file value
 
         Raises:
-            Exception: if the value should not be saved to the .env file
+            ValueError: if the value should not be saved to the .env file
 
         """
 
