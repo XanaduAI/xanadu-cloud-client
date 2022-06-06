@@ -2,7 +2,7 @@
 
 ### Improvements
 
-* An exception is now raised when saving a refresh token with unprintable characters.
+* An exception is now raised when saving a refresh token with invalid characters.
   [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
 ### New features since last release
