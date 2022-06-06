@@ -115,7 +115,7 @@ class Settings(BaseSettings):
             and val is not None
             and re.search(_BASE64URLRE, val) is not None
         ):
-            raise ValueError("REFRESH_TOKEN contains non-Base64URL character(s)")
+            raise ValueError("REFRESH_TOKEN contains non-JWT character(s)")
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""
