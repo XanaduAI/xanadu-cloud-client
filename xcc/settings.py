@@ -28,6 +28,26 @@ def get_name_of_env_var(key: str = "") -> str:
     return f"XANADU_CLOUD_{key}"
 
 
+def _check_for_invalid_values(key: str, val: str) -> None:
+    """
+    Check for conditions that make saving the env_file
+    dangerous to the user.
+
+    - REFRESH_TOKEN must not contain characters outside Base64URL set
+
+    Args:
+        key (str): .env file key
+        val (str): .env file value
+
+    Raises:
+        ValueError: if the value should not be saved to the .env file
+
+    """
+
+    if key == "REFRESH_TOKEN" and val is not None and re.search(_BASE64URLRE, val) is not None:
+        raise ValueError("REFRESH_TOKEN contains non-JWT character(s)")
+
+
 class Settings(BaseSettings):
     """Represents the configuration for connecting to the Xanadu Cloud.
 
@@ -94,29 +114,6 @@ class Settings(BaseSettings):
         env_file = get_path_to_env_file()
         env_prefix = get_name_of_env_var()
 
-    def _check_for_invalid_values(self, key: str, val: str) -> None:
-        """
-        Check for conditions that make saving the env_file
-        dangerous to the user.
-
-        - REFRESH_TOKEN must not contain characters outside Base64URL set
-
-        Args:
-            key (str): .env file key
-            val (str): .env file value
-
-        Raises:
-            ValueError: if the value should not be saved to the .env file
-
-        """
-
-        if (
-            key == "REFRESH_TOKEN"
-            and val is not None
-            and re.search(_BASE64URLRE, val) is not None
-        ):
-            raise ValueError("REFRESH_TOKEN contains non-JWT character(s)")
-
     def save(self) -> None:
         """Saves the current settings to the .env file."""
 
@@ -128,7 +125,7 @@ class Settings(BaseSettings):
 
         # must be done first as dict is not ordered
         for key, val in self.dict().items():
-            self._check_for_invalid_values(key, val)
+            _check_for_invalid_values(key, val)
 
         for key, val in self.dict().items():
             field = get_name_of_env_var(key)

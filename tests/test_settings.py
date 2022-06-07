@@ -54,9 +54,7 @@ class TestSettings:
 
     def test_save(self, env_file):
         """Tests that settings can be saved to a .env file."""
-        settings = xcc.Settings(
-            REFRESH_TOKEN="j.w.t", HOST="example.com", PORT=80, TLS=False
-        )
+        settings = xcc.Settings(REFRESH_TOKEN="j.w.t", HOST="example.com", PORT=80, TLS=False)
         settings.save()
 
         assert dotenv_values(env_file.name) == {
@@ -66,7 +64,7 @@ class TestSettings:
             "XANADU_CLOUD_TLS": "False",
         }
 
-    def test_save_bad_Base64URL(self, settings):
+    def test_save_bad_base64_url(self, settings):
         """Tests that a ValueError will be raised
         if REFRESH_TOKEN contains a character outside the Base64URL with
         the addition that the '.' dot character is part of the token as a
