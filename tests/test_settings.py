@@ -79,7 +79,7 @@ class TestSettings:
             settings.save()
 
         # Check that the .env file was not modified since there was a "\n" in the refresh token.
-        assert dotenv_values(env_file.name) == {
+        assert dotenv_values(xcc.Settings.Config.env_file) == {
             "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t",
             "XANADU_CLOUD_HOST": "example.com",
             "XANADU_CLOUD_PORT": "80",
