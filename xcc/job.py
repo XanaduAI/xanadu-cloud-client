@@ -93,9 +93,13 @@ class Job:
 
     @staticmethod
     def list(
-        connection: Connection, limit: int = 5, ids: Optional[Collection[str]] = None
+        connection: Connection,
+        limit: int = 5,
+        ids: Optional[Collection[str]] = None,
+        status: Optional[str] = None,
     ) -> Sequence[Job]:
         """Returns jobs submitted to the Xanadu Cloud.
+
 
         Args:
             connection (Connection): connection to the Xanadu Cloud
@@ -103,13 +107,16 @@ class Job:
             ids (Collection[str], optional): IDs of the jobs to retrieve; if at
                 least one ID is specified, ``limit`` will be set to the length
                 of the ID collection
+            status (str, optional): filter jobs by the given status (if not ``None``)
 
         Returns:
             Sequence[Job]: jobs which were submitted on the Xanadu Cloud by the
             user associated with the Xanadu Cloud connection
         """
         size = len(ids) if ids else limit
-        response = connection.request("GET", "/jobs", params={"size": size, "id": ids})
+
+        params = {"size": size, "id": ids, "status": status}
+        response = connection.request("GET", "/jobs", params=params)
 
         jobs = []
 
@@ -122,7 +129,11 @@ class Job:
 
     @staticmethod
     def submit(
-        connection: Connection, name: Optional[str], target: str, circuit: str, language: str
+        connection: Connection,
+        name: Optional[str],
+        target: str,
+        circuit: str,
+        language: str,
     ) -> Job:
         """Submits a job to the Xanadu Cloud.
 
@@ -136,7 +147,12 @@ class Job:
         Returns:
             Job: job submitted to the Xanadu Cloud
         """
-        payload = {"name": name, "target": target, "circuit": circuit, "language": language}
+        payload = {
+            "name": name,
+            "target": target,
+            "circuit": circuit,
+            "language": language,
+        }
         response = connection.request("POST", "/jobs", json=payload)
         details = response.json()
 
