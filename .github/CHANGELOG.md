@@ -1,6 +1,7 @@
 ## Release 0.3.0 (development release)
 
 ### New features since last release
+* `pyproject.toml` file added with option for `[tool.black]` so all developers get the project-approved `black` settings
 
 * Job lists can now be filtered by status.
   [(#30)](https://github.com/XanaduAI/xanadu-cloud-client/pull/30)
@@ -13,7 +14,7 @@
 
   Using the Python API:
 
-   ```python
+  ```python
   xcc.Job.list(connection, status="<Status>")
   ```
 
@@ -22,6 +23,7 @@
 
 This release contains contributions from (in alphabetical order):
 
+[Jack Woehr](https://githup.com/jwoehr)
 [Hudhayfa Zaheem](https://github.com/HudZah).
 
 ## Release 0.2.1 (current release)
