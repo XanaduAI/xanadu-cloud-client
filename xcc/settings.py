@@ -3,11 +3,18 @@ This module contains the :class:`~xcc.Settings` class and related helper functio
 """
 
 import os
+import re
 from typing import Optional
 
 from appdirs import user_config_dir
 from dotenv import dotenv_values, set_key, unset_key
 from pydantic import BaseSettings
+
+# Matches when string contains chars outside Base64URL set
+# https://base64.guru/standards/base64url
+# https://en.wikipedia.org/wiki/Base64#Variants_summary_table
+# Also, the dot '.' to separate sections.
+_BASE64URLRE = re.compile(r"[^\.A-Za-z0-9_-]+")
 
 
 def get_path_to_env_file() -> str:
@@ -19,6 +26,26 @@ def get_path_to_env_file() -> str:
 def get_name_of_env_var(key: str = "") -> str:
     """Returns the name of the Xanadu Cloud environment variable associated with the given key."""
     return f"XANADU_CLOUD_{key}"
+
+
+def _check_for_invalid_values(key: str, val: str) -> None:
+    """
+    Check for conditions that make saving the env_file
+    dangerous to the user.
+
+    - REFRESH_TOKEN must not contain characters outside Base64URL set
+
+    Args:
+        key (str): .env file key
+        val (str): .env file value
+
+    Raises:
+        ValueError: if the value should not be saved to the .env file
+
+    """
+
+    if key == "REFRESH_TOKEN" and val is not None and re.search(_BASE64URLRE, val) is not None:
+        raise ValueError("REFRESH_TOKEN contains non-JWT character(s)")
 
 
 class Settings(BaseSettings):
@@ -89,11 +116,16 @@ class Settings(BaseSettings):
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""
+
         env_file = Settings.Config.env_file
         env_dir = os.path.dirname(env_file)
         os.makedirs(env_dir, exist_ok=True)
 
         saved = dotenv_values(dotenv_path=env_file)
+
+        # must be done first as dict is not ordered
+        for key, val in self.dict().items():
+            _check_for_invalid_values(key, val)
 
         for key, val in self.dict().items():
             field = get_name_of_env_var(key)
