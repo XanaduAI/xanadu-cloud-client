@@ -31,7 +31,7 @@ lint:
 
 .PHONY: format
 format:
-	$(PYTHON) -m black --check --diff --color -l 100 xcc tests
+	$(PYTHON) -m black --check --diff --color xcc tests
 	$(PYTHON) -m isort --check --diff --color --profile black xcc tests
 
 .PHONY: wheel

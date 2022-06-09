@@ -1,10 +1,5 @@
 ## Release 0.3.0 (development release)
 
-### Improvements
-
-* An exception is now raised when saving a refresh token with invalid characters.
-  [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
-
 ### New features since last release
 
 * Job lists can now be filtered by status.
@@ -18,17 +13,20 @@
 
   Using the Python API:
 
-   ```python
+  ```python
   xcc.Job.list(connection, status="<Status>")
   ```
+
+### Improvements
+
+* An exception is now raised when saving a refresh token with invalid characters.
+  [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-[Jack Woehr](https://github.com/jwoehr)
-[Hudhayfa Zaheem](https://github.com/HudZah).
-
+[Jack Woehr](https://githup.com/jwoehr), [Hudhayfa Zaheem](https://github.com/HudZah).
 
 ## Release 0.2.1 (current release)
 
