@@ -64,6 +64,26 @@ class TestSettings:
             "XANADU_CLOUD_TLS": "False",
         }
 
+    def test_save_bad_base64_url(self, settings):
+        """Tests that a ValueError will be raised
+        if REFRESH_TOKEN contains a character outside the Base64URL with
+        the addition that the '.' dot character is part of the token as a
+        section separator.
+        """
+        settings.REFRESH_TOKEN = "j.w.t\n"
+
+        match = r"REFRESH_TOKEN contains non-JWT character\(s\)"
+        with pytest.raises(ValueError, match=match):
+            settings.save()
+
+        # Check that the .env file was not modified since there was a "\n" in the refresh token.
+        assert dotenv_values(xcc.Settings.Config.env_file) == {
+            "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t",
+            "XANADU_CLOUD_HOST": "example.com",
+            "XANADU_CLOUD_PORT": "80",
+            "XANADU_CLOUD_TLS": "False",
+        }
+
     def test_save_multiple_times(self, settings):
         """Tests that settings can be saved to a .env file multiple times."""
         path_to_env_file = xcc.Settings.Config.env_file
