@@ -23,7 +23,7 @@
   [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
 * Job results are now displayed using the `pprint` module.
-  [#32](https://github.com/XanaduAI/xanadu-cloud-client/pull/32)
+  [#33](https://github.com/XanaduAI/xanadu-cloud-client/pull/33)
 
   Before:
 
