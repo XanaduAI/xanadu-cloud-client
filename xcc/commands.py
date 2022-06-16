@@ -5,9 +5,11 @@ This module implements the Xanadu Cloud CLI.
 import json
 import sys
 from functools import wraps
+from pprint import pformat
 from typing import Any, Callable, List, Mapping, Sequence, Tuple, Union
 
 import fire
+import numpy as np
 from fire.core import FireError
 from fire.formatting import Error
 from pydantic import ValidationError
@@ -251,7 +253,22 @@ def get_job(
     if status:
         return job.status
     if result:
-        return job.get_result(integer_overflow_protection=False)
+        result = job.get_result(integer_overflow_protection=False)
+
+        def convert_to_list(value: Union[np.ndarray, List[np.ndarray]]) -> List:
+            """Converts the given job result value into a native Python list."""
+            if isinstance(value, np.ndarray):
+                return value.tolist()
+
+            return [array.tolist() for array in value]
+
+        # Convert all NumPy arrays into lists to take advantage of pprint.
+        list_result = {key: convert_to_list(value) for key, value in result.items()}
+
+        # Use "" instead of '' to ensure the output is compatible with JSON.
+        json_result = pformat(list_result).replace("'", '"')
+        # Apply the same formatting rules as the JSON dumper in beautify().
+        return json_result.replace("{", "{\n ").replace("\n", "\n   ").replace("}", "\n}")
 
     return job.overview
 

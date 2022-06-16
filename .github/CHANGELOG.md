@@ -22,11 +22,36 @@
 * An exception is now raised when saving a refresh token with invalid characters.
   [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
+* Job results are now displayed using the `pprint` module.
+  [#34](https://github.com/XanaduAI/xanadu-cloud-client/pull/34)
+
+  Before:
+
+  ```json
+  {
+      "output": [
+          "[[0 0 0 0]\n [0 0 0 0]\n [0 0 0 0]\n [0 0 0 0]\n [0 0 0 0]]"
+      ]
+  }
+  ```
+
+  After:
+
+  ```json
+  {
+      "output": [[[0, 0, 0, 0],
+                  [0, 0, 0, 0],
+                  [0, 0, 0, 0],
+                  [0, 0, 0, 0],
+                  [0, 0, 0, 0]]]
+  }
+  ```
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-[Jack Woehr](https://githup.com/jwoehr), [Hudhayfa Zaheem](https://github.com/HudZah).
+[Mikhail Andrenkov](https://github.com/Mandrenkov), [Jack Woehr](https://githup.com/jwoehr), [Hudhayfa Zaheem](https://github.com/HudZah).
 
 ## Release 0.2.1 (current release)
 

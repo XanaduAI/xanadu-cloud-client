@@ -4,6 +4,7 @@ This module tests the :module:`xcc.commands` module.
 """
 
 import json
+from inspect import cleandoc
 
 import numpy as np
 import pytest
@@ -72,7 +73,7 @@ class MockJob(xcc.Job):
         return "blackbird:1.0"
 
     def get_result(self, integer_overflow_protection=True):
-        return {"output": [np.zeros((4, 4))]}
+        return {"output": [np.zeros((4, 4))], "metadata": np.ones((2, 2))}
 
     def cancel(self):
         pass
@@ -265,7 +266,17 @@ class TestGetJob:
     def test_result(self):
         """Tests that the result of a job can be retrieved."""
         have_result = xcc.commands.get_job(id="foo", result=True)
-        want_result = json.dumps({"output": [str(np.zeros((4, 4)))]}, indent=4)
+        want_result = cleandoc(
+            """
+            {
+                "metadata": [[1.0, 1.0], [1.0, 1.0]],
+                "output": [[[0.0, 0.0, 0.0, 0.0],
+                            [0.0, 0.0, 0.0, 0.0],
+                            [0.0, 0.0, 0.0, 0.0],
+                            [0.0, 0.0, 0.0, 0.0]]]
+            }
+            """
+        )
         assert have_result == want_result
 
     def test_invalid_number_of_flags(self):
