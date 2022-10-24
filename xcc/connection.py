@@ -311,7 +311,7 @@ class Connection:
             # keys since most users will likely encounter it at some point.
             if response.status_code == 400 and body.get("error", "") == "invalid_grant":
                 raise requests.exceptions.HTTPError(
-                    "Refresh token (e.g., Xanadu Cloud API key) is invalid"
+                    "Refresh token (e.g., Xanadu Cloud API key) is invalid", response=response
                 )
 
             response.raise_for_status()
