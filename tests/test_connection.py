@@ -329,8 +329,11 @@ class TestConnection:
         )
 
         match = r"Refresh token \(e\.g\.\, Xanadu Cloud API key\) is invalid"
-        with pytest.raises(HTTPError, match=match):
+        with pytest.raises(HTTPError, match=match) as excinfo:
             connection.update_access_token()
+        assert hasattr(excinfo.value, "response")
+        assert excinfo.value.response.status_code == 400
+        assert excinfo.value.response.json()["error"] == "invalid_grant"
 
     @responses.activate
     def test_update_access_token_failure_due_to_status_code(self, connection):
