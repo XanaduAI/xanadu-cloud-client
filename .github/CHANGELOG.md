@@ -47,11 +47,14 @@
   }
   ```
 
+* The HTTPError raised when the refresh token is invalid now contains the response object.
+  [#35](https://github.com/XanaduAI/xanadu-cloud-client/pull/35)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-[Mikhail Andrenkov](https://github.com/Mandrenkov), [Jack Woehr](https://githup.com/jwoehr), [Hudhayfa Zaheem](https://github.com/HudZah).
+[Mikhail Andrenkov](https://github.com/Mandrenkov), [Noah Rossignol](https://github.com/NIR7cd), [Jack Woehr](https://githup.com/jwoehr), [Hudhayfa Zaheem](https://github.com/HudZah).
 
 ## Release 0.2.1 (current release)
 
