@@ -282,7 +282,7 @@ class TestConnection:
             url=connection.url("path"),
             method="POST",
             status=200,
-            match=(matchers.request_kwargs_matcher({"headers": connection.headers}),),
+            match=(matchers.header_matcher(connection.headers),),
         )
 
         assert connection.request(method="POST", path="path").status_code == 200
@@ -296,11 +296,7 @@ class TestConnection:
             url=connection.url("path"),
             method="POST",
             status=200,
-            match=(
-                matchers.request_kwargs_matcher(
-                    {"headers": {**connection.headers, **extra_headers}}
-                ),
-            ),
+            match=(matchers.header_matcher({**connection.headers, **extra_headers}),),
         )
 
         assert (
