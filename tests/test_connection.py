@@ -4,6 +4,7 @@ This module tests the :module:`xcc.connection` module.
 """
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
 import requests
@@ -270,6 +271,30 @@ class TestConnection:
 
         with pytest.raises(RequestException, match=r"Failed to resolve hostname 'test.xanadu.ai'"):
             connection.request("GET", "/healthz")
+
+    def test_request_headers(self, connection):
+        """Test that request() passes the headers attribute to _request if the headers argument
+        is not provided."""
+
+        connection._request = MagicMock()
+        connection.request(method="method", path="path")
+
+        connection._request.assert_called_once_with(
+            method="method", url=connection.url("path"), headers=connection.headers
+        )
+
+    @pytest.mark.parametrize("extra_headers", [{"X-Test": "data"}, {}])
+    def test_request_extra_headers(self, connection, extra_headers):
+        """Tests that request() passes the combined headers from the headers attribute
+        and the headers argument to the _request method."""
+        connection._request = MagicMock()
+
+        connection.request(method="post", path="path", headers=extra_headers)
+        connection._request.assert_called_once_with(
+            method="post",
+            url=connection.url("path"),
+            headers={**connection.headers, **extra_headers},
+        )
 
     @responses.activate
     def test_update_access_token_success(self, connection):
