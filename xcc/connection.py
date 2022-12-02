@@ -357,6 +357,7 @@ class Connection:
         """
         try:
             timeout = kwargs.pop("timeout", 10)
+
             return requests.request(method=method, url=url, timeout=timeout, **kwargs)
 
         except requests.exceptions.Timeout as exc:
