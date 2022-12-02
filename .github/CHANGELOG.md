@@ -2,6 +2,9 @@
 
 ### New features since last release
 
+* Extra request headers may be passed to `Connection.request()`.
+  [(#36)](https://github.com/XanaduAI/xanadu-cloud-client/pull/36)
+
 * Job lists can now be filtered by status.
   [(#30)](https://github.com/XanaduAI/xanadu-cloud-client/pull/30)
 
