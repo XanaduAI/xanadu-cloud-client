@@ -4,7 +4,6 @@ This module tests the :module:`xcc.connection` module.
 """
 
 import json
-from unittest.mock import MagicMock
 
 import pytest
 import requests
