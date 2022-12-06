@@ -274,8 +274,7 @@ class TestConnection:
 
     @responses.activate
     def test_request_headers(self, connection):
-        """Test that request() passes the headers attribute to _request if the headers argument
-        is not provided."""
+        """Tests that the correct headers are passed when the headers argument is not provided.
 
         responses.add(
             url=connection.url("path"),
@@ -284,13 +283,12 @@ class TestConnection:
             match=(matchers.header_matcher(connection.headers),),
         )
 
-        assert connection.request(method="POST", path="path").status_code == 200
+        connection.request(method="POST", path="path")
 
     @responses.activate
     @pytest.mark.parametrize("extra_headers", [{"X-Test": "data"}, {}])
     def test_request_extra_headers(self, connection, extra_headers):
-        """Tests that request() passes the combined headers from the headers attribute
-        and the headers argument to the _request method."""
+        """Tests that the correct headers are passed when the headers argument is provided.
         responses.add(
             url=connection.url("path"),
             method="POST",
@@ -298,9 +296,7 @@ class TestConnection:
             match=(matchers.header_matcher({**connection.headers, **extra_headers}),),
         )
 
-        assert (
-            connection.request(method="POST", path="path", headers=extra_headers).status_code == 200
-        )
+        connection.request(method="POST", path="path", headers=extra_headers)
 
     @responses.activate
     def test_update_access_token_success(self, connection):
