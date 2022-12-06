@@ -218,7 +218,7 @@ class Connection:
         Args:
             method (str): HTTP request method
             path (str): HTTP request path
-            headers (Mapping[str, str]): Extra headers to pass to request
+            headers (Mapping[str, str]): extra headers to pass to the request
             **kwargs: optional arguments to pass to :func:`requests.request()`
 
         Returns:
