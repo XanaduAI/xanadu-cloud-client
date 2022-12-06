@@ -1,4 +1,4 @@
-## Release 0.3.0 (development release)
+## Release 0.3.0 (current release)
 
 ### New features since last release
 
@@ -59,7 +59,7 @@ This release contains contributions from (in alphabetical order):
 
 [Mikhail Andrenkov](https://github.com/Mandrenkov), [Noah Rossignol](https://github.com/NIR7cd), [Jack Woehr](https://githup.com/jwoehr), [Hudhayfa Zaheem](https://github.com/HudZah).
 
-## Release 0.2.1 (current release)
+## Release 0.2.1
 
 ### New features since last release
 
