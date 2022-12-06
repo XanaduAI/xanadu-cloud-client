@@ -274,7 +274,7 @@ class TestConnection:
 
     @responses.activate
     def test_request_headers(self, connection):
-        """Tests that the correct headers are passed when the headers argument is not provided.
+        """Tests that the correct headers are passed when the headers argument is not provided."""
 
         responses.add(
             url=connection.url("path"),
@@ -288,7 +288,7 @@ class TestConnection:
     @responses.activate
     @pytest.mark.parametrize("extra_headers", [{"X-Test": "data"}, {}])
     def test_request_extra_headers(self, connection, extra_headers):
-        """Tests that the correct headers are passed when the headers argument is provided.
+        """Tests that the correct headers are passed when the headers argument is provided."""
         responses.add(
             url=connection.url("path"),
             method="POST",
