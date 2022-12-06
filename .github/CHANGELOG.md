@@ -1,3 +1,9 @@
+## Release 0.4.0 (development release)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
 ## Release 0.3.0 (current release)
 
 ### New features since last release
@@ -23,10 +29,10 @@
 ### Improvements
 
 * An exception is now raised when saving a refresh token with invalid characters.
-  [#31](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
+  [(#31)](https://github.com/XanaduAI/xanadu-cloud-client/pull/31)
 
 * Job results are now displayed using the `pprint` module.
-  [#34](https://github.com/XanaduAI/xanadu-cloud-client/pull/34)
+  [(#34)](https://github.com/XanaduAI/xanadu-cloud-client/pull/34)
 
   Before:
 
@@ -51,7 +57,7 @@
   ```
 
 * The HTTPError raised when the refresh token is invalid now contains the response object.
-  [#35](https://github.com/XanaduAI/xanadu-cloud-client/pull/35)
+  [(#35)](https://github.com/XanaduAI/xanadu-cloud-client/pull/35)
 
 ### Contributors
 
