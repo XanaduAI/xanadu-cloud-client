@@ -210,12 +210,15 @@ class Connection:
         """
         return self.request(method="GET", path="/healthz")
 
-    def request(self, method: str, path: str, **kwargs) -> requests.Response:
+    def request(
+        self, method: str, path: str, *, headers: Optional[Dict[str, str]] = None, **kwargs
+    ) -> requests.Response:
         """Sends an HTTP request to the Xanadu Cloud.
 
         Args:
             method (str): HTTP request method
             path (str): HTTP request path
+            headers (Mapping[str, str]): extra headers to pass to the request
             **kwargs: optional arguments to pass to :func:`requests.request()`
 
         Returns:
@@ -235,7 +238,12 @@ class Connection:
         """
         url = self.url(path)
 
-        response = self._request(method=method, url=url, headers=self.headers, **kwargs)
+        if headers:
+            headers = {**self.headers, **headers}
+        else:
+            headers = self.headers
+
+        response = self._request(method=method, url=url, headers=headers, **kwargs)
 
         if response.status_code == 401:
             self.update_access_token()
@@ -349,6 +357,7 @@ class Connection:
         """
         try:
             timeout = kwargs.pop("timeout", 10)
+
             return requests.request(method=method, url=url, timeout=timeout, **kwargs)
 
         except requests.exceptions.Timeout as exc:

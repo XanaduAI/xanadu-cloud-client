@@ -9,6 +9,7 @@ import pytest
 import requests
 import responses
 from requests.exceptions import HTTPError, RequestException
+from responses import matchers
 
 import xcc
 
@@ -270,6 +271,32 @@ class TestConnection:
 
         with pytest.raises(RequestException, match=r"Failed to resolve hostname 'test.xanadu.ai'"):
             connection.request("GET", "/healthz")
+
+    @responses.activate
+    def test_request_headers(self, connection):
+        """Tests that the correct headers are passed when the headers argument is not provided."""
+
+        responses.add(
+            url=connection.url("path"),
+            method="POST",
+            status=200,
+            match=(matchers.header_matcher(connection.headers),),
+        )
+
+        connection.request(method="POST", path="path")
+
+    @responses.activate
+    @pytest.mark.parametrize("extra_headers", [{"X-Test": "data"}, {}])
+    def test_request_extra_headers(self, connection, extra_headers):
+        """Tests that the correct headers are passed when the headers argument is provided."""
+        responses.add(
+            url=connection.url("path"),
+            method="POST",
+            status=200,
+            match=(matchers.header_matcher({**connection.headers, **extra_headers}),),
+        )
+
+        connection.request(method="POST", path="path", headers=extra_headers)
 
     @responses.activate
     def test_update_access_token_success(self, connection):
