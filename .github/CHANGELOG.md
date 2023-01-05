@@ -1,5 +1,9 @@
 ## Release 0.4.0 (development release)
 
+### Improvements
+
+* Bumped `wheel` to v0.38.1. [(#39)](https://github.com/XanaduAI/xanadu-cloud-client/pull/39)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
