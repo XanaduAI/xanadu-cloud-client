@@ -18,8 +18,8 @@ jobs:
           old_version=`grep -oP '(?<=__version__ = ").*(?=")' xcc/_version.py`
           new_version=`echo $old_version | awk '{split($0,v,"."); print v[1] "." v[2]+1 ".0-dev"}'`
 
-          echo "::set-output name=old_version::$old_version"
-          echo "::set-output name=new_version::$new_version"
+          echo "old_version=$old_version" >> $GITHUB_OUTPUT
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Bump version in _version.py
         run:
