@@ -1,4 +1,4 @@
-## Release 0.4.0 (current release)
+## Release 0.3.1 (current release)
 
 ### Improvements
 

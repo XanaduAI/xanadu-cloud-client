@@ -3,4 +3,4 @@ This module specifies the XCC version number (<major>.<minor>.<patch>[-<pre-rele
 See https://semver.org/.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.3.1"
