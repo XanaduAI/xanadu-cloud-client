@@ -4,9 +4,15 @@
 
 * Bumped `wheel` to v0.38.1. [(#39)](https://github.com/XanaduAI/xanadu-cloud-client/pull/39)
 
+### Bug fixes
+
+* Set upper bound on compatible `pydantic` versions to v2.0.0. [(#42)](https://github.com/XanaduAI/xanadu-cloud-client/pull/42)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+[Mikhail Andrenkov](https://github.com/Mandrenkov).
 
 ## Release 0.3.0 (current release)
 
