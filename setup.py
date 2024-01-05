@@ -7,7 +7,7 @@ requirements = [
     "appdirs",
     "fire",
     "numpy",
-    "pydantic",
+    "pydantic>=2",
     "pydantic-settings",
     "python-dateutil",
     "python-dotenv",
