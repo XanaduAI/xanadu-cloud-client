@@ -9,7 +9,6 @@ requirements = [
     "fire",
     "numpy",
     "pydantic",
-    "pydantic-settings",
     "python-dateutil",
     "requests",
 ]

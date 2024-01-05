@@ -8,7 +8,7 @@ from typing import Optional
 
 from appdirs import user_config_dir
 from dotenv import dotenv_values, set_key, unset_key
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic.v1 import BaseSettings
 
 # Matches when string contains chars outside Base64URL set
 # https://base64.guru/standards/base64url
@@ -108,9 +108,11 @@ class Settings(BaseSettings):
 
     TLS: bool = True
     """Whether to use HTTPS for requests to the Xanadu Cloud."""
-    model_config = SettingsConfigDict(
-        case_sensitive=True, env_file=get_path_to_env_file(), env_prefix=get_name_of_env_var()
-    )
+
+    class Config:  # pylint: disable=missing-class-docstring
+        case_sensitive = True
+        env_file = get_path_to_env_file()
+        env_prefix = get_name_of_env_var()
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""
