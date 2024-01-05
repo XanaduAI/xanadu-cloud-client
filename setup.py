@@ -7,8 +7,10 @@ requirements = [
     "appdirs",
     "fire",
     "numpy",
-    "pydantic[dotenv]<2",
+    "pydantic>=2",
+    "pydantic-settings",
     "python-dateutil",
+    "python-dotenv",
     "requests",
 ]
 
@@ -41,7 +43,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",

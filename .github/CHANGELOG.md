@@ -1,10 +1,16 @@
-## Release 0.4.0 (development release)
+## Release 0.3.2 (current release)
+
+### Bug fixes
+
+* Sets lower bound on compatible `pydantic` versions to v2.0.0. [(#46)](https://github.com/XanaduAI/xanadu-cloud-client/pull/46)
 
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
 
-## Release 0.3.1 (current release)
+[Mikhail Andrenkov](https://github.com/Mandrenkov), [Luke Helt](https://github.com/heltluke).
+
+## Release 0.3.1
 
 ### Improvements
 
