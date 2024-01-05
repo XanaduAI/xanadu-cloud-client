@@ -12,7 +12,7 @@ import fire
 import numpy as np
 from fire.core import FireError
 from fire.formatting import Error
-from pydantic import ValidationError
+from pydantic.v1 import ValidationError
 
 from ._version import __version__
 from .connection import Connection
