@@ -8,7 +8,7 @@ from typing import Optional
 
 from appdirs import user_config_dir
 from dotenv import dotenv_values, set_key, unset_key
-from pydantic.v1 import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Matches when string contains chars outside Base64URL set
 # https://base64.guru/standards/base64url
@@ -109,25 +109,26 @@ class Settings(BaseSettings):
     TLS: bool = True
     """Whether to use HTTPS for requests to the Xanadu Cloud."""
 
-    class Config:  # pylint: disable=missing-class-docstring
-        case_sensitive = True
-        env_file = get_path_to_env_file()
-        env_prefix = get_name_of_env_var()
+    model_config = SettingsConfigDict(
+        case_sensitive=True,
+        env_file=get_path_to_env_file(),
+        env_prefix=get_name_of_env_var(),
+    )
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""
 
-        env_file = Settings.Config.env_file
+        env_file = self.model_config["env_file"]
         env_dir = os.path.dirname(env_file)
         os.makedirs(env_dir, exist_ok=True)
 
         saved = dotenv_values(dotenv_path=env_file)
 
-        # must be done first as dict is not ordered
-        for key, val in self.dict().items():
+        # Must be done first as the dictionary is not ordered.
+        for key, val in self.model_dump().items():
             _check_for_invalid_values(key, val)
 
-        for key, val in self.dict().items():
+        for key, val in self.model_dump().items():
             field = get_name_of_env_var(key)
 
             # Remove keys that are assigned to None.
