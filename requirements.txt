@@ -1,5 +1,5 @@
 appdirs==1.4.4
-python-dotenv==1.0.0
+python-dotenv==0.21.1
 fire==0.4.0
 numpy==1.21.3
 pydantic==2.4
