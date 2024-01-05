@@ -1,3 +1,15 @@
+## Release 0.4.1 (development release)
+
+### Bug fixes
+
+* Updates required `pydantic` version from 1.8.2 to 2.4, while still continuing to use "v1" features. [#46](https://github.com/XanaduAI/xanadu-cloud-client/pull/46)
+
+### Contributors
+
+This release contains contributions from (in alphabetical order):
+
+[Luke Helt](https://github.com/heltluke).
+
 ## Release 0.4.0 (development release)
 
 ### Contributors
