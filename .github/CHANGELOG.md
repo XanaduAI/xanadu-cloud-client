@@ -1,4 +1,4 @@
-## Release 0.3.2 (development release)
+## Release 0.3.2 (current release)
 
 ### Bug fixes
 
@@ -10,7 +10,7 @@ This release contains contributions from (in alphabetical order):
 
 [Mikhail Andrenkov](https://github.com/Mandrenkov), [Luke Helt](https://github.com/heltluke).
 
-## Release 0.3.1 (current release)
+## Release 0.3.1
 
 ### Improvements
 
