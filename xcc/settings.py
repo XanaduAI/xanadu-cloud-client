@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     >>> import xcc
     >>> settings = xcc.Settings()
     >>> settings
-    REFRESH_TOKEN=None ACCESS_TOKEN=None HOST='platform.xanadu.ai' PORT=443 TLS=True
+    Settings(REFRESH_TOKEN=None, ACCESS_TOKEN=None, HOST'platform.xanadu.ai', PORT=443, TLS=True)
 
     Now, individual options can be accessed or assigned through their
     corresponding attribute:
@@ -84,9 +84,9 @@ class Settings(BaseSettings):
 
         Several aggregate representations of options are also available, such as
 
-        >>> settings.dict()
+        >>> settings.model_dump()
         {'REFRESH_TOKEN': None, 'ACCESS_TOKEN': None, ..., 'TLS': True}
-        >>> settings.json()
+        >>> settings.model_dump_json()
         '{"REFRESH_TOKEN": null, "ACCESS_TOKEN": null, ..., "TLS": true}'
 
     Finally, saving a configuration can be done by invoking :meth:`Settings.save`:
