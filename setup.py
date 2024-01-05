@@ -5,9 +5,10 @@ with open("xcc/_version.py") as f:
 
 requirements = [
     "appdirs",
+    "python-dotenv",
     "fire",
     "numpy",
-    "pydantic[dotenv]<2",
+    "pydantic",
     "python-dateutil",
     "requests",
 ]
