@@ -108,7 +108,9 @@ class Settings(BaseSettings):
 
     TLS: bool = True
     """Whether to use HTTPS for requests to the Xanadu Cloud."""
-    model_config = SettingsConfigDict(case_sensitive=True, env_file=get_path_to_env_file(), env_prefix=get_name_of_env_var())
+    model_config = SettingsConfigDict(
+        case_sensitive=True, env_file=get_path_to_env_file(), env_prefix=get_name_of_env_var()
+    )
 
     def save(self) -> None:
         """Saves the current settings to the .env file."""
