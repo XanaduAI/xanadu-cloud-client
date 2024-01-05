@@ -1,8 +1,14 @@
 ## Release 0.4.0 (development release)
 
+### Bug fixes
+
+* Fixed an issue with the Read the Docs configuration. [(#49)](https://github.com/XanaduAI/xanadu-cloud-client/pull/49)
+
 ### Contributors
 
 This release contains contributions from (in alphabetical order):
+
+[Mikhail Andrenkov](https://github.com/Mandrenkov).
 
 ## Release 0.3.2 (current release)
 
