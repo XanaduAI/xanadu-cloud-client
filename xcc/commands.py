@@ -12,7 +12,7 @@ import fire
 import numpy as np
 from fire.core import FireError
 from fire.formatting import Error
-from pydantic.v1 import ValidationError
+from pydantic import ValidationError
 
 from ._version import __version__
 from .connection import Connection
@@ -87,7 +87,7 @@ def list_settings() -> Mapping[str, Any]:
     Returns:
         Mapping[str, Any]: Mapping from setting names to values.
     """
-    return Settings().dict()
+    return Settings().model_dump()
 
 
 @beautify
@@ -108,14 +108,14 @@ def set_setting(name: str, value: Union[str, int, bool]) -> str:
     key, _ = _resolve_setting(name)
 
     try:
-        settings = Settings(**{key: value})
+        settings = Settings.model_validate({key: value})
         settings.save()
     except ValidationError as exc:
         err = exc.errors()[0].get("msg", "invalid value")
         raise ValueError(f"Failed to update {key} setting: {err}") from exc
 
     # Using repr() ensures that strings are quoted.
-    val = repr(settings.dict()[key])
+    val = repr(settings.model_dump()[key])
     return f"Successfully updated {key} setting to {val}."
 
 
@@ -133,11 +133,11 @@ def _resolve_setting(name: str) -> Tuple[str, Any]:
     """
     key = name.upper()
 
-    settings = Settings()
-    if key not in settings.dict():
-        raise ValueError(f"The setting name '{name}' must be one of {list(settings.dict())}.")
+    settings_dict = Settings().model_dump()
+    if key not in settings_dict:
+        raise ValueError(f"The setting name '{name}' must be one of {list(settings_dict)}.")
 
-    return key, settings.dict()[key]
+    return key, settings_dict[key]
 
 
 # Device CLI

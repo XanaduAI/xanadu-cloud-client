@@ -179,7 +179,10 @@ class TestSetSetting:
 
     def test_invalid_value(self):
         """Tests that a ValueError is raised when the value of a setting is invalid."""
-        match = r"Failed to update PORT setting: value is not a valid integer"
+        match = (
+            r"Failed to update PORT setting: "
+            r"Input should be a valid integer, unable to parse string as an integer"
+        )
         with pytest.raises(ValueError, match=match):
             xcc.commands.set_setting(name="PORT", value="string")
 

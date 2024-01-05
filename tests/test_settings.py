@@ -15,7 +15,7 @@ import xcc
 def env_file(monkeypatch):
     """Returns a mock .env file which :class:`xcc.Settings` is configured to use."""
     with NamedTemporaryFile("w") as env_file:
-        monkeypatch.setattr("xcc.settings.Settings.Config.env_file", env_file.name)
+        monkeypatch.setitem(xcc.Settings.model_config, "env_file", env_file.name)
         yield env_file
 
 
@@ -77,7 +77,7 @@ class TestSettings:
             settings.save()
 
         # Check that the .env file was not modified since there was a "\n" in the refresh token.
-        assert dotenv_values(xcc.Settings.Config.env_file) == {
+        assert dotenv_values(settings.model_config["env_file"]) == {
             "XANADU_CLOUD_REFRESH_TOKEN": "j.w.t",
             "XANADU_CLOUD_HOST": "example.com",
             "XANADU_CLOUD_PORT": "80",
@@ -86,7 +86,7 @@ class TestSettings:
 
     def test_save_multiple_times(self, settings):
         """Tests that settings can be saved to a .env file multiple times."""
-        path_to_env_file = xcc.Settings.Config.env_file
+        path_to_env_file = settings.model_config["env_file"]
 
         settings.REFRESH_TOKEN = None
         settings.save()
@@ -108,7 +108,7 @@ class TestSettings:
         """Tests that settings can be saved to a .env file in a nonexistent directory."""
         with TemporaryDirectory() as env_dir:
             env_file = os.path.join(env_dir, "foo", "bar", ".env")
-            monkeypatch.setattr("xcc.settings.Settings.Config.env_file", env_file)
+            monkeypatch.setitem(xcc.Settings.model_config, "env_file", env_file)
 
             xcc.Settings().save()
             assert os.path.exists(env_file) is True
