@@ -6,8 +6,8 @@
 The `Xanadu Cloud Client <https://xanadu-cloud-client.readthedocs.io>`_ (XCC) is
 a Python API and CLI for the Xanadu Cloud.
 
-> [!IMPORTANT]
-> Access to the Xanadu Cloud is no longer available.
+.. warning::
+  Access to the Xanadu Cloud is no longer available.
 
 .. inclusion-marker-for-features-start
 
