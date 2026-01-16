@@ -6,7 +6,8 @@
 The `Xanadu Cloud Client <https://xanadu-cloud-client.readthedocs.io>`_ (XCC) is
 a Python API and CLI for the Xanadu Cloud.
 
-<h3>⚠️ Important: Xanadu's Quantum Cloud is no longer available.</h3>
+⚠️ Xanadu's Quantum Cloud is no longer available
+===============================================
 
 .. inclusion-marker-for-features-start
 
